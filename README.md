@@ -1,92 +1,95 @@
-# faro
+faro连接和同步文件步骤
+一：环境
+电脑环境：Windows 10 教育版
+开发环境：
+visual studio 2022
+使用C++桌面开发/通用windows平台开发
+单个组件：MFC---143
+二：步骤
+1.安装E1844_FARO_LS_SDK_7.2.0.648_Dev_x64_Setup
+2.安装完成后在"C:\Program Files (x86)\FARO\FARO LS"下会有
+a.FARO LS 7.2.0.648 x64 Setup
+b.FARO.LS_7.2.0.648
+c.vcredist_x64_100
+d.vcredist_x64_2017
+四个安装包，全部点击安装
+3.安装完成后在C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81
+会有iQOpen.dll和FARO.LS.SDK.dll两个动态库
+路径：
+C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\iQOpen.dll
+C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\FARO.LS.SDK.dll
+4.***重要***
+以管理员身份运行cmd注册上面两个动态库
+regsvr32 C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\iQOpen.dll
+regsvr32 C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\FARO.LS.SDK.dll
+确认注册成功进行下一步
+5.在"C:\Program Files (x86)\FARO\FARO LS"下找到压缩包
+FAROLSDemoScans---[几个扫描后的文件]
+FAROOpenDemoApp---[获取fls数据相关]
+FAROSDKDemoApp---[连接和同步]
+根据自己需要解压
+6.解压FAROSDKDemoApp
+用visual studio 打开FAROSDKDemoApp.vcxproj项目，找到
+FAROSDKDemoAppDlg.cpp文件
+a.修改
+//#ifdef _WIN64
+//	// Yes - type is 'win32' even on WIN64!
+//	#pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.408.0' processorArchitecture='amd64' publicKeyToken='1d23f5635ba800ab'\"")
+//#else
+//	#pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.408.0' processorArchitecture='x86' publicKeyToken='1d23f5635ba800ab'\"")
+//#endif
 
+#ifdef _WIN64
+	// Yes - type is 'win32' even on WIN64!
+#pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.0.0' processorArchitecture='amd64' publicKeyToken='1d23f5635ba800ab'\"")
+#else
+#pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.0.0' processorArchitecture='x86' publicKeyToken='1d23f5635ba800ab'\"")
+#endif
+b.修改
+//#import "C:\WINDOWS\WinSxS\x86_FARO.LS_1d23f5635ba800ab_1.1.406.62_x-ww_a176a2d4\iQopen.dll" no_namespace
+//#import "C:\WINDOWS\WinSxS\x86_FARO.LS_1d23f5635ba800ab_1.1.406.62_x-ww_a176a2d4\FARO.LS.SDK.dll" no_namespace
+#import "C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\iQOpen.dll" no_namespace 
+#import "C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\FARO.LS.SDK.dll" no_namespace 
+c.找到CFAROSDKDemoAppDlg方法修改
+//		BSTR licenseCode = L"FARO Open Runtime License\n"
+//#include "../FAROOpenLicense"	// Delete this line, uncomment the following line, and enter your own license key here:
+//			// L"Key:<Your License Key>\n"
+//			L"\n"
+//			L"The software is the registered property of FARO Scanner Production GmbH, Stuttgart, Germany.\n"
+//			L"All rights reserved.\n"
+//			L"This software may only be used with written permission of FARO Scanner Production GmbH, Stuttgart, Germany.";
+			const wchar_t* licenseText =
+		L"FARO Open Runtime License\n"
+		L"Key: 434ELNNRTCTXXMKT8KVUSPUPS\n"
+		L"\n"
+		L"The software is the registered property of "
+		L"FARO Scanner Production GmbH, Stuttgart, Germany.\n"
+		L"All rights reserved.\n"
+		L"This software may only be used with written permission "
+		L"of FARO Scanner Production GmbH, Stuttgart, Germany.";
 
+	BSTR licenseCode = SysAllocString(licenseText);
+d.找到OnBnClickedConnect方法用下面方法替换
+void CFAROSDKDemoAppDlg::OnBnClickedConnect()
+{
+	UpdateData(true);
 
-## Getting started
+	_bstr_t scannerIP(m_ScannerIP);
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin http://gitlab.metadigital.net.cn/yyzs/faro.git
-git branch -M master
-git push -uf origin master
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](http://gitlab.metadigital.net.cn/yyzs/faro/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+	if (scanCtrlSDKPtr) {
+		scanCtrlSDKPtr->ScannerIP = scannerIP;
+		scanCtrlSDKPtr->connect();
+		HRESULT hr;
+		CComBSTR bstrPath(L"D:\\fls");
+		hr = scanCtrlSDKPtr->put_RemoteScanStoragePath(bstrPath);
+		if (SUCCEEDED(hr)) {
+			// Path set successfully
+		}
+		else {
+			// Handle error
+		}
+		scanCtrlSDKPtr->RemoteScanAccess = RSAEnabled;
+		scanCtrlSDKPtr->PutStorageMode(SMRemote);
+		startConnectTimer(this);
+	}
+}
