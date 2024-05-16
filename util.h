@@ -1,0 +1,24 @@
+﻿#ifndef UTIL_H
+#define UTIL_H
+
+#include <QObject>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QString>
+#include <QDebug>
+#include <QQmlApplicationEngine>
+#include <QStandardItemModel>
+#include <QJsonArray>
+#include <QMap>
+#include <QVariant>
+
+class Util {
+public:
+    // 声明静态方法
+    static QJsonObject parseJsonStringToObject(const QString &jsonString);
+    // 静态方法：将QMap<QString, QVariant>转换为JSON字符串
+    static QString mapToJson(const QMap<QString, QVariant>& map);
+    static void populateModel(QStandardItemModel *model, const QJsonObject &data, QStandardItem *parent = nullptr);
+};
+
+#endif // UTIL_H

@@ -1,0 +1,6 @@
+module Dialog
+
+Dialog    1.0     Dialog.qml
+BaseDialog    1.0     BaseDialog.qml
+Toast    1.0     Toast.qml
+Hub    1.0     Hub.qml
