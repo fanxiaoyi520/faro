@@ -7,39 +7,17 @@ import "../../Util/GlobalEnum.js" as GlobalEnum
 
 Grid {
     property var list: []
-    ListModel {
-        id: listModel
-        ListElement {
-            text: "一阶段"
-            progresscolor: "#1FA3FF"
-        }
-        ListElement {
-            text: "二阶段"
-            progresscolor: "#FE9623"
-        }
-        ListElement {
-            text: "三阶段"
-            progresscolor: "#44D7B6"
-        }
-        ListElement {
-            text: "四阶段"
-            progresscolor: "#32C5FF"
-        }
-        ListElement {
-            text: "五阶段"
-            progresscolor: "#38BE76"
-        }
-    }
     columns: 3
     rowSpacing: 16
     columnSpacing: 13
     x: 16
     y: 13.5
     flow: Flow.LeftToRight
+    id: grid
     Repeater {
         model: list
         Rectangle{
-            width: (parent.parent.parent.width-16*2-13*(3-1))/3
+            width: (parent.parent.parent.parent.width-16*2-13*(3-1))/3
             height: 175
             color: "#FFFFFF"
             Rectangle{
@@ -75,7 +53,7 @@ Grid {
                 }
                 Text{
                     id: subtitle
-                    text: qsTr(modelData.projectName)
+                    text: qsTr(modelData ? modelData.projectName : "Measure")
                     elide: Qt.ElideRight
                     wrapMode: Text.NoWrap
                     anchors {
@@ -105,12 +83,12 @@ Grid {
                 ListView {
                     id: listView
                     width: parent.width
-                    height: modelData.reduceItem ? 18*modelData.reduceItem.totalData : 18*listModel.count
+                    height: 18*modelData.stageProgresses.length
                     anchors{
                         top: content.bottom
                         topMargin: 13
                     }
-                    model: modelData.reduceItem ? modelData.reduceItem.totalData : listModel
+                    model: modelData.stageProgresses
                     delegate: itemDelegate
                 }
 
@@ -119,11 +97,54 @@ Grid {
                     HomeGridSubConView{
                         width: parent.width
                         height: 14
-                        titlestr: modelData.text ? modelData.text : "一阶段"
-                        progresscolor: modelData.progresscolor ? modelData.progresscolor : "#1FA3FF"
+                        titlestr: getStageTypeStr(modelData)
+                        progresscolor: getStageTypeColor(modelData)
+                        totalRoomCount: modelData.totalTaskCount
+                        finishRoomCount: modelData.finishedTaskCount
+                    }
+                }
+
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        console.log("clicked project item to: "+ index)
+                        jumpToSelectBuilding(index,modelData)
                     }
                 }
             }
+        }
+    }
+
+    function getStageTypeStr(modelData){
+        switch(modelData.stageType){
+        case GlobalEnum.MMStageType.One:
+            return "一阶段"
+        case GlobalEnum.MMStageType.Two:
+            return "二阶段"
+        case GlobalEnum.MMStageType.Three:
+            return "三阶段"
+        case GlobalEnum.MMStageType.Four:
+            return "四阶段"
+        case GlobalEnum.MMStageType.Five:
+            return "五阶段"
+        default: break
+        }
+
+    }
+
+    function getStageTypeColor(modelData){
+        switch(modelData.stageType){
+        case GlobalEnum.MMStageType.One:
+            return "#1FA3FF"
+        case GlobalEnum.MMStageType.Two:
+            return "#FE9623"
+        case GlobalEnum.MMStageType.Three:
+            return "#44D7B6"
+        case GlobalEnum.MMStageType.Four:
+            return "#32C5FF"
+        case GlobalEnum.MMStageType.Five:
+            return "#38BE76"
+        default: break
         }
     }
 

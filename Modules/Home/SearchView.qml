@@ -22,34 +22,8 @@ ScrollView{
     BaseNavigationBar{
         id: navigationBar
         title: qsTr("选择项目")
-        Item {
-            id: backbutton
-            width: image.width + text.width + spacing
-            height: 44
-            property int spacing: 10
-            anchors.left: parent.left
-            anchors.leftMargin: spacing * 2
-            Image {
-                id: image
-                source: "../../images/measure_other/measure_back.png"
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                width: 15;height: 15
-            }
-
-            Text {
-                id: text
-                text: qsTr("返回")
-                anchors.left: image.right
-                anchors.leftMargin: spacing
-                anchors.verticalCenter: parent.verticalCenter
-                font.pointSize: 14
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: searchview.parent.parent.pop()
-            }
+        onBackAction: {
+            searchview.parent.parent.pop()
         }
     }
 
@@ -71,9 +45,14 @@ ScrollView{
     }
 
     Component.onCompleted: {
-        console.log("hahahah")
-        hub.open()
-        getNumberOfOrganizations()
+        var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
+        if (organizationalTree.length > 0) {
+            list = organizationalTree.data[0].children
+            item_tree.model = list
+        } else {
+            hub.open()
+            getNumberOfOrganizations()
+        }
     }
 
     onListChanged: {

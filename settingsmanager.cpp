@@ -30,3 +30,23 @@ QString SettingsManager::user() const
 {
     return QString("user");
 }
+
+QString SettingsManager::organizationalTree() const
+{
+    QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
+    QMap<QString, QString>headersMap;
+    return user.value("tenant_id").toString();
+}
+
+QString SettingsManager::selectedProject() const
+{
+    QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
+    QMap<QString, QString>headersMap;
+    return "selectedProject_"+user.value("tenant_id").toString();
+}
+
+QString SettingsManager::selectedProjectSource() const
+{
+    return "selectedProjectSource";
+}
+

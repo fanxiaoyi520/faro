@@ -7,6 +7,7 @@ import Api 1.0
 import Dialog 1.0
 StackView{
     property var modellist: []
+    property var sourcelist: []
     property var menuItems: []
     property string navigationBarTitle: qsTr("房间实测")
     property int headerSelectedIndex: 0
@@ -16,10 +17,9 @@ StackView{
     Http {id: http}
     Dialog{id: dialog}
     Hub{id: hub}
-    Loader {
-        id: searchview
-        source: "SearchView.qml"
-    }
+    Loader {id: searchview}
+    Loader {id: selectBuildingView}
+
     Component {
         id: homeview
         Rectangle{
@@ -29,7 +29,7 @@ StackView{
             BaseNavigationBar{
                 id: navigationBar
                 title: navigationBarTitle
-
+                isVisibleBackBtn: false
                 Image{
                     id: searchimage
                     source: "../../images/home_page_slices/measure_search.png"
@@ -37,7 +37,6 @@ StackView{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     anchors.rightMargin: 20
-
                     MouseArea{
                         anchors.fill: parent
                         onClicked: jumpToSearchView()
@@ -62,16 +61,7 @@ StackView{
                 anchors.topMargin: 24
                 height: 31
                 selectedButtonIndex: headerSelectedIndex
-                onSelectedButtonAction: {
-                    console.log("selected header index and item data: "+index,itemData)
-                    if (index === 0) {
-                        modellist = 10
-                    } else if (index === 1) {
-                        modellist = 5
-                    } else {
-                        modellist = 1
-                    }
-                }
+                onSelectedButtonAction: headerFilterData(index,itemData)
             }
 
             Canvas {
@@ -104,26 +94,79 @@ StackView{
                 anchors.bottomMargin: 79+16
                 width: parent.width
                 height: parent.height
-                HomeGridView{
-                    list: modellist
+                Loader {
+                    id: myLoader
+                    sourceComponent: modellist.length === 0 ? noDataViewComponent : homeGridViewComponent
+                }
+
+                Component {
+                    id: homeGridViewComponent
+                    HomeGridView{
+                        id: homeGridView
+                        list: modellist
+                    }
+                }
+
+                Component{
+                    id: noDataViewComponent
+                    NoDataView{
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        width: rect.width
+                        height: rect.height-100-79-54-title.height
+                        id: noDataView
+                        textStr: qsTr("暂无项目数据")
+                    }
                 }
             }
         }
     }
 
     Component.onCompleted: {
-        hub.open()
-        getNumberOfOrganizations()
+        var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
+        if (organizationalTree.data.length > 0) {
+            var selectedProjectData = JSON.parse(settingsManager.getValue(settingsManager.selectedProject))
+            sourcelist = modellist = selectedProjectData
+        } else {
+            hub.open()
+            getNumberOfOrganizations()
+        }
     }
 
+    //MARK: logic
+    function headerFilterData(index,itemData){
+        console.log("selected header index and item data: "+index,itemData)
+        if (index !== 0) {
+            modellist = sourcelist.filter(model => {
+                                              return model.reduceItem.status === index;
+                                          })
+        } else {
+            modellist = sourcelist
+        }
+    }
+
+    //MARK: jump
+    //跳转到搜索
     function jumpToSearchView(){
-        //searchview.menuItems = menuItems
+        //使用的时候再加载
+        searchview.source = "SearchView.qml"
         homestack.push(searchview)
     }
 
+    //跳转到选择楼栋
+    function jumpToSelectBuilding(index,modelData){
+        console.log("incoming data model: "+JSON.stringify(modelData))
+        selectBuildingView.source = "SelectBuildingView.qml"
+        selectBuildingView.item.inputModelData = modelData
+        homestack.push(selectBuildingView)
+    }
+
+    //MARK: network
     function sureSelectedSearchResult(modelData){
         searchview.parent.pop()
-        console.log("search selected cell clicked: "+ JSON.stringify(modelData))
+        headerSelectedIndex = 0
+        console.log("search selected project data: "+JSON.stringify(modelData))
+        settingsManager.setValue(settingsManager.selectedProjectSource,JSON.stringify(modelData))
         assemblySelectedProjectData(modelData)
     }
 
@@ -155,7 +198,6 @@ StackView{
             var ids = model.records.map(item => item.id)
             console.log("ids: "+ ids)
             if(ids.length <= 0) {
-                headerSelectedIndex = 0
                 //更新数据UI
                 return
             }
@@ -171,45 +213,18 @@ StackView{
             hub.close()
             console.log("complete building room projectRoomCount data: "+reply)
             var response = JSON.parse(reply)
-            response.data.forEach((obj, index) => {
-                model.records.forEach((item, recordIndex) => {
-                    if (obj.projectId === item.id) {
-                        item.reduceItem = addObjData(index, obj); // 假设 addObjData 是一个函数，用于添加或修改数据
-                    }
-                });
-                                      modellist = model.records
-                                      console.log("ffffffffff:"+JSON.stringify(modellist))
-            });
-//            response.data.map(obj =>{
-//                                  var dataItems = model.records.map(item => {
-//                                                                        if(obj.projectId === item.id){
-//                                                                            item.reduceItem = addObjData(index,obj)
-//                                                                        }
-//                                                                        return item
-//                                                                    })
-//                                  console.log("Combined data: " + JSON.stringify(dataItems))
-//                                  modellist = dataItems
-//                              })
-        }
-
-        function addObjData(index,obj) {
-            if (index === 0) {
-                obj.text = "一阶段"
-                obj.progresscolor = "#1FA3FF"
-            } else if (index === 1) {
-                obj.text = "二阶段"
-                obj.progresscolor = "#FE9623"
-            } else if (index === 2) {
-                obj.text = "三阶段"
-                obj.progresscolor = "#44D7B6"
-            } else if (index === 3) {
-                obj.text = "四阶段"
-                obj.progresscolor = "#32C5FF"
-            } else  {
-                obj.text = "五阶段"
-                obj.progresscolor = "#38BE76"
-            }
-            return obj
+            response.data.map(obj =>{
+                                  var dataItems = model.records.map(item => {
+                                                                        if(obj.projectId === item.id){
+                                                                            item.reduceItem = obj
+                                                                        }
+                                                                        return item
+                                                                    })
+                                  console.log("Combined data: " + JSON.stringify(dataItems))
+                                  settingsManager.setValue(settingsManager.selectedProject,JSON.stringify(dataItems))
+                                  sourcelist = dataItems
+                                  modellist = dataItems
+                              })
         }
 
         function onFail(reply,code){
@@ -231,8 +246,7 @@ StackView{
             var response = JSON.parse(reply)
             console.log("complete dept tree data: "+response)
             if (response.data.length <=0) return;
-            menuItems = response.data
-            handleOrgData(response.data[0])
+            settingsManager.setValue(settingsManager.organizationalTree,reply)
         }
 
         function onFail(reply,code){
@@ -244,9 +258,5 @@ StackView{
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
         http.get(Api.admin_dept_tree)
-    }
-
-    function handleOrgData(data){
-        console.log("neet handle,s data :"+JSON.stringify(data))
     }
 }

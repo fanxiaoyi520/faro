@@ -76,5 +76,10 @@
         <file>images/measure_other/measure_ic_progress.png</file>
         <file>images/measure_other/measure_ic_progress@2x.png</file>
         <file>Util/GlobalEnum.js</file>
+        <file>Modules/Component/NoDataView.qml</file>
+        <file>Modules/Home/SelectBuildingView.qml</file>
+        <file>Util/GlobalFunc.js</file>
+        <file>images/home_page_slices/select_building_arrow.png</file>
+        <file>images/home_page_slices/select_building_arrow@2x.png</file>
     </qresource>
 </RCC>

@@ -51,7 +51,7 @@ Item {
         Rectangle{
             id: currentprogress
             height: 5
-            width: parent.width * 0.5
+            width: parent.width * (finishRoomCount / totalRoomCount)
             color: progresscolor
             radius: 2.5
         }
@@ -59,7 +59,7 @@ Item {
 
     TextEdit {
         id: footertitle
-        text: qsTr("2/5")
+        text: finishRoomCount.toString() +"/" + totalRoomCount.toString()
         color: progresscolor
         wrapMode: Text.NoWrap
         font: font

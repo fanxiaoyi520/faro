@@ -39,4 +39,9 @@ QString Api::building_room_projectRoomCount() const
     return QString("/building/room/projectRoomCount");
 }
 
+QString Api::building_block_page() const
+{
+    return QString("/building/block/page");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

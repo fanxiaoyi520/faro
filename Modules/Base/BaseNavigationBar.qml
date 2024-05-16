@@ -5,6 +5,8 @@ import QtGraphicalEffects 1.0
 Rectangle {
 
     property alias title: titleText.text
+    property bool isVisibleBackBtn: true
+    signal backAction()
 
     id: navigationBar
     anchors.top: parent.top
@@ -25,5 +27,36 @@ Rectangle {
         text: title === "" ? "Measure" : title
         font.pixelSize: 17
         color: "black"
+    }
+
+    Item {
+        id: backbutton
+        width: image.width + text.width + spacing
+        height: 44
+        property int spacing: 10
+        anchors.left: parent.left
+        anchors.leftMargin: spacing * 2
+        visible: isVisibleBackBtn
+        Image {
+            id: image
+            source: "../../images/measure_other/measure_back.png"
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: 15;height: 15
+        }
+
+        Text {
+            id: text
+            text: qsTr("返回")
+            anchors.left: image.right
+            anchors.leftMargin: spacing
+            anchors.verticalCenter: parent.verticalCenter
+            font.pointSize: 14
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: backAction()//searchview.parent.parent.pop()
+        }
     }
 }

@@ -7,4 +7,5 @@ ScanPage 1.0 ./Scan/ScanPage.qml
 ResultPage 1.0 ./Result/ResultPage.qml
 MinePage 1.0 ./Mine/MinePage.qml
 MHeaderListButtonGroup 1.0 ./Component/MHeaderListButtonGroup.qml
+NoDataView 1.0 ./Component/NoDataView.qml
 

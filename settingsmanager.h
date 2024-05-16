@@ -3,12 +3,15 @@
 
 #include <QObject>
 #include <QSettings>
+#include "util.h"
 
 class SettingsManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString user READ user CONSTANT)
-
+    Q_PROPERTY(QString organizationalTree READ organizationalTree CONSTANT)
+    Q_PROPERTY(QString selectedProject READ selectedProject CONSTANT)
+    Q_PROPERTY(QString selectedProjectSource READ selectedProjectSource CONSTANT)
 public:
     static SettingsManager* instance();
 
@@ -24,7 +27,9 @@ public:
      * 保存的字段
      */
     QString user() const;
-
+    QString organizationalTree() const;
+    QString selectedProject() const;
+    QString selectedProjectSource() const;
 private:
     QSettings settings;
     explicit SettingsManager(QObject *parent = nullptr);
