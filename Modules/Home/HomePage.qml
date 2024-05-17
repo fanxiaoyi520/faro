@@ -8,9 +8,10 @@ import Dialog 1.0
 StackView{
     property var modellist: []
     property var sourcelist: []
-    property var menuItems: []
     property string navigationBarTitle: qsTr("房间实测")
     property int headerSelectedIndex: 0
+    //公布stackView，让其在所有子控件可以访问到homestack
+    property var rootStackView: homestack
     id: homestack
     initialItem: homeview
     Toast {id: toastPopup}
@@ -60,6 +61,7 @@ StackView{
                 anchors.top: title.bottom
                 anchors.topMargin: 24
                 height: 31
+                list: ["全部","进行中","已完成"]
                 selectedButtonIndex: headerSelectedIndex
                 onSelectedButtonAction: headerFilterData(index,itemData)
             }
@@ -158,6 +160,11 @@ StackView{
         console.log("incoming data model: "+JSON.stringify(modelData))
         selectBuildingView.source = "SelectBuildingView.qml"
         selectBuildingView.item.inputModelData = modelData
+        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+        selectBuildingView.item.currentRow = selectedStageType.index
+        selectBuildingView.item.selectedStageName = selectedStageType.name
+
+        settingsManager.setValue(settingsManager.selectedItem,JSON.stringify(modelData))
         homestack.push(selectBuildingView)
     }
 

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
@@ -6,16 +6,16 @@ import QtQuick.Layouts 1.12
 Popup {
     property var list: []
     property int currentIndex: 0
-
-    signal selTenant(var model)
+    property var titleStr: "选择租户"
+    signal confirmOptionsAction(var model)
     onListChanged: {
         console.log("List has changed:", list.length)
     }
 
     id: popup
-    y: parent.height - (160 + list.length * 55)
+    y: parent.height - (160 + 3 * 55)
     width: parent.width
-    height: 160 + list.length * 55
+    height: 160 + 3 * 55
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
@@ -38,7 +38,7 @@ Popup {
         clip: true
         Text {
             id: title
-            text: qsTr("选择租户")
+            text: titleStr
             font.pointSize: 18
             Layout.topMargin: 17.5
             Layout.alignment: Qt.AlignHCenter
@@ -208,7 +208,7 @@ Popup {
     function sureAction(){
         popup.close()
         console.log("sure clicked and currentIndex: " + currentIndex)
-        selTenant(list[currentIndex])
+        confirmOptionsAction(list[currentIndex])
     }
 }
 

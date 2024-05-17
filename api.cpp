@@ -44,4 +44,29 @@ QString Api::building_block_page() const
     return QString("/building/block/page");
 }
 
+QString Api::building_room_blockRoomCount() const
+{
+    return QString("/building/room/blockRoomCount");
+}
+
+QString Api::building_unit_page() const
+{
+    return QString("/building/unit/page");
+}
+
+QString Api::building_floor_page() const
+{
+    return QString("/building/floor/page");
+}
+
+QString Api::building_room_countFloorRoom() const
+{
+    return QString("/building/room/countFloorRoom");
+}
+
+QString Api::building_room_listByFloorId() const
+{
+    return QString("/building/room/listByFloorId");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

@@ -81,5 +81,9 @@
         <file>Util/GlobalFunc.js</file>
         <file>images/home_page_slices/select_building_arrow.png</file>
         <file>images/home_page_slices/select_building_arrow@2x.png</file>
+        <file>Modules/Component/PullListViewV2.qml</file>
+        <file>Modules/Home/SelectFloorView.qml</file>
+        <file>Modules/Home/TaskDetailsView.qml</file>
+        <file>Modules/Component/MHeaderListView.qml</file>
     </qresource>
 </RCC>

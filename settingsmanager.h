@@ -12,6 +12,10 @@ class SettingsManager : public QObject
     Q_PROPERTY(QString organizationalTree READ organizationalTree CONSTANT)
     Q_PROPERTY(QString selectedProject READ selectedProject CONSTANT)
     Q_PROPERTY(QString selectedProjectSource READ selectedProjectSource CONSTANT)
+    Q_PROPERTY(QString selectedStageType READ selectedStageType CONSTANT)
+    Q_PROPERTY(QString selectedItem READ selectedItem CONSTANT)
+
+    Q_PROPERTY(QString stageType READ stageType CONSTANT)
 public:
     static SettingsManager* instance();
 
@@ -30,6 +34,14 @@ public:
     QString organizationalTree() const;
     QString selectedProject() const;
     QString selectedProjectSource() const;
+    QString selectedStageType() const;
+    QString selectedItem() const;
+
+    /**
+     * @brief 静态数据
+     * @return
+     */
+    QString stageType() const;
 private:
     QSettings settings;
     explicit SettingsManager(QObject *parent = nullptr);

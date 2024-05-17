@@ -3,7 +3,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 Rectangle {
-    property variant list: ["全部", "进行中", "已完成"]//default data
+    property variant list: []//default data
     property int selectedButtonIndex: 0
     signal selectedButtonAction(int index,var itemData)
     height: 31
@@ -26,7 +26,7 @@ Rectangle {
                 }
                 Text {
                     id: btntext
-                    text: qsTr(modelData)
+                    text: typeof modelData === "string" ? qsTr(modelData) : modelData.unitName
                     anchors.centerIn: parent.Center
                     color: "#292929"
                     font.pixelSize: 15

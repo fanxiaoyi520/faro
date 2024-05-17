@@ -13,7 +13,14 @@ Rectangle{
     height: 400
     Toast {id: toastPopup}
     Http {id: http}
-    Dialog{id: dialog}
+    Dialog{
+        id: dialog
+        onConfirmOptionsAction: {
+            console.log("dialog selected data: " + JSON.stringify(model))
+            hub.open()
+            getLoginToken(model.id)
+        }
+    }
     Hub{id: hub}
 
     Image {
@@ -199,13 +206,5 @@ Rectangle{
         http.replyFailSignal.connect(onFail)
         console.log("user.userinfo.tenantId: "+user.tenant_id)
         http.get(Api.admin_tenant_details+"/"+user.tenant_id)
-    }
-
-    Connections{
-        target: dialog
-        onSelTenant:{
-            hub.open()
-            getLoginToken(model.id)
-        }
     }
 }

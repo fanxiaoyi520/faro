@@ -15,6 +15,12 @@ class Api : public QObject {
     Q_PROPERTY(QString building_project_page READ building_project_page CONSTANT)
     Q_PROPERTY(QString building_room_projectRoomCount READ building_room_projectRoomCount CONSTANT)
     Q_PROPERTY(QString building_block_page READ building_block_page CONSTANT)
+    Q_PROPERTY(QString building_room_blockRoomCount READ building_room_blockRoomCount CONSTANT)
+    Q_PROPERTY(QString building_unit_page READ building_unit_page CONSTANT)
+    Q_PROPERTY(QString building_room_countFloorRoom READ building_room_countFloorRoom CONSTANT)
+    Q_PROPERTY(QString building_floor_page READ building_floor_page CONSTANT)
+    Q_PROPERTY(QString building_room_listByFloorId READ building_room_listByFloorId CONSTANT)
+
 public:
     static Api* instance();
     QString admin_tenant_queryTenantByUserName() const;
@@ -25,6 +31,11 @@ public:
     QString building_project_page() const;
     QString building_room_projectRoomCount() const;
     QString building_block_page() const;
+    QString building_room_blockRoomCount() const;
+    QString building_unit_page() const;
+    QString building_floor_page() const;
+    QString building_room_countFloorRoom() const;
+    QString building_room_listByFloorId() const;
 private:
     Api(QObject *parent = nullptr);
     Q_DISABLE_COPY(Api)

@@ -11,12 +11,12 @@ import "../../Util/GlobalFunc.js" as GlobalFunc
 ScrollView{
     property int page: 0
     property var inputModelData
-    property string projectName: "Measure"
+    property var roomsList:[]
     property var list:[]
     property int currentRow: 0
     property string selectedStageName: "主体阶段（一阶段）"
-
-    id: selectBuildingView
+    property string projectName: "Measure"
+    id: selectTaskDetailsView
     Layout.fillWidth: true
     Layout.fillHeight: true
     anchors.fill: parent
@@ -32,25 +32,23 @@ ScrollView{
             currentRow = model.index
             selectedStageName = model.name
             hub.open()
-            getBuildingBlockPage()
+            getBuildingUnitPage()
         }
     }
     Hub{id: hub}
-    Loader {id: selectFloorView}
     background: Rectangle{
         color: "#FFFFFF"
     }
-
     BaseNavigationBar{
         id: navigationBar
-        title: qsTr("选择楼栋")
+        title: qsTr("任务详情")
         Rectangle{
             id: stageTypeBtn
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 12
             height: 34
-            width: parent.width *  0.25
+            width: parent.width * 0.25
             radius: 17
             color: "#F7F7F7"
             Text{
@@ -70,6 +68,7 @@ ScrollView{
         }
         onBackAction: {
             rootStackView.pop()
+            callbackOrSyncEventHandling()
         }
     }
 
@@ -84,9 +83,36 @@ ScrollView{
         font.pixelSize: 19
     }
 
+    MHeaderListView{
+        id: headerListView
+        anchors.top: title.bottom
+        anchors.topMargin: 17
+        height: 31
+        list: roomsList
+    }
+
+    Canvas {
+        id: lineview
+        width: parent.width
+        height: 1
+        anchors.top: headerListView.bottom
+        property color lineColor: "#80EAEAEA"
+        property int lineWidth: 1
+
+        onPaint: {
+            var ctx = getContext("2d");
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = lineWidth;
+            ctx.beginPath();
+            ctx.moveTo(0, 1);
+            ctx.lineTo(parent.width, 1);
+            ctx.stroke();
+        }
+    }
+
     ListView /**PullListViewV2*/ {
         id: listView
-        anchors.top: title.bottom
+        anchors.top: lineview.bottom
         anchors.topMargin: 17.5
         anchors.left: parent.left
         anchors.right: parent.right
@@ -95,62 +121,7 @@ ScrollView{
         clip: true
         model: list
         delegate: itemDelegate
-        /**
-        Component{
-            id: cmpHeader
-            Rectangle{
-                width: listView.width
-                height: 16
-                Text{
-                    anchors.centerIn: parent
-                    text: listView.headerHold ? qsTr("正在刷新...") : qsTr("下拉刷新")
-                }
-            }
-        }
-        header: headerVisible ? cmpHeader : null
-        onHeaderHoldChanged:{
-            if(headerHold)
-                timerRefresh.start()
-        }
-
-        Component{
-            id: cmpFooter
-            Rectangle{
-                width: listView.width
-                height: 16
-                Text{
-                    anchors.centerIn: parent
-                    text: listView.footerHold ? qsTr("正在加载...") : qsTr("加载更多")
-                }
-            }
-        }
-        footer: footerVisible ? cmpFooter : null
-        onFooterHoldChanged: {
-            if(footerHold)
-                timerLoadMore.start()
-        }
-         */
     }
-
-    /**
-    Timer{
-        id: timerRefresh
-        interval: 1000
-        onTriggered: {
-            console.log("refresh complete")
-            listView.headerVisible = false
-        }
-    }
-
-    Timer{
-        id: timerLoadMore
-        interval: 1000
-        onTriggered: {
-            console.log("loading complete")
-            listView.footerVisible = false
-        }
-    }
-     */
 
     Component {
         id: itemDelegate
@@ -173,21 +144,12 @@ ScrollView{
                     radius: 11.5
                     color: "#10000000"
                 }
-                Image{
-                    id: img
-                    source: GlobalFunc.setStatusImageSource(modelData)
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: 20
-                    width: 17.5
-                    height: 17.5
-                }
                 Text {
                     id: name
-                    text: qsTr(modelData.blockName.replace(/栋/g,''))
+                    text: qsTr("楼层: ")+qsTr(modelData.floorName)+qsTr("层")
+
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: img.right
-                    anchors.leftMargin: 5
+                    x:20
                 }
                 Text {
                     id: contentname
@@ -236,52 +198,33 @@ ScrollView{
                     anchors.rightMargin: 20
                 }
             }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    jumpToSelectFloor(index,modelData)
-                }
-            }
         }
     }
 
     onInputModelDataChanged: {
-        projectName = JSON.parse(settingsManager.getValue(settingsManager.selectedProjectSource)).name + inputModelData.projectName
+        console.log("task details input model data: "+JSON.stringify(inputModelData))
+        var selectedItem = JSON.parse(settingsManager.getValue(settingsManager.selectedItem))
+        projectName = selectedItem.projectName
         hub.open()
-        getBuildingBlockPage()
+        getBuildingRoomListByFloorId()
     }
 
     //MARK: logic
-    function callbackOrSyncEventHandling(){
-        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        selectBuildingView.currentRow = selectedStageType.index
-        selectBuildingView.selectedStageName = selectedStageType.name
-    }
-
-    //MARK: jump
-    //跳转到选择楼层
-    function jumpToSelectFloor(index,modelData){
-        console.log("incoming data index: ("+index+") and model: "+JSON.stringify(modelData))
-        selectFloorView.source = "SelectFloorView.qml"
-        selectFloorView.item.inputModelData = modelData
-        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        selectFloorView.item.currentRow = selectedStageType.index
-        selectFloorView.item.selectedStageName = selectedStageType.name
-        rootStackView.push(selectFloorView)
+    function headerFilterData(index,itemData){
+        console.log("selected header index and item data: "+index,itemData)
+        accordingToUnitIdSearchFloor(index)
     }
 
     //MARK: network
-    function getBuildingBlockPage(){
+    function getBuildingRoomListByFloorId(){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
+            hub.close()
             var response = JSON.parse(reply)
-            console.log("complete building block page data: "+reply)
+            console.log("complete building room listByFloorId data: "+reply)
             if (response.data.length <=0) return;
-            if(response.data.records.length === 0) {
-                list = response.data.records
-                return
-            }
-            assemblySelectedProjectData(response.data.records)
+            roomsList = response.data
+            //accordingToUnitIdSearchFloor(0)
         }
 
         function onFail(reply,code){
@@ -292,23 +235,45 @@ ScrollView{
 
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
-        http.post(Api.building_block_page,{"current":page,"size":"2000","projectId":inputModelData.id})
+        http.get(Api.building_room_listByFloorId,{"floorId":inputModelData.id})
     }
 
-    function assemblySelectedProjectData(dataList){
-        var blockIds = dataList.map(item=>{
+    function accordingToUnitIdSearchFloor(index){
+        var unit = unitList[index]
+        function onReply(reply){
+            http.onReplySucSignal.disconnect(onReply)
+            console.log("complete building floor page data: "+reply)
+            var response = JSON.parse(reply)
+            assemblySelectedProjectData(index,response.data.records)
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFail)
+            hub.close()
+        }
+
+        http.onReplySucSignal.connect(onReply)
+        http.replyFailSignal.connect(onFail)
+        http.post(Api.building_floor_page,
+                  {"current":1,"size":2000,"unitId":unit.id,"projectId":inputModelData.projectId,"blockId":inputModelData.id,"floorName":""})
+    }
+
+    function assemblySelectedProjectData(index,dataList){
+        var unit = unitList[index]
+        var floorIds = dataList.map(item=>{
                                         return item.id
                                     })
-        console.log("input params blockIds: " + blockIds)
+        console.log("input params floorIds: " + floorIds)
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
             hub.close()
-            console.log("complete building room blockRoomCount data: "+reply)
+            console.log("complete building room countFloorRoom data: "+reply)
             var response = JSON.parse(reply)
             var endlist = dataList
             response.data.map(item => {
                                   endlist = dataList.map(subItem => {
-                                                             if (subItem.id === item.blockId){
+                                                             if (subItem.id === item.floorId){
                                                                  subItem.finishRoomCount = item.finishRoomCount
                                                                  subItem.totalRoomCount = item.totalRoomCount
                                                                  subItem.status = item.status
@@ -317,6 +282,7 @@ ScrollView{
                                                          })
                               })
             list = endlist
+            console.log("complete floor data: "+JSON.stringify(list))
         }
 
         function onFail(reply,code){
@@ -327,7 +293,7 @@ ScrollView{
 
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
-        http.post(Api.building_room_blockRoomCount,
-                  {"blockIds":blockIds,"stageType":currentRow+1})
+        http.post(Api.building_room_countFloorRoom,
+                  {"floorIds":floorIds,"stageType":currentRow+1,"unitId":unit.id})
     }
 }

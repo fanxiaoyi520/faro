@@ -8,4 +8,5 @@ ResultPage 1.0 ./Result/ResultPage.qml
 MinePage 1.0 ./Mine/MinePage.qml
 MHeaderListButtonGroup 1.0 ./Component/MHeaderListButtonGroup.qml
 NoDataView 1.0 ./Component/NoDataView.qml
-
+PullListViewV2 1.0 ./Component/PullListViewV2.qml
+MHeaderListView 1.0 ./Component/MHeaderListView.qml
