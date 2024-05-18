@@ -8,7 +8,7 @@ import Dialog 1.0
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 
-ScrollView{
+Item{
     property int page: 0
     property var inputModelData
     property var roomsList:[]
@@ -16,6 +16,10 @@ ScrollView{
     property int currentRow: 0
     property string selectedStageName: "主体阶段（一阶段）"
     property string projectName: "Measure"
+    property string imageUrl : ""
+    property double imageBackHeight : parent.width * 0.6
+    property double imageBackWidth : parent.width * 0.6
+
     id: selectTaskDetailsView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -36,8 +40,8 @@ ScrollView{
         }
     }
     Hub{id: hub}
-    background: Rectangle{
-        color: "#FFFFFF"
+    EnlargeImage{
+        id: enlargeImagePopUp
     }
     BaseNavigationBar{
         id: navigationBar
@@ -113,7 +117,6 @@ ScrollView{
     ListView /**PullListViewV2*/ {
         id: listView
         anchors.top: lineview.bottom
-        anchors.topMargin: 17.5
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -121,83 +124,20 @@ ScrollView{
         clip: true
         model: list
         delegate: itemDelegate
+        header: headerDelegate
+    }
+
+    Component{
+        id: headerDelegate
+        TaskDetailsListHeaderView{
+            imgUrl: imageUrl
+        }
     }
 
     Component {
         id: itemDelegate
-        Rectangle {
-            width: listView.width
-            height: 54
-            Rectangle {
-                color: "#FFFFFF"
-                anchors.left: parent.left
-                anchors.leftMargin: 16
-                anchors.right: parent.right
-                anchors.rightMargin: 16
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                layer.enabled: true
-                radius: 8
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 5.5
-                    radius: 11.5
-                    color: "#10000000"
-                }
-                Text {
-                    id: name
-                    text: qsTr("楼层: ")+qsTr(modelData.floorName)+qsTr("层")
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    x:20
-                }
-                Text {
-                    id: contentname
-                    text: qsTr("待测户数")
-                    anchors.right: numname.left
-                    anchors.rightMargin: 1
-                    anchors.top: parent.top
-                    anchors.topMargin: 13.5
-                    color: "#000000"
-                }
-                Text {
-                    id: numname
-                    text: "("+modelData.finishRoomCount + "/" + modelData.totalRoomCount+")"
-                    anchors.right: arrowimg.left
-                    anchors.rightMargin: 10
-                    anchors.top: parent.top
-                    anchors.topMargin: 13.5
-                    color: "#999999"
-                }
-                Rectangle{
-                    id: progress
-                    height: 5
-                    color: "#F5F5F5"
-                    radius: 2.5
-                    anchors {
-                        left: contentname.left
-                        right: numname.right
-                        top: contentname.bottom
-                        topMargin: 4
-                    }
-                    Rectangle{
-                        id: currentprogress
-                        height: 5
-                        width: parent.width * (modelData.finishRoomCount / modelData.totalRoomCount)
-                        color: GlobalFunc.getStageTypeColor(currentRow+1)
-                        radius: 2.5
-                    }
-                }
-                Image {
-                    id: arrowimg
-                    source: "../../images/home_page_slices/select_building_arrow@2x.png"
-                    width: 7
-                    height: 12.5
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: 20
-                }
-            }
+        TaskDetailsCell{
+            model: modelData
         }
     }
 
@@ -215,6 +155,20 @@ ScrollView{
         accordingToUnitIdSearchFloor(index)
     }
 
+    function enlargeImageAction(inputImageUrl){
+        console.log("need enlarge image: "+ inputImageUrl)
+        enlargeImagePopUp.imgUrl = imageUrl
+        enlargeImagePopUp.open()
+    }
+
+    function scanAction(){
+
+    }
+
+    function moreAction(){
+
+    }
+
     //MARK: network
     function getBuildingRoomListByFloorId(){
         function onReply(reply){
@@ -224,7 +178,7 @@ ScrollView{
             console.log("complete building room listByFloorId data: "+reply)
             if (response.data.length <=0) return;
             roomsList = response.data
-            //accordingToUnitIdSearchFloor(0)
+            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
         }
 
         function onFail(reply,code){
@@ -238,13 +192,13 @@ ScrollView{
         http.get(Api.building_room_listByFloorId,{"floorId":inputModelData.id})
     }
 
-    function accordingToUnitIdSearchFloor(index){
-        var unit = unitList[index]
+    function getBuildingRoomTaskAndGetRoomTaskInfo(roomModel){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
-            console.log("complete building floor page data: "+reply)
+            console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
-            assemblySelectedProjectData(index,response.data.records)
+            list = response.data.stations
+            admin_sys_file_listFileByFileIds([response.data.houseTypeDrawing])
         }
 
         function onFail(reply,code){
@@ -255,34 +209,17 @@ ScrollView{
 
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
-        http.post(Api.building_floor_page,
-                  {"current":1,"size":2000,"unitId":unit.id,"projectId":inputModelData.projectId,"blockId":inputModelData.id,"floorName":""})
+        http.get(Api.building_roomTask_getRoomTaskInfo,
+                 {"roomId":roomModel.id,"stageType":currentRow+1})
     }
 
-    function assemblySelectedProjectData(index,dataList){
-        var unit = unitList[index]
-        var floorIds = dataList.map(item=>{
-                                        return item.id
-                                    })
-        console.log("input params floorIds: " + floorIds)
+    function admin_sys_file_listFileByFileIds(urlStrs){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
-            hub.close()
-            console.log("complete building room countFloorRoom data: "+reply)
+            console.log("complete admin sys file listFileByFileIds: "+reply)
             var response = JSON.parse(reply)
-            var endlist = dataList
-            response.data.map(item => {
-                                  endlist = dataList.map(subItem => {
-                                                             if (subItem.id === item.floorId){
-                                                                 subItem.finishRoomCount = item.finishRoomCount
-                                                                 subItem.totalRoomCount = item.totalRoomCount
-                                                                 subItem.status = item.status
-                                                             }
-                                                             return subItem
-                                                         })
-                              })
-            list = endlist
-            console.log("complete floor data: "+JSON.stringify(list))
+            imageUrl = "http://"+response.data[0].bucketName+"."+response.data[0].fileUri+"/"+response.data[0].fileName
+            console.log("imageUrl: "+imageUrl)
         }
 
         function onFail(reply,code){
@@ -290,10 +227,9 @@ ScrollView{
             http.replyFailSignal.disconnect(onFail)
             hub.close()
         }
-
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
-        http.post(Api.building_room_countFloorRoom,
-                  {"floorIds":floorIds,"stageType":currentRow+1,"unitId":unit.id})
+        http.post(Api.admin_sys_file_listFileByFileIds,
+                  {"integers":urlStrs})
     }
 }

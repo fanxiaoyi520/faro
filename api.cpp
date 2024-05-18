@@ -69,4 +69,14 @@ QString Api::building_room_listByFloorId() const
     return QString("/building/room/listByFloorId");
 }
 
+QString Api::building_roomTask_getRoomTaskInfo() const
+{
+    return QString("/building/roomTask/getRoomTaskInfo");
+}
+
+QString Api::admin_sys_file_listFileByFileIds() const
+{
+    return QString("/admin/sys-file/listFileByFileIds");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

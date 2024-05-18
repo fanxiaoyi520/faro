@@ -13,6 +13,7 @@ StackView{
             BaseNavigationBar{
                 id: navigationBar
                 title: qsTr("系统设置")
+                isVisibleBackBtn: false
             }
         }
     }

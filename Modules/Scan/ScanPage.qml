@@ -13,6 +13,7 @@ StackView{
             BaseNavigationBar{
                 id: navigationBar
                 title: qsTr("快速扫描")
+                isVisibleBackBtn: false
             }
         }
     }

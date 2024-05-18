@@ -14,6 +14,10 @@ QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
 
 int main(int argc, char *argv[])
 {
+    qDebug() << "OpenSSL支持情况:" << QSslSocket::supportsSsl();
+    qDebug()<<"QSslSocket="<<QSslSocket::sslLibraryBuildVersionString();
+
+
     //解决乱码问题
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QTextCodec *codec = QTextCodec::codecForName("utf8"); //GBK gbk

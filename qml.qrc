@@ -85,5 +85,14 @@
         <file>Modules/Home/SelectFloorView.qml</file>
         <file>Modules/Home/TaskDetailsView.qml</file>
         <file>Modules/Component/MHeaderListView.qml</file>
+        <file>Modules/Home/TaskDetailsCell.qml</file>
+        <file>images/home_page_slices/home_more.png</file>
+        <file>images/home_page_slices/home_more@2x.png</file>
+        <file>images/home_page_slices/home_scan.png</file>
+        <file>images/home_page_slices/home_scan@2x.png</file>
+        <file>Modules/Home/TaskDetailsListHeaderView.qml</file>
+        <file>images/home_page_slices/home_enlarge.png</file>
+        <file>images/home_page_slices/home_enlarge@2x.png</file>
+        <file>Modules/Home/EnlargeImage.qml</file>
     </qresource>
 </RCC>

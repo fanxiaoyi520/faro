@@ -75,3 +75,8 @@ QString SettingsManager::stageType() const
     return jsonString;
 }
 
+QString SettingsManager::pubKey_integers() const
+{
+    return "integers";
+}
+

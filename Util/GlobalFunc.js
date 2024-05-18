@@ -72,6 +72,32 @@ function setStatusImageSource(modelData){
     }
 }
 
+function setStationType(modelData){
+
+    if (modelData) {
+        var stationType = modelData.stationType;
+        switch (stationType){
+        case 1:
+            return "客厅"
+        case 2:
+            return "卧室"
+        case 3:
+            return "厨房"
+        case 4:
+            return "卫生间"
+        case 5:
+            return "阳台"
+        case 6:
+            return "玄关"
+        case 7:
+            return "过道"
+        default:  return "其他"
+        }
+    } else {
+        return "其他"
+    }
+}
+
 function setStatusStr(modelData){
 
     if (modelData && modelData.reduceItem) {

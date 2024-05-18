@@ -13,6 +13,7 @@ StackView{
             BaseNavigationBar{
                 id: navigationBar
                 title: qsTr("测量结果")
+                isVisibleBackBtn: false
             }
         }
     }

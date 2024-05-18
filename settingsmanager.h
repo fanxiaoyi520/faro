@@ -16,6 +16,7 @@ class SettingsManager : public QObject
     Q_PROPERTY(QString selectedItem READ selectedItem CONSTANT)
 
     Q_PROPERTY(QString stageType READ stageType CONSTANT)
+    Q_PROPERTY(QString pubKey_integers READ pubKey_integers CONSTANT)
 public:
     static SettingsManager* instance();
 
@@ -42,6 +43,7 @@ public:
      * @return
      */
     QString stageType() const;
+    QString pubKey_integers() const;
 private:
     QSettings settings;
     explicit SettingsManager(QObject *parent = nullptr);
