@@ -12,6 +12,7 @@ Rectangle {
     anchors.top: parent.top
     width: parent.width
     height: 44
+    z:1
     color: "#FFFFFF"
     layer.enabled: true
     layer.effect: DropShadow{

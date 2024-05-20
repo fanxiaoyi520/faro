@@ -81,6 +81,7 @@
         <file>Util/GlobalFunc.js</file>
         <file>images/home_page_slices/select_building_arrow.png</file>
         <file>images/home_page_slices/select_building_arrow@2x.png</file>
+<<<<<<< Updated upstream
         <file>Modules/Component/PullListViewV2.qml</file>
         <file>Modules/Home/SelectFloorView.qml</file>
         <file>Modules/Home/TaskDetailsView.qml</file>
@@ -94,5 +95,15 @@
         <file>images/home_page_slices/home_enlarge.png</file>
         <file>images/home_page_slices/home_enlarge@2x.png</file>
         <file>Modules/Home/EnlargeImage.qml</file>
+=======
+        <file>Modules/Mine/SettingItem.qml</file>
+        <file>images/mine/ic_cache.png</file>
+        <file>images/mine/ic_connect_wifi.png</file>
+        <file>images/mine/ic_customer.png</file>
+        <file>images/mine/ic_language.png</file>
+        <file>images/mine/ic_tester.png</file>
+        <file>images/mine/ic_upload.png</file>
+        <file>String_Zh_Cn.js</file>
+>>>>>>> Stashed changes
     </qresource>
 </RCC>
