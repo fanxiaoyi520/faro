@@ -112,6 +112,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("scan clicked")
+                    scanAction()
                 }
             }
         }
@@ -140,6 +141,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("more clicked")
+                    moreAction()
                 }
             }
         }

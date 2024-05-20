@@ -94,5 +94,17 @@
         <file>images/home_page_slices/home_enlarge.png</file>
         <file>images/home_page_slices/home_enlarge@2x.png</file>
         <file>Modules/Home/EnlargeImage.qml</file>
+        <file>Modules/Component/TipsPopUp.qml</file>
+        <file>Modules/Home/MorePopUp.qml</file>
+        <file>images/home_page_slices/home_more_arrow.png</file>
+        <file>images/home_page_slices/home_more_close.png</file>
+        <file>images/home_page_slices/home_more_close@2x.png</file>
+        <file>images/home_page_slices/home_more_measuremode.png</file>
+        <file>images/home_page_slices/home_more_measuremode@2x.png</file>
+        <file>images/home_page_slices/home_more_recalculate.png</file>
+        <file>images/home_page_slices/home_more_recalculate@2x.png</file>
+        <file>images/home_page_slices/home_more_upload.png</file>
+        <file>images/home_page_slices/home_more_upload@2x.png</file>
+        <file>Modules/Component/SelectMeasureModePopUp.qml</file>
     </qresource>
 </RCC>

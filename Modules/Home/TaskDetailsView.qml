@@ -39,6 +39,28 @@ Item{
             getBuildingUnitPage()
         }
     }
+    TipsPopUp{
+        id: tipsPopUp
+        tipsContentStr: qsTr("是否重新开始扫描")
+        onConfirmAction: {
+            tipsSwitchPopUp.open()
+        }
+    }
+    TipsPopUp{
+        id: tipsSwitchPopUp
+        tipsContentStr: qsTr("扫描后是否自动上传")
+        switchvisible: true
+        onConfirmAndSwitchAction: {
+            console.log("is auto upload file: "+checked)
+        }
+    }
+    MorePopUp {
+        id: morePopUp
+        onConfirmOptionsAction: moreCellClickAction(model)
+    }
+    SelectMeasureModePopUp{
+        id: selectMeasureModePopUp
+    }
     Hub{id: hub}
     EnlargeImage{
         id: enlargeImagePopUp
@@ -93,6 +115,7 @@ Item{
         anchors.topMargin: 17
         height: 31
         list: roomsList
+        onClickSwitchAction: headerClickSwitchAction(index,model)
     }
 
     Canvas {
@@ -123,8 +146,21 @@ Item{
         spacing: 12
         clip: true
         model: list
-        delegate: itemDelegate
+        delegate:itemDelegate
         header: headerDelegate
+        ScrollView {
+            anchors.fill: parent
+            background: NoDataView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                y: 0
+                width: parent.width
+                height: parent.height
+                id: noDataView
+                textStr: qsTr("暂无数据")
+            }
+            visible: list && list.length > 0 && imageUrl ? false : true
+        }
     }
 
     Component{
@@ -150,9 +186,9 @@ Item{
     }
 
     //MARK: logic
-    function headerFilterData(index,itemData){
-        console.log("selected header index and item data: "+index,itemData)
-        accordingToUnitIdSearchFloor(index)
+    function headerClickSwitchAction(index,model){
+        console.log("selected header index and model data: "+index,JSON.stringify(model))
+        getBuildingRoomTaskAndGetRoomTaskInfo(model)
     }
 
     function enlargeImageAction(inputImageUrl){
@@ -162,15 +198,19 @@ Item{
     }
 
     function scanAction(){
-
+        tipsPopUp.open()
     }
 
     function moreAction(){
+        morePopUp.open()
+    }
 
+    function moreCellClickAction(model){
+        selectMeasureModePopUp.open()
     }
 
     //MARK: network
-    function getBuildingRoomListByFloorId(){
+    function getBuildingRoomListByFloorId(floorId){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
             hub.close()
@@ -197,6 +237,11 @@ Item{
             http.onReplySucSignal.disconnect(onReply)
             console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
+            if (!response.data || response.data.length <=0) {
+                list = []
+                imageUrl = ""
+                return;
+            }
             list = response.data.stations
             admin_sys_file_listFileByFileIds([response.data.houseTypeDrawing])
         }

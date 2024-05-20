@@ -75,6 +75,39 @@ QString SettingsManager::stageType() const
     return jsonString;
 }
 
+QString SettingsManager::moreType() const
+{
+    QJsonArray jsonArray;
+    QStringList stringList = {"重新计算","上传文件","测量模式"};
+    QStringList imageList = {"../../images/home_page_slices/home_more_recalculate@2x.png","../../images/home_page_slices/home_more_upload@2x.png","../../images/home_page_slices/home_more_measuremode@2x.png"};
+    for (int i = 0; i < stringList.size(); ++i) {
+        QJsonObject jsonObject;
+        jsonObject["name"] = stringList.at(i);
+        jsonObject["imagePath"] = imageList.at(i);
+        jsonObject["index"] = i;
+        jsonArray.append(jsonObject);
+    }
+    QJsonDocument jsonDoc(jsonArray);
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    return jsonString;
+}
+
+QString SettingsManager::selectedMeasureMode() const
+{
+    QJsonArray jsonArray;
+    QStringList stringList = { "识别砌体", "测量平面范围(米)", "测量高度范围(米)","测量下尺模式","扫描密度","" };
+    for (int i = 0; i < stringList.size(); ++i) {
+        QJsonObject jsonObject;
+        jsonObject["name"] = stringList.at(i);
+        jsonObject["index"] = i;
+        jsonArray.append(jsonObject);
+    }
+    QJsonDocument jsonDoc(jsonArray);
+    QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
+    return jsonString;
+}
+
+
 QString SettingsManager::pubKey_integers() const
 {
     return "integers";

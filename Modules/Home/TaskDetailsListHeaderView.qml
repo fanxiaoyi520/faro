@@ -16,8 +16,7 @@ Rectangle{
         height: imageBackHeight
         y: 20
         x: (parent.width - imageBackWidth)/2
-        Image{
-            id: imageViewer
+        Image{            id: imageViewer
             anchors.top: parent.top
             source: imgUrl
             asynchronous: true;

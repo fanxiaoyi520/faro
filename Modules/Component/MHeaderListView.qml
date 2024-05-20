@@ -15,6 +15,7 @@ ListView {
     clip: true
     model: list
     delegate: delegateItem
+    signal clickSwitchAction(int index,var model)
     Component {
         id: delegateItem
         Rectangle{
@@ -43,6 +44,7 @@ ListView {
                 anchors.fill: parent
                 onClicked: {
                     listView.currentIndex = index
+                    clickSwitchAction(index,list[index])
                 }
             }
         }
