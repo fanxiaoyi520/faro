@@ -50,8 +50,16 @@ Item{
         id: tipsSwitchPopUp
         tipsContentStr: qsTr("扫描后是否自动上传")
         switchvisible: true
-        onConfirmAndSwitchAction: {
-            console.log("is auto upload file: "+checked)
+        cancelBtnStr: qsTr("取消扫描")
+        sureBtnStr: qsTr("开始扫描")
+        onConfirmAndSwitchAction: startScan(checked)
+    }
+    TipsPopUp{
+        id: recalculatePopUp
+        tipsContentStr: qsTr("执行成功")
+        isVisibleCancel: false
+        onConfirmAction: {
+
         }
     }
     MorePopUp {
@@ -206,7 +214,25 @@ Item{
     }
 
     function moreCellClickAction(model){
-        selectMeasureModePopUp.open()
+        morePopUp.close()
+        if (model.index === 0) {
+            console.log("start recalculate")
+            recalculatePopUp.open()
+            return
+        }
+        if (model.index === 1) {
+            console.log("jump upload file")
+            return
+        }
+        if (model.index === 2) {
+            selectMeasureModePopUp.open()
+            return
+        }
+    }
+
+    function startScan(checked){
+        console.log("is auto upload file: "+checked)
+        console.log("start scan ...")
     }
 
     //MARK: network

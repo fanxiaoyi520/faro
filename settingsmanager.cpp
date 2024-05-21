@@ -95,7 +95,7 @@ QString SettingsManager::moreType() const
 QString SettingsManager::selectedMeasureMode() const
 {
     QJsonArray jsonArray;
-    QStringList stringList = { "识别砌体", "测量平面范围(米)", "测量高度范围(米)","测量下尺模式","扫描密度","" };
+    QStringList stringList = { "识别砌体", "测量平面范围(米)", "测量高度范围(米)","测量下尺模式","扫描密度" };
     for (int i = 0; i < stringList.size(); ++i) {
         QJsonObject jsonObject;
         jsonObject["name"] = stringList.at(i);

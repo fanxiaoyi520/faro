@@ -106,5 +106,12 @@
         <file>images/home_page_slices/home_more_upload.png</file>
         <file>images/home_page_slices/home_more_upload@2x.png</file>
         <file>Modules/Component/SelectMeasureModePopUp.qml</file>
+        <file>Modules/Component/SelectMeasureModeCell.qml</file>
+        <file>Modules/Component/BaseModeCell.qml</file>
+        <file>images/home_page_slices/home_measure_right_arrow.png</file>
+        <file>images/home_page_slices/home_measure_right_arrow@2x.png</file>
+        <file>images/home_page_slices/home_measure_up_arrow.png</file>
+        <file>images/home_page_slices/home_measure_up_arrow@2x.png</file>
+        <file>Modules/Component/SelectMeasureListButtonView.qml</file>
     </qresource>
 </RCC>

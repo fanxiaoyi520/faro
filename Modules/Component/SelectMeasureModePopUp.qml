@@ -7,7 +7,7 @@ Popup {
     property var titleStr: "选择测量模式"
     property var tipsContentStr: ""
     property bool switchvisible: false
-    property var list: JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureMode))
+    property var list: JSON.parse(settingsManager.selectedMeasureMode)
     signal confirmAction()
     id: popup
     y: parent.height * 0.1
@@ -35,19 +35,18 @@ Popup {
             color: "#2C2C2C"
             font.weight: Font.Bold
         }
-
-//        Image {
-//            id: closeimg
-//            source: "../../images/home_page_slices/home_more_close@2x.png"
-//            width: 17;height: 17
-//            anchors.right: parent.right
-//            anchors.rightMargin: 34
-//            anchors.verticalCenter: title.verticalCenter
-//            MouseArea{
-//                anchors.fill: parent
-//                onClicked: closeAction()
-//            }
-//        }
+        Image {
+            id: closeimg
+            source: "../../images/measure_other/measure_back.png"
+            width: 17;height: 17
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.verticalCenter: title.verticalCenter
+            MouseArea{
+                anchors.fill: parent
+                onClicked: popup.close()
+            }
+        }
         Rectangle {
             id: bottomLine
             anchors.top: title.bottom
@@ -59,35 +58,19 @@ Popup {
         ListView /**PullListViewV2*/ {
             id: listView
             anchors.top: bottomLine.bottom
-            anchors.topMargin: 17
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: buttonsContainer.top
-            spacing: 12
             clip: true
             model: list
             delegate:itemDelegate
         }
-
-        Component {
+        Component{
             id: itemDelegate
-            Rectangle {
-                width: parent.width
-                height: 50
-                Text {
-                    id: celltitle
-                    anchors.left: parent.left
-                    anchors.leftMargin: 24
-                    anchors.top: parent.top
-                    anchors.topMargin: 10
-                    font.pixelSize: 15
-                    height: font.pixelSize + 10*2
-                    color: "#3C3C3C"
-                    text: qsTr(modelData.name)
-                }
+            SelectMeasureModeCell{
+                cellModel: modelData
             }
         }
-
         Item {
             id: buttonsContainer
             anchors.left: parent.left

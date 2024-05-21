@@ -6,7 +6,10 @@ import QtQuick.Layouts 1.12
 Popup {
     property var titleStr: "温馨提示"
     property var tipsContentStr: ""
+    property var cancelBtnStr: "取消"
+    property var sureBtnStr: "确定"
     property bool switchvisible: false
+    property bool isVisibleCancel: true
     signal confirmAction()
     signal confirmAndSwitchAction(bool checked)
     id: popup
@@ -58,6 +61,8 @@ Popup {
             anchors.leftMargin: 20
             anchors.right: parent.right
             anchors.rightMargin: switchvisible ? 74 : 20
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
             color: "#3C3C3C"
         }
         Switch {
@@ -82,8 +87,9 @@ Popup {
                 anchors.leftMargin: 20
                 width: (parent.width-20*3)/2
                 height: 41
-                text: qsTr("取消")
+                text: qsTr(cancelBtnStr)
                 highlighted: true
+                visible: isVisibleCancel
                 background: Rectangle{
                     id: cancelbtnrect
                     color: "#F5F5F7"
@@ -112,9 +118,9 @@ Popup {
                 id: surebtn
                 anchors.right: parent.right
                 anchors.rightMargin: 20
-                width: (parent.width-20*3)/2
+                width: isVisibleCancel ? (parent.width-20*3)/2 : (parent.width-20*2)
                 height: 41
-                text: qsTr("确定")
+                text: qsTr(sureBtnStr)
                 highlighted: true
                 background: Rectangle{
                     id: surebtnrect
