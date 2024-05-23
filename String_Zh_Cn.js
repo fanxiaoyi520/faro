@@ -29,4 +29,3 @@ var passchange_origin_pass_empty = "旧密码不能为空"
 var passchange_newpass_empty = "请输入新密码"
 var passchange_confirm_pass_empty = "两次输入的密码不一致"
 var passchange_update_success = "修改密码成功请重新登录"
-
