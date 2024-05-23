@@ -9,9 +9,9 @@ Rectangle {
     signal backAction()
 
     id: navigationBar
-    anchors.top: parent.top
     width: parent.width
     height: 44
+    z:1
     color: "#FFFFFF"
     layer.enabled: true
     layer.effect: DropShadow{
@@ -58,5 +58,14 @@ Rectangle {
             anchors.fill: parent
             onClicked: backAction()//searchview.parent.parent.pop()
         }
+    }
+    Component.onCompleted: {
+        if (!isParentColumn(navigationBar)) {
+            navigationBar.anchors.top = myRect.parent.top;
+        }
+    }
+
+    function isParentColumn(item) {
+        return item.parent && item.parent.spacing !== undefined;
     }
 }

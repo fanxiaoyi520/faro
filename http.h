@@ -26,6 +26,7 @@ public:
 
     Q_INVOKABLE void post(QString url);
     Q_INVOKABLE void post(QString url,const QMap<QString, QVariant> &ps);
+    Q_INVOKABLE void put(QString url,const QMap<QString, QVariant> &ps);
     Q_INVOKABLE void loginPost(QString url,const QMap<QString, QVariant> &ps,const QMap<QString, QVariant> &headers);
 
 signals:

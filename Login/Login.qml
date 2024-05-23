@@ -93,6 +93,25 @@ Rectangle{
 
     }
 
+    Timer {
+        id:timer_logintoken
+        property var user_id
+        interval: 200
+        onTriggered: {
+            hub.close()
+            completeLogin()
+            getUserDetail(user_id)
+        }
+    }
+
+    Timer {
+        id:timer_userdetail
+        interval: 200
+        onTriggered: {
+            getById(user.tenant_id)
+        }
+    }
+
     function login(){
         if(accountfield.inputfield.text === '') {
             toastPopup.text = "手机号不能为空"
@@ -110,6 +129,7 @@ Rectangle{
         function onReply(reply){
             console.log(reply)
             http.onReplySucSignal.disconnect(onReply)
+            http.replyFailSignal.disconnect(onFail)
             var response = JSON.parse(reply)
             if (response.data.length > 1) {
                 dialog.list = response.data
@@ -124,6 +144,7 @@ Rectangle{
 
         function onFail(reply,code){
             console.log(reply,code)
+             http.onReplySucSignal.disconnect(onReply)
             http.replyFailSignal.disconnect(onFail)
         }
 
@@ -135,22 +156,22 @@ Rectangle{
     function getLoginToken(tenantId){
         function onLoginTokenReply(reply){
             console.log("LoginTokenReply: "+reply)
+            http.replyFailSignal.disconnect(onFail)
             http.onReplySucSignal.disconnect(onLoginTokenReply)
             var user = JSON.parse(reply)
             user.account = accountfield.inputfield.text
             user.loginMode = 0
             user.tenant_id = tenant_id
             settingsManager.setValue(settingsManager.user,JSON.stringify(user))
-            hub.close()
-            completeLogin()
-            getUserDetail()
-
+            timer_logintoken.user_id = user.user_id
+            timer_logintoken.start()
         }
 
         function onFail(reply,code){
             hub.close()
             console.log(reply,code)
             http.replyFailSignal.disconnect(onFail)
+            http.onReplySucSignal.disconnect(onLoginTokenReply)
             toastPopup.text = "手机号或密码错误"
         }
 
@@ -161,50 +182,54 @@ Rectangle{
                        {"Tenant-id":tenant_id})
     }
 
-    function getUserDetail(){
+    function getUserDetail(user_id){
         function onUserReply(reply){
             console.log("getUserDetail: "+reply)
-            http.onReplySucSignal.disconnect(onUserReply)
+            http.replyFailSignal.disconnect(onFail)
+             http.onReplySucSignal.disconnect(onUserReply)
             var response = JSON.parse(reply)
             var user = JSON.parse(settingsManager.getValue(settingsManager.user))
             user.userinfo = JSON.stringify(response.data)
             settingsManager.setValue(settingsManager.user,JSON.stringify(user))
-
-            getById()
+            timer_userdetail.start()
         }
 
         function onFail(reply,code){
             console.log(reply,code)
             http.replyFailSignal.disconnect(onFail)
+             http.onReplySucSignal.disconnect(onUserReply)
         }
 
-        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
-        console.log("userid: " + user.user_id)
+//        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
+        console.log("userid: " + user_id)
         http.onReplySucSignal.connect(onUserReply)
         http.replyFailSignal.connect(onFail)
-        http.get(Api.admin_user_details+"/"+user.user_id)
+        http.get(Api.admin_user_details+"/"+user_id)
     }
 
-    function getById(){
+    function getById(tenant_id){
         function onByIdReply(reply){
+            http.replyFailSignal.disconnect(onFail)
             http.onReplySucSignal.disconnect(onByIdReply)
             var response = JSON.parse(reply)
             var user = JSON.parse(settingsManager.getValue(settingsManager.user))
             user.company = response.data.name
             settingsManager.setValue(settingsManager.user,JSON.stringify(user))
             console.log("complete user data: "+settingsManager.getValue(settingsManager.user))
+            rootWindow.toggleView()
         }
 
         function onFail(reply,code){
             console.log(reply,code)
             http.replyFailSignal.disconnect(onFail)
+            http.onReplySucSignal.disconnect(onByIdReply)
         }
 
-        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
-        console.log("userid: " + user.user_id)
+//        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
+//        console.log("userid: " + user.user_id)
         http.onReplySucSignal.connect(onByIdReply)
         http.replyFailSignal.connect(onFail)
-        console.log("user.userinfo.tenantId: "+user.tenant_id)
-        http.get(Api.admin_tenant_details+"/"+user.tenant_id)
+        console.log("user.userinfo.tenantId: "+ tenant_id)
+        http.get(Api.admin_tenant_details+"/"+tenant_id)
     }
 }

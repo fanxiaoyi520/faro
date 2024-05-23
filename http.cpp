@@ -104,6 +104,48 @@ void Http::post(QString url, const QMap<QString, QVariant> &ps)
     }).post();
 }
 
+void Http::put(QString url, const QMap<QString, QVariant> &ps)
+{
+    QMap<QString, QVariant> paramsMap;
+    for(int i = 0; i < ps.keys().size(); i++) {
+        paramsMap.insert(ps.keys().at(i),ps.values().at(i));
+    }
+    QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
+    QMap<QString, QString>headersMap;
+    if(!user.isEmpty()) {
+        qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
+        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("lang","zh_CN");
+        headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
+    } else {
+        qDebug() << "user info is empty";
+    }
+    qDebug() << "headers: "<< headersMap;
+    qDebug() << "params: " << paramsMap;
+    qDebug() << "json: " << Util::mapToJson(paramsMap);
+    QString jsonParams = Util::mapToJson(paramsMap);
+    if (paramsMap.contains("integers")) {
+        QJsonArray jsonArray;
+        for (const QVariant  &id : paramsMap.value("integers").toList()) {
+            QString stringItem = id.toString();
+            jsonArray.append(stringItem);
+        }
+        QJsonDocument jsonDoc(jsonArray);
+        jsonParams = jsonDoc.toJson(QJsonDocument::Indented);
+        qDebug() << "jsonParams: " << jsonParams;
+    }
+    HttpClient(BASE_URL+url)
+            .debug(true)
+            //.params(paramsMap)
+            .json(jsonParams)
+            .headers(headersMap)
+            .success([this](const QString &response) {
+        replyFinished(response);
+    }).fail([this](const QString &error, int errorCode) {
+        replyFail(error,errorCode);
+    }).put();
+}
+
 void Http::loginPost(QString url,
                      const QMap<QString, QVariant> &ps,
                      const QMap<QString, QVariant> &headers)

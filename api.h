@@ -12,6 +12,7 @@ class Api : public QObject {
     Q_PROPERTY(QString admin_user_details READ admin_user_details CONSTANT)
     Q_PROPERTY(QString admin_tenant_details READ admin_tenant_details CONSTANT)
     Q_PROPERTY(QString admin_dept_tree READ admin_dept_tree CONSTANT)
+    Q_PROPERTY(QString admin_user_password READ admin_user_password CONSTANT)
     Q_PROPERTY(QString building_project_page READ building_project_page CONSTANT)
     Q_PROPERTY(QString building_room_projectRoomCount READ building_room_projectRoomCount CONSTANT)
     Q_PROPERTY(QString building_block_page READ building_block_page CONSTANT)
@@ -29,6 +30,7 @@ public:
     QString auth_oauth_token() const;
     QString admin_user_details() const;
     QString admin_tenant_details() const;
+    QString admin_user_password() const;
     QString admin_dept_tree() const;
     QString building_project_page() const;
     QString building_room_projectRoomCount() const;

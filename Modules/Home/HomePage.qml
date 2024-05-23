@@ -195,6 +195,7 @@ StackView{
         }
 
         http.onReplySucSignal.connect(onReply)
+
         http.replyFailSignal.connect(onFail)
         http.post(Api.building_project_page,
                   {"current":1,"size":10,"deptId":modelData.id})

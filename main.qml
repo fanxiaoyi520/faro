@@ -16,19 +16,34 @@ Window {
     property var currentView: login
 
     Component.onCompleted: {
-        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
-        console.log("token: "+ user.access_token)
-        if (user.access_token !== ""){
-            currentView = mainview
+       initView()
+    }
+
+    function initView(){
+        var user;
+        var userString = settingsManager.getValue(settingsManager.user);
+        console.log("setting user == " + userString)
+        if (userString) {
+            try {
+                user = JSON.parse(userString);
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+            }
+        }
+
+        if (user && user.access_token !== "") {
+            console.log("enter mainview")
+            currentView = mainview;
         } else {
-            currentView = login
+            console.log("enter loginview")
+            currentView = login;
         }
     }
 
     function toggleView() {
-        if (currentView === login) {
+        if(currentView === login){
             currentView = mainview
-        } else {
+        }else{
             currentView = login
         }
     }

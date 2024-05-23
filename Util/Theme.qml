@@ -1,5 +1,4 @@
 import QtQuick 2.0
-
 Item {
     id: theme
     // 定义日夜间模式的枚举类型
