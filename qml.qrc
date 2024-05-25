@@ -123,5 +123,6 @@
         <file>Modules/Mine/UserInfoPage.qml</file>
         <file>Dialog/ChangePassPop.qml</file>
         <file>images/ic_cross_x.png</file>
+        <file>images/json/scaning.json</file>
     </qresource>
 </RCC>

@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Http 1.0
 import Api 1.0
 import Dialog 1.0
+import WifiHlper 1.0
 
 Rectangle {
     id:root
@@ -15,8 +16,14 @@ Rectangle {
     color: "white"
 
     Http{id:http}
-    Hub{id: hub}
     Loader{ id : userInfoLoader}
+    WifiHelper{
+        id:wifiHelper
+        onNetworksResult: {
+            hub.close()
+            console.log("get network result  = " + JSON.stringify(list))
+        }
+    }
 
     Rectangle{
         id:rect_setting_item
@@ -75,6 +82,10 @@ Rectangle {
             onClicked: {
                 if(index == 0){
                     jumpToUserInfo()
+                }
+                if(index == 3 && visible){
+                    hub.open()
+//                    wifiHelper.startWork()
                 }
             }
         }

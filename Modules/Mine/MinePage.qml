@@ -3,6 +3,7 @@ import Modules 1.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import "../../String_Zh_Cn.js" as SettingString
+import Dialog 1.0
 
 StackView{
     id: minestack
@@ -12,7 +13,6 @@ StackView{
         id: mineview
         Rectangle{
             id:root
-<<<<<<< HEAD
             Layout.fillHeight: true
             Layout.fillWidth: true
             color: "white"
@@ -26,11 +26,6 @@ StackView{
                     settingsManager.setValue(settingsManager.user,null)
                 }
             }
-
-=======
-            anchors.fill: parent
-            color: "white"
->>>>>>> 86781295a03096b5b996ed89429844b12a25ea8e
             BaseNavigationBar{
                 id: navigationBar
                 title: qsTr("系统设置")
@@ -52,13 +47,6 @@ StackView{
                         delegate:SettingItem{
                             settingInfo: JSON.parse(SettingString.setting_lists[index])
                             iconPath : ""
-<<<<<<< HEAD
-=======
-                            onItemClick : function(){
-                                console.log("click item :" + index)
-                                //TODO 每个item不同的事件
-                            }
->>>>>>> 86781295a03096b5b996ed89429844b12a25ea8e
                             showDive: index != SettingString.setting_lists.length - 1
                         }
                     }
@@ -81,14 +69,10 @@ StackView{
                         border.color: "#999999"
                         border.width: 0.5
                         radius: 10
-<<<<<<< HEAD
                          property var loaded: false
-=======
->>>>>>> 86781295a03096b5b996ed89429844b12a25ea8e
-
                         Text{
                             anchors.centerIn: parent
-                            text: SettingString.setting_logout
+                            text: qsTr(SettingString.setting_logout)
                         }
 
                         MouseArea{
@@ -99,13 +83,10 @@ StackView{
                             onReleased: {
                                 rect_logout.color = "white"
                             }
-<<<<<<< HEAD
                             onClicked: {
                                 mineTipsPop.tipsContentStr = qsTr(SettingString.setting_logout_tips)
                                 mineTipsPop.open()
                             }
-=======
->>>>>>> 86781295a03096b5b996ed89429844b12a25ea8e
                         }
                     }
                 }

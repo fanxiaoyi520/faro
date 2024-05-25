@@ -4,6 +4,7 @@
 #include "api.h"
 #include <QSettings>
 #include "settingsmanager.h"
+#include "wifihelper.h"
 #include <QtQml>
 #include <QTextCodec>
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QNetworkAccessManager>("QNetworkAccessManager", 1, 0, "QNetworkAccessManager");
     qmlRegisterType<Http>("Http", 1, 0, "Http");
+    qmlRegisterType<WifiHelper>("WifiHlper",1,0,"WifiHelper");
     qmlRegisterSingletonType<QObject>("Api", 1, 0, "Api",apiProvider);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());

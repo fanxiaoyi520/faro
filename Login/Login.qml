@@ -90,7 +90,6 @@ Rectangle{
             color: "#1A1890FF"
         }
         onClicked: login()
-
     }
 
     Timer {

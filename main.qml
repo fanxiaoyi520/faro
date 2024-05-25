@@ -5,6 +5,7 @@ import QtQuick.XmlListModel 2.12
 import Modules 1.0
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
+import Dialog 1.0
 
 Window {
     id: rootWindow
@@ -48,6 +49,7 @@ Window {
         }
     }
 
+    Hub{id:hub}
     Component {
         id: login
         Item {

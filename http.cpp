@@ -184,3 +184,8 @@ void Http::loginPost(QString url,
         replyFail(error,errorCode);
     }).post();
 }
+
+QString Http::getActiveWifi()
+{
+    return QString("123");
+}

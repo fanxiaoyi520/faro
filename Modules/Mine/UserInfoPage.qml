@@ -22,8 +22,6 @@ Column{
         }
     }
     Http{id:http}
-    Hub{id: hub}
-
     TipsPopUp{
         id:tipspop
         property var isChangePassSuccess: false

@@ -364,15 +364,15 @@ Popup {
         }
 
         if (textfield_origin_pass.text === "") {
-            return showError(String.passchange_origin_pass_empty)
+            return showError(qsTr(String.passchange_origin_pass_empty))
         }
 
         if (textfield_newpass.text === "") {
-            return showError(String.passchange_newpass_empty)
+            return showError(qsTr(String.passchange_newpass_empty))
         }
 
         if (textfield_confirm_pass.text === "" || textfield_confirm_pass.text !== textfield_newpass.text) {
-            return showError(String.passchange_confirm_pass_empty)
+            return showError(qsTr(String.passchange_confirm_pass_empty))
         }
 
         return true
