@@ -6,6 +6,12 @@
 #include "settingsmanager.h"
 #include <QtQml>
 #include <QTextCodec>
+#include "faroscannercontroller.h"
+#include "Windows.h"
+#include "wlanapi.h"
+#include "QNetworkInterface"
+#include "QNetworkAddressEntry"
+#include "sstream"
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
@@ -40,7 +46,7 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonType<QObject>("Api", 1, 0, "Api",apiProvider);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());
-
+    qmlRegisterType<FaroScannerController>("FaroScanner", 1, 0, "FaroScannerController");
     engine.addImportPath(QStringLiteral("qrc:/"));
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

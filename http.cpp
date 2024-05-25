@@ -70,6 +70,7 @@ void Http::post(QString url, const QMap<QString, QVariant> &ps)
     }
     QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
     QMap<QString, QString>headersMap;
+    qDebug() << "=============================: " << user;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
         headersMap.insert("Tenant_id",user.value("tenant_id").toString());

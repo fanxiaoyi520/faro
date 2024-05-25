@@ -18,9 +18,9 @@ Popup{
         Image{
             id: imageViewer
             anchors.top: parent.top
-            source: imgUrl
-            asynchronous: true;
-            fillMode: Image.PreserveAspectFit;
+            source: imgUrl ? imgUrl : ""
+            asynchronous: true
+            fillMode: Image.PreserveAspectFit
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             scale: 1.0

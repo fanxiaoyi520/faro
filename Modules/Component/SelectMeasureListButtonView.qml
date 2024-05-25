@@ -3,11 +3,12 @@
 ListView {
     id: listView
     property var list: []
+    property int selectIndex: 0
     width: parent.width
     height: 31
     orientation: Qt.Horizontal
     spacing: 20
-    currentIndex: 0
+    currentIndex: selectIndex
     anchors.left: parent.left
     anchors.leftMargin: 20
     anchors.right: parent.right

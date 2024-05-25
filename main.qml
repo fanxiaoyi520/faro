@@ -18,7 +18,7 @@ Window {
     Component.onCompleted: {
         var user = JSON.parse(settingsManager.getValue(settingsManager.user))
         console.log("token: "+ user.access_token)
-        if (user.access_token !== ""){
+        if (user.access_token !== undefined){
             currentView = mainview
         } else {
             currentView = login

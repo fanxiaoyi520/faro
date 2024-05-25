@@ -7,6 +7,7 @@ import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
+import FaroScanner 1.0
 
 Item{
     property int page: 0
@@ -72,6 +73,14 @@ Item{
     Hub{id: hub}
     EnlargeImage{
         id: enlargeImagePopUp
+    }
+    FaroScannerController {
+        id: scannerController
+        Component.onCompleted: {
+            if(scannerController.init()) {
+                console.log("--------------初始化成功--------------")
+            }
+        }
     }
     BaseNavigationBar{
         id: navigationBar
@@ -233,6 +242,8 @@ Item{
     function startScan(checked){
         console.log("is auto upload file: "+checked)
         console.log("start scan ...")
+        scannerController.connect()
+        scannerController.startScan()
     }
 
     //MARK: network

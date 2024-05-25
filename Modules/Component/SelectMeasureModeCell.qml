@@ -11,16 +11,17 @@ Rectangle {
     /**
      * select measure mode params
      * @masonry_mode    识别砌体
-     * @map_mode        测量下尺模式
      * @xy_crop_dist    平面
      * @z_crop_dist     高度
+     * @map_mode        测量下尺模式
      * @scanningMode    扫描密度
      */
     property int masonry_mode: 1
-    property int map_mode: 3
     property int xy_crop_dist: 6
     property int z_crop_dist: 3
+    property int map_mode: 3
     property int scanningMode: 3
+
     id: basecellid
     width: parent.width
     height: getChangeHeight(cellModel.index)
@@ -69,7 +70,23 @@ Rectangle {
                     color: "transparent"
                     border.color: "#80EAEAEA"
                 }
-                onTextChanged: onInputTextChanged(cellModel.index,text)
+                validator: IntValidator { id: intValidator;bottom: 1; top: 50}
+
+                onTextChanged: {
+                    var text = this.text;
+                    var intValue = parseInt(text, 10)
+
+                    if (!isNaN(intValue) && intValue >= 1 && intValue <= 50) {
+                        // 值有效，不需要做任何事
+                    } else {
+                        if (isNaN(intValue) || intValue < 1) {
+                            this.text = "1";
+                        } else if (intValue > 50) {
+                            this.text = "50";
+                        }
+                    }
+                    onInputTextChanged(cellModel.index,this.text)
+                }
             }
         }
     }
@@ -96,6 +113,7 @@ Rectangle {
                 anchors.top: cell3.celltitle.bottom
                 anchors.topMargin: 12
                 visible: isControlLaunch1 ? true : false
+                selectIndex: map_mode
                 onClickSelectAction: measureTheBottomRulerMode(index,model)
             }
         }
@@ -123,6 +141,7 @@ Rectangle {
                 anchors.top: cell4.celltitle.bottom
                 anchors.topMargin: 12
                 visible: isControlLaunch2 ? true : false
+                selectIndex: scanningMode
                 onClickSelectAction: scanningDensity(index,model)
             }
         }
@@ -183,9 +202,13 @@ Rectangle {
     }
 
     function onInputTextChanged(index,text){
-        //xy_crop_dist : z_crop_dist
         console.log("input: "+index)
         console.log("text: "+text)
+        if(index === 1) {
+            xy_crop_dist = text
+        } else {
+            z_crop_dist = text
+        }
     }
 
     function scanningDensity(index,model){
