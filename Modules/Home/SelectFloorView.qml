@@ -7,6 +7,7 @@ import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
+import "../../String_Zh_Cn.js" as SettingString
 
 ScrollView{
     property int page: 0
@@ -62,7 +63,7 @@ ScrollView{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    dialog.list = JSON.parse(settingsManager.stageType)
+                    dialog.list = SettingString.stageType
                     dialog.open()
                 }
             }

@@ -31,6 +31,11 @@ Grid {
                     radius: 11.5
                     color: "#10000000"
                 }
+            }
+            Rectangle{
+                anchors.fill: parent
+                color: "#FFFFFF"
+                radius: 8
                 Image {
                     id: img
                     source: setStatusImageSource(modelData)

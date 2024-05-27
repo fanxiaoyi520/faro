@@ -1,4 +1,4 @@
-﻿#include <QGuiApplication>
+#include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "http.h"
 #include "api.h"
@@ -23,10 +23,11 @@ int main(int argc, char *argv[])
 
     //解决乱码问题
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QTextCodec *codec = QTextCodec::codecForName("utf8"); //GBK gbk
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8"); //GBK gbk
     QTextCodec::setCodecForLocale(codec);
 
     QGuiApplication app(argc, argv);
+
     app.setOrganizationName("YYZS");
     app.setApplicationName("Measure");
 

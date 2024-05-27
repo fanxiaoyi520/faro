@@ -1,4 +1,4 @@
-#ifndef WIFISCANNER_H
+﻿#ifndef WIFISCANNER_H
 #define WIFISCANNER_H
 
 #include <QObject>

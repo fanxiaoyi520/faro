@@ -124,5 +124,6 @@
         <file>Dialog/ChangePassPop.qml</file>
         <file>images/ic_cross_x.png</file>
         <file>images/json/scaning.json</file>
+        <file>Modules/Component/SelectMeasureListButtonView.qml</file>
     </qresource>
 </RCC>

@@ -2,9 +2,10 @@
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
+import "../../String_Zh_Cn.js" as SettingString
 
 Popup {
-    property var list: JSON.parse(settingsManager.moreType)
+    property var list: SettingString.moreType
     property int currentIndex: 0
     property var titleStr: "更多"
     signal confirmOptionsAction(var model)
@@ -88,7 +89,7 @@ Popup {
                 height: 54
                 Image {
                     id: img
-                    source: modelData.imagePath
+                    source: JSON.parse(modelData).imagePath
                     width: 20;height: 20
                     anchors.left: parent.left
                     anchors.leftMargin: 34
@@ -101,7 +102,7 @@ Popup {
                     anchors.right: parent.right
                     anchors.rightMargin: 34
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: modelData.index === 2
+                    visible: JSON.parse(modelData).index === 2
                 }
                 Item {
                     anchors.verticalCenter: parent.verticalCenter
@@ -110,9 +111,10 @@ Popup {
                     anchors.right: arrowimg.left
                     anchors.rightMargin: 5
                     Text {
-                        text: modelData.name
+                        text: JSON.parse(modelData).name
                         color: "#3C3C3C"
                         elide: Qt.ElideRight
+
                         anchors.left: parent.left
                         anchors.leftMargin: 5
                         anchors.verticalCenter: parent.verticalCenter
@@ -131,7 +133,7 @@ Popup {
                     anchors.fill: parent
                     onClicked: {
                         currentIndex = index;
-                        confirmOptionsAction(list[currentIndex])
+                        confirmOptionsAction(JSON.parse(list[currentIndex]))
                     }
                 }
             }

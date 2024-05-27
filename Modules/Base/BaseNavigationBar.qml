@@ -61,7 +61,7 @@ Rectangle {
     }
     Component.onCompleted: {
         if (!isParentColumn(navigationBar)) {
-            navigationBar.anchors.top = myRect.parent.top;
+            //navigationBar.anchors.top = myRect.parent.top;
         }
     }
 

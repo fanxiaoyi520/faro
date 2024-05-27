@@ -84,12 +84,13 @@ Popup {
                         width: parent.width * 0.7
 
                         Text {
-                            text: modelData.name
+                            text: JSON.parse(modelData).name
                             color: "#3C3C3C"
                             elide: Qt.ElideRight
                             anchors.left: parent.left
                             anchors.leftMargin: 5
                             anchors.verticalCenter: parent.verticalCenter
+                            font.pixelSize: 15
                         }
                     }
 
@@ -155,13 +156,6 @@ Popup {
                     font.capitalization: Font.MixedCase
                     font.pixelSize: 15
                 }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
-                }
                 onClicked: cancelAction()
             }
 
@@ -188,13 +182,6 @@ Popup {
                     horizontalAlignment: Text.AlignHCenter
                     font.capitalization: Font.MixedCase
                     font.pixelSize: 18
-                }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
                 }
                 onClicked: sureAction()
             }

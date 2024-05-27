@@ -7,6 +7,7 @@ import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
+import "../../String_Zh_Cn.js" as SettingString
 import FaroScanner 1.0
 
 Item{
@@ -104,7 +105,7 @@ Item{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    dialog.list = JSON.parse(settingsManager.stageType)
+                    dialog.list = SettingString.stageType
                     dialog.open()
                 }
             }

@@ -49,7 +49,6 @@ bool FaroScannerController::initFaroInternal()
         return false;
     }
 
-    qDebug() << "=========================================";
     if (scanCtrlSDKPtr == NULL) {
         qDebug() << "Failed to initialize FARO SDK";
         return false;

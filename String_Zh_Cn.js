@@ -1,13 +1,13 @@
 var confirm = "确认"
 var cancel = "取消"
 var setting_lists = [
-    '{"icon_name": "个人信息", "icon_path": "../../images/mine/ic_tester.png"}',
-    '{"icon_name": "上传文件", "icon_path": "../../images/mine/ic_upload.png"}',
-    '{"icon_name": "所属客户", "icon_path": "../../images/mine/ic_customer.png"}',
-    '{"icon_name": "设备Wifi", "icon_path": "../../images/mine/ic_connect_wifi.png"}',
-    '{"icon_name": "清除缓存", "icon_path": "../../images/mine/ic_cache.png"}',
-//    '{"icon_name": "切换语言", "icon_path": "../../images/mine/ic_tester.png"}'
-];
+            '{"icon_name": "个人信息", "icon_path": "../../images/mine/ic_tester.png"}',
+            '{"icon_name": "上传文件", "icon_path": "../../images/mine/ic_upload.png"}',
+            '{"icon_name": "所属客户", "icon_path": "../../images/mine/ic_customer.png"}',
+            '{"icon_name": "设备Wifi", "icon_path": "../../images/mine/ic_connect_wifi.png"}',
+            '{"icon_name": "清除缓存", "icon_path": "../../images/mine/ic_cache.png"}',
+            //    '{"icon_name": "切换语言", "icon_path": "../../images/mine/ic_tester.png"}'
+        ];
 var setting_logout = "退出登录";
 var setting_logout_tips = "确认是否退出登录?";
 
@@ -29,3 +29,25 @@ var passchange_origin_pass_empty = "旧密码不能为空"
 var passchange_newpass_empty = "请输入新密码"
 var passchange_confirm_pass_empty = "两次输入的密码不一致"
 var passchange_update_success = "修改密码成功请重新登录"
+
+var stageType = [
+            '{"index": 0, "name": "主体阶段(一阶段)"}',
+            '{"index": 1, "name": "砌筑阶段(二阶段)"}',
+            '{"index": 2, "name": "抹灰阶段(三阶段)"}',
+            '{"index": 3, "name": "装修腻子阶段1(四阶段)"}',
+            '{"index": 4, "name": "装修腻子阶段2(五阶段)"}'
+        ];
+
+var moreType = [
+            '{"index": 0, "name": "重新计算","imagePath":"../../images/home_page_slices/home_more_recalculate@2x.png"}',
+            '{"index": 1, "name": "上传文件","imagePath":"../../images/home_page_slices/home_more_upload@2x.png"}',
+            '{"index": 2, "name": "测量模式","imagePath":"../../images/home_page_slices/home_more_measuremode@2x.png"}',
+        ];
+
+var selectedMeasureMode = [
+            '{"index": 0, "name": "识别砌体"}',
+            '{"index": 1, "name": "测量平面范围(米)"}',
+            '{"index": 2, "name": "测量高度范围(米)"}',
+            '{"index": 3, "name": "测量下尺模式"}',
+            '{"index": 4, "name": "扫描密度"}'
+        ];

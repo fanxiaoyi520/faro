@@ -60,6 +60,7 @@ QString SettingsManager::selectedItem() const
     return "selectedItem";
 }
 
+/**
 QString SettingsManager::stageType() const
 {
     QJsonArray jsonArray;
@@ -106,7 +107,7 @@ QString SettingsManager::selectedMeasureMode() const
     QString jsonString = jsonDoc.toJson(QJsonDocument::Indented);
     return jsonString;
 }
-
+*/
 
 QString SettingsManager::pubKey_integers() const
 {

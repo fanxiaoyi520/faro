@@ -7,7 +7,7 @@ import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
-
+import "../../String_Zh_Cn.js" as SettingString
 ScrollView{
     property int page: 0
     property var inputModelData
@@ -63,7 +63,7 @@ ScrollView{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    dialog.list = JSON.parse(settingsManager.stageType)
+                    dialog.list = SettingString.stageType
                     dialog.open()
                 }
             }
@@ -95,62 +95,7 @@ ScrollView{
         clip: true
         model: list
         delegate: itemDelegate
-        /**
-        Component{
-            id: cmpHeader
-            Rectangle{
-                width: listView.width
-                height: 16
-                Text{
-                    anchors.centerIn: parent
-                    text: listView.headerHold ? qsTr("正在刷新...") : qsTr("下拉刷新")
-                }
-            }
-        }
-        header: headerVisible ? cmpHeader : null
-        onHeaderHoldChanged:{
-            if(headerHold)
-                timerRefresh.start()
-        }
-
-        Component{
-            id: cmpFooter
-            Rectangle{
-                width: listView.width
-                height: 16
-                Text{
-                    anchors.centerIn: parent
-                    text: listView.footerHold ? qsTr("正在加载...") : qsTr("加载更多")
-                }
-            }
-        }
-        footer: footerVisible ? cmpFooter : null
-        onFooterHoldChanged: {
-            if(footerHold)
-                timerLoadMore.start()
-        }
-         */
     }
-
-    /**
-    Timer{
-        id: timerRefresh
-        interval: 1000
-        onTriggered: {
-            console.log("refresh complete")
-            listView.headerVisible = false
-        }
-    }
-
-    Timer{
-        id: timerLoadMore
-        interval: 1000
-        onTriggered: {
-            console.log("loading complete")
-            listView.footerVisible = false
-        }
-    }
-     */
 
     Component {
         id: itemDelegate

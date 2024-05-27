@@ -1,4 +1,4 @@
-import QtQuick 2.0
+﻿import QtQuick 2.0
 import Http 1.0
 import Api 1.0
 import Dialog 1.0

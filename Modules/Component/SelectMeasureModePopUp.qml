@@ -2,12 +2,12 @@
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
-
+import "../../String_Zh_Cn.js" as SettingString
 Popup {
     property var titleStr: "选择测量模式"
     property var tipsContentStr: ""
     property bool switchvisible: false
-    property var list: JSON.parse(settingsManager.selectedMeasureMode)
+    property var list: SettingString.selectedMeasureMode
     signal confirmAction()
     id: popup
     y: parent.height * 0.1
@@ -21,10 +21,12 @@ Popup {
         radius: 25
         color: "transparent"
     }
+
     contentItem:     Rectangle{
         anchors.fill: parent
         radius: 25
         color: "#FFFFFF"
+
         Text {
             id: title
             text: titleStr
@@ -68,7 +70,7 @@ Popup {
         Component{
             id: itemDelegate
             SelectMeasureModeCell{
-                cellModel: modelData
+                cellModel: JSON.parse(modelData)
             }
         }
         Item {
@@ -102,13 +104,6 @@ Popup {
                     horizontalAlignment: Text.AlignHCenter
                     font.capitalization: Font.MixedCase
                     font.pixelSize: 15
-                }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
                 }
                 onClicked: sureAction()
             }

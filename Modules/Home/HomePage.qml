@@ -5,6 +5,8 @@ import QtQuick.Controls 2.12
 import Http 1.0
 import Api 1.0
 import Dialog 1.0
+import "../../String_Zh_Cn.js" as SettingString
+
 StackView{
     property var modellist: []
     property var sourcelist: []
@@ -160,6 +162,10 @@ StackView{
         console.log("incoming data model: "+JSON.stringify(modelData))
         selectBuildingView.source = "SelectBuildingView.qml"
         selectBuildingView.item.inputModelData = modelData
+        var params = settingsManager.getValue(settingsManager.selectedStageType)
+        if (!params) {
+            settingsManager.setValue(settingsManager.selectedStageType,SettingString.stageType[0])
+        }
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectBuildingView.item.currentRow = selectedStageType.index
         selectBuildingView.item.selectedStageName = selectedStageType.name

@@ -1,4 +1,4 @@
-#include "wifihelper.h"
+﻿#include "wifihelper.h"
 #include <thread>
 #include <QDebug>
 
