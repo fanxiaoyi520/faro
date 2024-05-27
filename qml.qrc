@@ -112,6 +112,17 @@
         <file>images/home_page_slices/home_measure_right_arrow@2x.png</file>
         <file>images/home_page_slices/home_measure_up_arrow.png</file>
         <file>images/home_page_slices/home_measure_up_arrow@2x.png</file>
-        <file>Modules/Component/SelectMeasureListButtonView.qml</file>
+        <file>Modules/Mine/SettingItem.qml</file>
+        <file>images/mine/ic_cache.png</file>
+        <file>images/mine/ic_connect_wifi.png</file>
+        <file>images/mine/ic_customer.png</file>
+        <file>images/mine/ic_language.png</file>
+        <file>images/mine/ic_tester.png</file>
+        <file>images/mine/ic_upload.png</file>
+        <file>String_Zh_Cn.js</file>
+        <file>Modules/Mine/UserInfoPage.qml</file>
+        <file>Dialog/ChangePassPop.qml</file>
+        <file>images/ic_cross_x.png</file>
+        <file>images/json/scaning.json</file>
     </qresource>
 </RCC>

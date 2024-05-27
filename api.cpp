@@ -24,6 +24,11 @@ QString Api::admin_tenant_details() const
     return QString("/admin/tenant/details");
 }
 
+QString Api::admin_user_password() const
+{
+     return QString("/admin/user/password");
+}
+
 QString Api::admin_dept_tree() const
 {
     return QString("/admin/dept/tree");

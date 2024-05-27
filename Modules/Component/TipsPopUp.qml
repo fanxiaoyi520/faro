@@ -13,10 +13,8 @@ Popup {
     signal confirmAction()
     signal confirmAndSwitchAction(bool checked)
     id: popup
-    y: (parent.height-188)/2
-    x: (parent.width-285)/2
-    width: 285
-    height: 188
+    width: parent.width
+    height: parent.height
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
@@ -24,10 +22,13 @@ Popup {
         radius: 25
         color: "transparent"
     }
-    contentItem:     Rectangle{
-        anchors.fill: parent
+    Rectangle{
+        id:rect_root
+        width: 300
+        height: 240
         radius: 25
         color: "#FFFFFF"
+        anchors.centerIn: parent
         Text {
             id: title
             text: titleStr
@@ -46,35 +47,44 @@ Popup {
             height: 1
             color: "#80EAEAEA"
         }
-        Text {
-            id: tipscontent
-            text: qsTr(tipsContentStr)
-            clip: true
-            elide:  Text.ElideRight
-            wrapMode: Text.WrapAnywhere
-            height: switchvisible ? font.pixelSize : font.pixelSize*2+10
-            width: parent.width-20-(switchvisible ? 74 : 20)
-            font.pixelSize: 16
-            anchors.top: bottomLine.top
-            anchors.topMargin: 20
-            anchors.left: parent.left
-            anchors.leftMargin: 20
-            anchors.right: parent.right
-            anchors.rightMargin: switchvisible ? 74 : 20
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            color: "#3C3C3C"
+        Rectangle{
+            width: parent.width
+            height: rect_root.height - title.height - 1 - buttonsContainer.height
+            anchors{
+                  top: bottomLine.bottom
+                  left: parent.left
+                  right: parent.right
+                  bottom: buttonsContainer.top
+                  margins: 8
+              }
+
+            Text {
+                id: tipscontent
+                text: qsTr(tipsContentStr)
+                clip: true
+                elide:  Text.ElideRight
+                wrapMode: Text.WrapAnywhere
+                height: parent.height
+                width: switchvisible ? parent.width - 74 : parent.width
+                font.pixelSize: 16
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                anchors.centerIn: parent.Center
+                color: "#3C3C3C"
+            }
+
+            Switch {
+                id: poposwitch
+                anchors.verticalCenter: tipscontent.verticalCenter
+                width: 42
+                height: 32
+                anchors.left: tipscontent.right
+                anchors.leftMargin: 8
+                visible: switchvisible
+                onCheckedChanged: switchAction(checked)
+            }
         }
-        Switch {
-            id: poposwitch
-            anchors.verticalCenter: tipscontent.verticalCenter
-            width: 42
-            height: 32
-            anchors.left: tipscontent.right
-            anchors.leftMargin: 12
-            visible: switchvisible
-            onCheckedChanged: switchAction(checked)
-        }
+
         Item {
             id: buttonsContainer
             anchors.left: parent.left
@@ -104,13 +114,13 @@ Popup {
                     font.capitalization: Font.MixedCase
                     font.pixelSize: 15
                 }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
-                }
+//                layer.enabled: true
+//                layer.effect: DropShadow{
+//                    horizontalOffset: 0
+//                    verticalOffset: 12
+//                    radius: 20.5
+//                    color: "#1A1890FF"
+//                }
                 onClicked: cancelAction()
             }
 
@@ -136,13 +146,13 @@ Popup {
                     font.capitalization: Font.MixedCase
                     font.pixelSize: 15
                 }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
-                }
+//                layer.enabled: true
+//                layer.effect: DropShadow{
+//                    horizontalOffset: 0
+//                    verticalOffset: 12
+//                    radius: 20.5
+//                    color: "#1A1890FF"
+//                }
                 onClicked: sureAction(poposwitch.checked)
             }
         }

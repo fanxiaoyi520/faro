@@ -1,6 +1,8 @@
 module Dialog
 
 Dialog    1.0     Dialog.qml
+ChangepassPop    1.0    ChangePassPop.qml
 BaseDialog    1.0     BaseDialog.qml
 Toast    1.0     Toast.qml
 Hub    1.0     Hub.qml
+

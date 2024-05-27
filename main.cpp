@@ -7,11 +7,8 @@
 #include <QtQml>
 #include <QTextCodec>
 #include "faroscannercontroller.h"
-#include "Windows.h"
-#include "wlanapi.h"
-#include "QNetworkInterface"
-#include "QNetworkAddressEntry"
-#include "sstream"
+#include "wifihelper.h"
+
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
@@ -43,6 +40,7 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QNetworkAccessManager>("QNetworkAccessManager", 1, 0, "QNetworkAccessManager");
     qmlRegisterType<Http>("Http", 1, 0, "Http");
+    qmlRegisterType<WifiHelper>("WifiHlper",1,0,"WifiHelper");
     qmlRegisterSingletonType<QObject>("Api", 1, 0, "Api",apiProvider);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());
