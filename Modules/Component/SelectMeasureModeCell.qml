@@ -107,13 +107,6 @@ Rectangle {
                 anchors.rightMargin: 24
                 anchors.top: cell3.celltitle.top
             }
-            Rectangle{
-                anchors.top: cell3.celltitle.bottom
-                anchors.topMargin: 12
-                width: 100
-                height: 100
-                color: "red"
-            }
             SelectMeasureListButtonView{
                 id: selectMeasureListButtonView
                 list: ["精简","标准","详细","全部"]

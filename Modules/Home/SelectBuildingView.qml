@@ -118,6 +118,16 @@ ScrollView{
                     radius: 11.5
                     color: "#10000000"
                 }
+            }
+            Rectangle {
+                color: "#FFFFFF"
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                radius: 8
                 Image{
                     id: img
                     source: GlobalFunc.setStatusImageSource(modelData)
