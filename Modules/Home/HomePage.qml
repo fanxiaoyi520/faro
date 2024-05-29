@@ -167,9 +167,8 @@ StackView{
             settingsManager.setValue(settingsManager.selectedStageType,SettingString.stageType[0])
         }
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        selectBuildingView.item.currentRow = selectedStageType.index
-        selectBuildingView.item.selectedStageName = selectedStageType.name
-
+        selectBuildingView.item.currentRow = selectedStageType.index === undefined ? 0 : selectedStageType.index
+        selectBuildingView.item.selectedStageName = selectedStageType.name === undefined ? "主体阶段(一阶段)" : selectedStageType.name
         settingsManager.setValue(settingsManager.selectedItem,JSON.stringify(modelData))
         homestack.push(selectBuildingView)
     }

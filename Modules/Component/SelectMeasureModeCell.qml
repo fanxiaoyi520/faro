@@ -16,11 +16,12 @@ Rectangle {
      * @map_mode        测量下尺模式
      * @scanningMode    扫描密度
      */
-    property int masonry_mode: 1
-    property int xy_crop_dist: 6
-    property int z_crop_dist: 3
-    property int map_mode: 3
-    property int scanningMode: 3
+
+    property int sub_masonry_mode: 0
+    property int sub_xy_crop_dist: 6
+    property int sub_z_crop_dist: 3
+    property int sub_map_mode: 1
+    property int sub_scanningMode: 4
 
     id: basecellid
     width: parent.width
@@ -60,7 +61,7 @@ Rectangle {
                 anchors.rightMargin: 24
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.15
-                text: cellModel.index === 1 ? xy_crop_dist : z_crop_dist
+                text: cellModel.index === 1 ? sub_xy_crop_dist : sub_z_crop_dist
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.capitalization: Font.MixedCase
@@ -113,7 +114,7 @@ Rectangle {
                 anchors.top: cell3.celltitle.bottom
                 anchors.topMargin: 12
                 visible: isControlLaunch1 ? true : false
-                selectIndex: map_mode
+                selectIndex: sub_map_mode
                 onClickSelectAction: measureTheBottomRulerMode(index,model)
             }
         }
@@ -141,7 +142,7 @@ Rectangle {
                 anchors.top: cell4.celltitle.bottom
                 anchors.topMargin: 12
                 visible: isControlLaunch2 ? true : false
-                selectIndex: scanningMode
+                selectIndex: sub_scanningMode-1
                 onClickSelectAction: scanningDensity(index,model)
             }
         }
@@ -192,28 +193,19 @@ Rectangle {
     }
 
     function switchAction(checked){
-        console.log("switch checked: "+checked)
-        masonry_mode = checked
+        parent_switchAction(checked)
     }
 
     function measureTheBottomRulerMode(index,model){
-        console.log("measure the bottom ruler mode index: "+index+" model: "+model)
-        map_mode = index
+        parent_measureTheBottomRulerMode(index,model)
     }
 
     function onInputTextChanged(index,text){
-        console.log("input: "+index)
-        console.log("text: "+text)
-        if(index === 1) {
-            xy_crop_dist = text
-        } else {
-            z_crop_dist = text
-        }
+        parent_onInputTextChanged(index,text)
     }
 
     function scanningDensity(index,model){
-        console.log("scanning density: "+index+" model: "+model)
-        scanningMode = index
+        parent_scanningDensity(index,model)
     }
 }
 

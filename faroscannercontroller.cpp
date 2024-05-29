@@ -99,7 +99,6 @@ void FaroScannerController::startScan() {
 
 void FaroScannerController::startScan(const QString &m_Resolution, const QString &m_ScanName)
 {
-    qDebug() << "----------: " << m_Resolution << "------------------" << m_ScanName;
     if (scanCtrlSDKPtr) {
         scanCtrlSDKPtr->Resolution = m_Resolution.toInt();
         _bstr_t _bstr_t_m_ScanName = m_ScanName.toStdWString().c_str();

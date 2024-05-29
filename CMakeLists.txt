@@ -24,29 +24,16 @@ endforeach()
 foreach(INC_FILE ${INC_FILES})
     list(APPEND PROJECT_HEADERS ${INC_FILE})
 endforeach()
-#include(FetchContent)
-#FetchContent_Declare(
-#  cpr
-#  GIT_REPOSITORY https://github.com/libcpr/cpr.git
-#  GIT_TAG 1b03deba3a84ba8b765b2f57ab05da825326aec9  # 你可以根据需要更改为特定的tag或branch
-#)
-#FetchContent_MakeAvailable(cpr)
-# QtCreator supports the following variables for Android, which are identical to qmake Android variables.
-# Check http://doc.qt.io/qt-5/deployment-android.html for more information.
-# They need to be set before the find_package(Qt5 ...) call.
-
-#if(ANDROID)
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-#    if (ANDROID_ABI STREQUAL "armeabi-v7a")
-#        set(ANDROID_EXTRA_LIBS
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so7
-
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
-#    endif()
-#endif()
 
 find_package(Qt5 COMPONENTS Core Quick REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Network)
+
+#include_directories(C:/Program Files/zlib/include)
+#find_library(QUAZIP_LIBRARY NAMES zlib PATHS C:/Program Files/zlib/lib)
+#if(NOT QUAZIP_LIBRARY)
+#    message(FATAL_ERROR "Could not find zlib library")
+#endif()
+
 # find_package(Qt6 6.4 REQUIRED COMPONENTS Quick)
 # find_package(Qt6 REQUIRED COMPONENTS Network)
 if(ANDROID)

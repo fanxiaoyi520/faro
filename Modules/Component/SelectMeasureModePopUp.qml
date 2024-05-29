@@ -9,11 +9,30 @@ Popup {
     property bool switchvisible: false
     property var list: SettingString.selectedMeasureMode
     signal confirmAction()
+
     id: popup
     y: parent.height * 0.1
     x: parent.width * 0.1
     width: parent.width * 0.8
     height: parent.height * 0.8
+    onListChanged: setDefaultData()
+        /**
+     * select measure mode params
+     * @masonry_mode    识别砌体
+     * @xy_crop_dist    平面
+     * @z_crop_dist     高度
+     * @map_mode        测量下尺模式
+     * @scanningMode    扫描密度
+     */
+    property string stageType
+    property int stationType
+
+    property int masonry_mode: 0
+    property int xy_crop_dist: 6
+    property int z_crop_dist: 3
+    property int map_mode: 1
+    property int scanningMode: 4
+
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
@@ -71,6 +90,11 @@ Popup {
             id: itemDelegate
             SelectMeasureModeCell{
                 cellModel: JSON.parse(modelData)
+                sub_map_mode: map_mode
+                sub_masonry_mode: masonry_mode
+                sub_scanningMode: scanningMode
+                sub_xy_crop_dist: xy_crop_dist
+                sub_z_crop_dist: z_crop_dist
             }
         }
         Item {
@@ -109,8 +133,79 @@ Popup {
             }
         }
     }
+
+    function setDefaultData(){
+        console.log("每次都响应吗")
+        var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
+        if (selectedMeasureData){
+            masonry_mode = selectedMeasureData.masonry_mode
+            if (stationType === 1) {
+                if(stageType === "2") {
+                    if(selectedMeasureData.masonry_mode === 1 && selectedMeasureData.scanningMode > 3){
+                        scanningMode = 3
+                    }
+                } else {
+                    scanningMode = selectedMeasureData.scanningMode > 3 ? 3 : selectedMeasureData.scanningMode
+                }
+            } else {
+                scanningMode = stageType === "2" ? ((masonry_mode === 1 && selectedMeasureData.scanningMode > 3) ? 3 : selectedMeasureData.scanningMode) : selectedMeasureData.scanningMode
+            }
+        } else {
+            var defaultParams = {
+                "activeColoring": "0",
+                "map_mode": 4,
+                "scanningMode": 4,
+                "masonry_mode": 0,
+                "xy_crop_dist": 6,
+                "z_crop_dist": 3,
+            }
+            settingsManager.setValue(settingsManager.selectedMeasureData,JSON.stringify(defaultParams))
+            map_mode = 1
+            masonry_mode = stageType === "2" ? 1 : 0
+            if(stationType === 1) {
+                scanningMode = 3
+            } else {
+                scanningMode = stageType === "2" ? 3 : 4
+            }
+        }
+    }
+
+    function parent_switchAction(checked){
+        console.log("switch checked: "+checked)
+        masonry_mode = checked
+    }
+
+    function parent_measureTheBottomRulerMode(index,model){
+        console.log("measure the bottom ruler mode index: "+index+" model: "+model)
+        map_mode = index
+    }
+
+    function parent_onInputTextChanged(index,text){
+        console.log("input: "+index)
+        console.log("text: "+text)
+        if(index === 1) {
+            xy_crop_dist = text
+        } else {
+            z_crop_dist = text
+        }
+    }
+
+    function parent_scanningDensity(index,model){
+        console.log("scanning density: "+index+" model: "+model)
+        scanningMode = index
+    }
+
     function sureAction(){
         popup.close()
+        var selectedMeasureData = {
+            "masonry_mode": masonry_mode,
+            "xy_crop_dist": xy_crop_dist,
+            "z_crop_dist": z_crop_dist,
+            "map_mode": map_mode,
+            "scanningMode": scanningMode,
+            "activeColoring": "0",
+        }
+        settingsManager.setValue(settingsManager.selectedMeasureData,JSON.stringify(selectedMeasureData))
     }
 }
 

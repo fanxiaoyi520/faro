@@ -220,8 +220,8 @@ ScrollView{
         selectFloorView.source = "SelectFloorView.qml"
         selectFloorView.item.inputModelData = modelData
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        selectFloorView.item.currentRow = selectedStageType.index
-        selectFloorView.item.selectedStageName = selectedStageType.name
+        selectFloorView.item.currentRow = selectedStageType.index === undefined ? 0 : selectedStageType.index
+        selectFloorView.item.selectedStageName = selectedStageType.name === undefined ? "主体阶段(一阶段)" : selectedStageType.name
         rootStackView.push(selectFloorView)
     }
 

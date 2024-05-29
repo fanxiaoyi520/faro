@@ -84,4 +84,9 @@ QString Api::admin_sys_file_listFileByFileIds() const
     return QString("/admin/sys-file/listFileByFileIds");
 }
 
+QString Api::admin_sys_file_upload() const
+{
+    return QString("/admin/sys-file/upload");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

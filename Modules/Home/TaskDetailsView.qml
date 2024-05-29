@@ -8,12 +8,13 @@ import Dialog 1.0
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as SettingString
-import FaroScanner 1.0
+import FaroManager 1.0
 
 Item{
     property int page: 0
     property var inputModelData
     property var roomsList:[]
+    property var roomTaskVoModel
     property var list:[]
     property int currentRow: 0
     property string selectedStageName: "主体阶段（一阶段）"
@@ -21,6 +22,7 @@ Item{
     property string imageUrl : ""
     property double imageBackHeight : parent.width * 0.6
     property double imageBackWidth : parent.width * 0.6
+    property var inputCellModel
 
     id: selectTaskDetailsView
     Layout.fillWidth: true
@@ -38,13 +40,15 @@ Item{
             currentRow = model.index
             selectedStageName = model.name
             hub.open()
-            getBuildingUnitPage()
+            getBuildingRoomListByFloorId()
         }
     }
     TipsPopUp{
         id: tipsPopUp
         tipsContentStr: qsTr("是否重新开始扫描")
         onConfirmAction: {
+            var model = inputModel
+            tipsSwitchPopUp.inputModel = model
             tipsSwitchPopUp.open()
         }
     }
@@ -54,7 +58,7 @@ Item{
         switchvisible: true
         cancelBtnStr: qsTr("取消扫描")
         sureBtnStr: qsTr("开始扫描")
-        onConfirmAndSwitchAction: startScan(checked)
+        onConfirmAndSwitchAction: startScan(checked,inputModel)
     }
     TipsPopUp{
         id: recalculatePopUp
@@ -70,15 +74,17 @@ Item{
     }
     SelectMeasureModePopUp{
         id: selectMeasureModePopUp
+        stageType: roomTaskVoModel.stageType
+        stationType: inputCellModel.stationType
     }
     Hub{id: hub}
     EnlargeImage{
         id: enlargeImagePopUp
     }
-    FaroScannerController {
-        id: scannerController
+    FaroManager {
+        id: faroManager
         Component.onCompleted: {
-            if(scannerController.init()) {
+            if(faroManager.init()) {
                 console.log("--------------初始化成功--------------")
             }
         }
@@ -215,7 +221,9 @@ Item{
         enlargeImagePopUp.open()
     }
 
-    function scanAction(){
+    function scanAction(scanModel){
+        inputCellModel = scanModel
+        tipsPopUp.inputModel = scanModel
         tipsPopUp.open()
     }
 
@@ -240,11 +248,33 @@ Item{
         }
     }
 
-    function startScan(checked){
+    function startScan(checked,inoutModel){
         console.log("is auto upload file: "+checked)
         console.log("start scan ...")
-        scannerController.connect()
-        scannerController.startScan()
+        var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
+        var scanParams = {
+            "activeColoring": selectedMeasureData ? selectedMeasureData.activeColoring : "0",
+            "map_mode": selectedMeasureData ? selectedMeasureData.map_mode : "4",
+            "scanningMode": selectedMeasureData ? selectedMeasureData.scanningMode : "4",
+            "masonry_mode": selectedMeasureData ? selectedMeasureData.masonry_mode : 0,
+            "xy_crop_dist": selectedMeasureData ? selectedMeasureData.xy_crop_dist : 6,
+            "z_crop_dist": selectedMeasureData ? selectedMeasureData.z_crop_dist : 3,
+
+            "stationId":inoutModel.stationId,
+            "taskNo":inoutModel.stationNo,
+            "stationType":inoutModel.stationType,
+            "isAutoUpload":checked,
+            "projectName":roomTaskVoModel.projectName,
+            "blockName":roomTaskVoModel.blockName,
+            "unitName":roomTaskVoModel.unitName,
+            "floorName":roomTaskVoModel.floorName,
+            "roomName":roomTaskVoModel.roomName,
+            "stageType":roomTaskVoModel.stageType,
+            "filePath":"",
+            "roomId":inputModelData.id,
+        }
+        console.log("input scanning parameters: "+JSON.stringify(scanParams))
+        faroManager.startScan(scanParams)
     }
 
     //MARK: network
@@ -275,7 +305,8 @@ Item{
             http.onReplySucSignal.disconnect(onReply)
             console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
-            if (!response.data || response.data.length <=0) {
+            roomTaskVoModel = response.data
+            if (!response.data || response.data.stations.length <=0) {
                 list = []
                 imageUrl = ""
                 return;

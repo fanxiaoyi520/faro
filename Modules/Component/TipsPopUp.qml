@@ -4,14 +4,15 @@ import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
 
 Popup {
+    property var inputModel
     property var titleStr: "温馨提示"
     property var tipsContentStr: ""
     property var cancelBtnStr: "取消"
     property var sureBtnStr: "确定"
     property bool switchvisible: false
     property bool isVisibleCancel: true
-    signal confirmAction()
-    signal confirmAndSwitchAction(bool checked)
+    signal confirmAction(var inputModel)
+    signal confirmAndSwitchAction(bool checked,var inputModel)
     id: popup
     width: parent.width
     height: parent.height
@@ -153,7 +154,7 @@ Popup {
 //                    radius: 20.5
 //                    color: "#1A1890FF"
 //                }
-                onClicked: sureAction(poposwitch.checked)
+                onClicked: sureAction(poposwitch.checked,inputModel)
             }
         }
     }
@@ -162,12 +163,12 @@ Popup {
         popup.close()
     }
 
-    function sureAction(checked){
+    function sureAction(checked,inputModel){
         popup.close()
         if (switchvisible){
-            confirmAndSwitchAction(checked)
+            confirmAndSwitchAction(checked,inputModel)
         }else{
-            confirmAction()
+            confirmAction(inputModel)
         }
     }
 

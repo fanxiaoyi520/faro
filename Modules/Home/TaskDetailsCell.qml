@@ -122,7 +122,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("scan clicked")
-                    scanAction()
+                    scanAction(model)
                 }
             }
         }

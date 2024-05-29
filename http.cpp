@@ -4,8 +4,8 @@
 Http::Http(QObject *parent) : QObject(parent)
 {
     manager = new QNetworkAccessManager(this);
-    QObject::connect(manager,SIGNAL(finished(const QString &)),this,SLOT(replyFinished(const QString &)));
-    QObject::connect(manager,SIGNAL(finished(const QString &, int)),this,SLOT(replyFail(const QString &, int)));
+    //QObject::connect(manager,SIGNAL(finished(const QString &)),this,SLOT(replyFinished(const QString &)));
+    //QObject::connect(manager,SIGNAL(finished(const QString &, int)),this,SLOT(replyFail(const QString &, int)));
 }
 
 void Http::replyFinished(const QString &response)
@@ -183,6 +183,29 @@ void Http::loginPost(QString url,
     }).fail([this](const QString &error, int errorCode) {
         replyFail(error,errorCode);
     }).post();
+}
+
+void Http::upload(QString url,QString path)
+{
+    QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
+    QMap<QString, QString>headersMap;
+    if(!user.isEmpty()) {
+        qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
+        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("lang","zh_CN");
+        headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
+    } else {
+        qDebug() << "user info is empty";
+    }
+    qDebug() << "headers: "<< headersMap;
+    HttpClient(BASE_URL+url)
+            .debug(true)
+            .headers(headersMap)
+            .success([this](const QString &response) {
+        emit qtreplySucSignal(response);
+    }).fail([this](const QString &error, int errorCode) {
+        emit qtreplyFailSignal(error,errorCode);
+    }).upload(path);
 }
 
 QString Http::getActiveWifi()

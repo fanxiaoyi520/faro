@@ -39,3 +39,44 @@ void Util::populateModel(QStandardItemModel *model, const QJsonObject &data, QSt
     }
 }
 
+QStandardItemModel* Util::jsonStringToStandardModel(const QString& jsonString) {
+    QStandardItemModel* model = new QStandardItemModel();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonString.toUtf8());
+    if (!jsonDoc.isObject()) {
+        qDebug() << "JSON is not an object";
+        return nullptr;
+    }
+
+    QJsonObject jsonObject = jsonDoc.object();
+    for (auto it = jsonObject.constBegin(); it != jsonObject.constEnd(); ++it) {
+        QList<QStandardItem*> rowItems;
+        rowItems.append(new QStandardItem(it.key()));
+
+        QJsonValue value = it.value();
+        if (value.isString()) {
+            rowItems.append(new QStandardItem(value.toString()));
+        } else {
+            rowItems.append(new QStandardItem(QString("Non-string value")));
+        }
+
+        model->appendRow(rowItems);
+    }
+
+    // 设置模型的水平头
+    model->setHorizontalHeaderLabels(QStringList() << "Key" << "Value");
+    return model;
+}
+
+QString Util::standardModelToJsonString(const QStandardItemModel* model) {
+    QJsonObject jsonObject;
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        QJsonObject itemObject;
+        itemObject[model->index(row, 0).data().toString()] = QJsonValue(model->index(row, 1).data().toString());
+        jsonObject[QString::number(row)] = itemObject;
+    }
+
+    QJsonDocument jsonDoc(jsonObject);
+    return jsonDoc.toJson(QJsonDocument::Indented);
+}
+

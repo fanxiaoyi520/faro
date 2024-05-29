@@ -19,6 +19,10 @@ public:
     // 静态方法：将QMap<QString, QVariant>转换为JSON字符串
     static QString mapToJson(const QMap<QString, QVariant>& map);
     static void populateModel(QStandardItemModel *model, const QJsonObject &data, QStandardItem *parent = nullptr);
+    // 将JSON字符串转换为QStandardItemModel
+    static QStandardItemModel* jsonStringToStandardModel(const QString& jsonString);
+    // 将QStandardItemModel转换为JSON字符串
+    static QString standardModelToJsonString(const QStandardItemModel* model);
 };
 
 #endif // UTIL_H

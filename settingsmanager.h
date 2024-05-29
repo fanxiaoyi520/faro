@@ -14,6 +14,7 @@ class SettingsManager : public QObject
     Q_PROPERTY(QString selectedProjectSource READ selectedProjectSource CONSTANT)
     Q_PROPERTY(QString selectedStageType READ selectedStageType CONSTANT)
     Q_PROPERTY(QString selectedItem READ selectedItem CONSTANT)
+    Q_PROPERTY(QString selectedMeasureData READ selectedMeasureData CONSTANT)
 
 //    Q_PROPERTY(QString stageType READ stageType CONSTANT)
 //    Q_PROPERTY(QString moreType READ moreType CONSTANT)
@@ -39,6 +40,7 @@ public:
     QString selectedProjectSource() const;
     QString selectedStageType() const;
     QString selectedItem() const;
+    QString selectedMeasureData() const;
 
     /**
      * @brief 静态数据

@@ -17,7 +17,24 @@ Window {
     property var currentView: login
 
     Component.onCompleted: {
-       initView()
+        initData()
+        initView()
+    }
+
+    //initialize default select measure data
+    function initData(){
+        var selectedMeasureData = settingsManager.getValue(settingsManager.selectedMeasureData)
+        //if (!selectedMeasureData) {
+            var defaultParams = {
+                "activeColoring": "0",
+                "map_mode": 1,
+                "scanningMode": 4,
+                "masonry_mode": 0,
+                "xy_crop_dist": 6,
+                "z_crop_dist": 3,
+            }
+            settingsManager.setValue(settingsManager.selectedMeasureData,JSON.stringify(defaultParams))
+        //}
     }
 
     function initView(){

@@ -23,6 +23,7 @@ class Api : public QObject {
     Q_PROPERTY(QString building_room_listByFloorId READ building_room_listByFloorId CONSTANT)
     Q_PROPERTY(QString building_roomTask_getRoomTaskInfo READ building_roomTask_getRoomTaskInfo CONSTANT)
     Q_PROPERTY(QString admin_sys_file_listFileByFileIds READ admin_sys_file_listFileByFileIds CONSTANT)
+    Q_PROPERTY(QString admin_sys_file_upload READ admin_sys_file_upload CONSTANT)
 
 public:
     static Api* instance();
@@ -42,6 +43,7 @@ public:
     QString building_room_listByFloorId() const;
     QString building_roomTask_getRoomTaskInfo() const;
     QString admin_sys_file_listFileByFileIds() const;
+    QString admin_sys_file_upload() const;
 private:
     Api(QObject *parent = nullptr);
     Q_DISABLE_COPY(Api)

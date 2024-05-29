@@ -195,7 +195,7 @@ Popup {
     function sureAction(){
         popup.close()
         console.log("sure clicked and currentIndex: " + currentIndex)
-        confirmOptionsAction(list[currentIndex])
+        confirmOptionsAction(JSON.parse(list[currentIndex]))
     }
 }
 

@@ -60,6 +60,11 @@ QString SettingsManager::selectedItem() const
     return "selectedItem";
 }
 
+QString SettingsManager::selectedMeasureData() const
+{
+    return "selectedMeasureData";
+}
+
 /**
 QString SettingsManager::stageType() const
 {

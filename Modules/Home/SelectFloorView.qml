@@ -234,8 +234,8 @@ ScrollView{
         selectTaskDetailsView.source = "TaskDetailsView.qml"
         selectTaskDetailsView.item.inputModelData = modelData
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        selectTaskDetailsView.item.currentRow = selectedStageType.index
-        selectTaskDetailsView.item.selectedStageName = selectedStageType.name
+        selectTaskDetailsView.item.currentRow = selectedStageType.index === undefined ? 0 : selectedStageType.index
+        selectTaskDetailsView.item.selectedStageName = selectedStageType.name === undefined ? "主体阶段(一阶段)" : selectedStageType.name
         rootStackView.push(selectTaskDetailsView)
     }
 
