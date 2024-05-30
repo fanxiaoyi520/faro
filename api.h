@@ -22,7 +22,9 @@ class Api : public QObject {
     Q_PROPERTY(QString building_floor_page READ building_floor_page CONSTANT)
     Q_PROPERTY(QString building_room_listByFloorId READ building_room_listByFloorId CONSTANT)
     Q_PROPERTY(QString building_roomTask_getRoomTaskInfo READ building_roomTask_getRoomTaskInfo CONSTANT)
+    Q_PROPERTY(QString building_measureDevice_searchDevice READ building_measureDevice_searchDevice CONSTANT)
     Q_PROPERTY(QString admin_sys_file_listFileByFileIds READ admin_sys_file_listFileByFileIds CONSTANT)
+
 
 public:
     static Api* instance();
@@ -41,6 +43,7 @@ public:
     QString building_room_countFloorRoom() const;
     QString building_room_listByFloorId() const;
     QString building_roomTask_getRoomTaskInfo() const;
+    QString building_measureDevice_searchDevice() const;
     QString admin_sys_file_listFileByFileIds() const;
 private:
     Api(QObject *parent = nullptr);

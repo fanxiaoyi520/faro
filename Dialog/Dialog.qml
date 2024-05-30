@@ -9,13 +9,13 @@ Popup {
     property var titleStr: "选择租户"
     signal confirmOptionsAction(var model)
     onListChanged: {
-        console.log("List has changed:", list.length)
+        console.log("List has changed:" + list[0], list.length)
     }
 
     id: popup
-    y: parent.height - (160 + 3 * 55)
+    y: parent.height - popup.height
     width: parent.width
-    height: 160 + 3 * 55
+    height: contentItem.implicitHeight
     modal: true
     focus: true
     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
@@ -33,8 +33,7 @@ Popup {
         }
     }
     padding: 0
-    ColumnLayout{
-        anchors.fill: parent
+    contentItem:  ColumnLayout{
         clip: true
         Text {
             id: title
@@ -56,21 +55,27 @@ Popup {
 
         ListView{
             clip: true
-            id: listview
+            id: my_listview
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.maximumHeight: 3*55
             model: list
             delegate: listviewDelegate
             onCurrentIndexChanged: {
                 currentIndex = currentIndex;
+            }
+            Component.onCompleted: {
+                contentHeightChanged();
+            }
+
+            onContentHeightChanged: {
+                my_listview.height = my_listview.contentHeight + 54 * 2;
+                console.log("list height =" + my_listview.contentHeight)
             }
         }
 
         Component{
             id: listviewDelegate
             Item {
-                width: listview.width
+                width: my_listview.width
                 height: 54
                 Row {
                     spacing: 15
@@ -129,17 +134,20 @@ Popup {
         Item {
             id: buttonsContainer
             Layout.fillWidth: true
-            height: 100
+            Layout.topMargin: 16
+            height: 57
 
             Button{
                 id: cancelbtn
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 38.5
+                anchors.bottomMargin: 16
                 anchors.left: parent.left
                 anchors.leftMargin: 60
                 width: (parent.width-60*2-24)/2
                 height: 41
                 text: qsTr("取消")
+                font.pixelSize: 16
+                font.bold: true
                 highlighted: true
                 background: Rectangle{
                     id: cancelbtnrect
@@ -153,14 +161,8 @@ Popup {
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     font.capitalization: Font.MixedCase
-                    font.pixelSize: 15
-                }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
+                    font.pixelSize: 16
+                    font.bold: true
                 }
                 onClicked: cancelAction()
             }
@@ -168,13 +170,15 @@ Popup {
             Button{
                 id: surebtn
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 38.5
+                anchors.bottomMargin: 16
                 anchors.right: parent.right
                 anchors.rightMargin: 60
                 width: (parent.width-60*2-24)/2
                 height: 41
                 text: qsTr("确定")
                 highlighted: true
+                font.pixelSize: 16
+                font.bold: true
                 background: Rectangle{
                     id: surebtnrect
                     color: "#1890FF"
@@ -187,14 +191,8 @@ Popup {
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     font.capitalization: Font.MixedCase
-                    font.pixelSize: 18
-                }
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 12
-                    radius: 20.5
-                    color: "#1A1890FF"
+                    font.pixelSize: 16
+                    font.bold: true
                 }
                 onClicked: sureAction()
             }

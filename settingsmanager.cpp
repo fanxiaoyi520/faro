@@ -60,6 +60,11 @@ QString SettingsManager::selectedItem() const
     return "selectedItem";
 }
 
+QString SettingsManager::currentDevice() const
+{
+    return "currentDevice";
+}
+
 QString SettingsManager::stageType() const
 {
     QJsonArray jsonArray;

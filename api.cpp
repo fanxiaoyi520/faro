@@ -79,6 +79,11 @@ QString Api::building_roomTask_getRoomTaskInfo() const
     return QString("/building/roomTask/getRoomTaskInfo");
 }
 
+QString Api::building_measureDevice_searchDevice() const
+{
+    return QString("/building/measureDevice/searchDevice");
+}
+
 QString Api::admin_sys_file_listFileByFileIds() const
 {
     return QString("/admin/sys-file/listFileByFileIds");

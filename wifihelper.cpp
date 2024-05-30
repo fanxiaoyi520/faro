@@ -69,7 +69,10 @@ void WifiHelper::scanNetworks()
 
     for (unsigned int i = 0; i < pNetworkList->dwNumberOfItems; ++i) {
         WLAN_AVAILABLE_NETWORK network = pNetworkList->Network[i];
-        list.append(QString::fromUtf8(reinterpret_cast<const char*>(network.dot11Ssid.ucSSID), network.dot11Ssid.uSSIDLength));
+        QString itemNetWork = QString::fromUtf8(reinterpret_cast<const char*>(network.dot11Ssid.ucSSID), network.dot11Ssid.uSSIDLength);
+        if(!list.contains(itemNetWork)){
+            list.append(itemNetWork);
+        }
     }
 
 
