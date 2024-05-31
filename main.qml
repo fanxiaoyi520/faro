@@ -67,6 +67,11 @@ Window {
     }
 
     Hub{id:hub}
+
+    ScanningWifiLottiePop{
+        id:scanningwifi_pop
+    }
+
     Component {
         id: login
         Item {

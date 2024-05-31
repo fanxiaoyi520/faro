@@ -51,3 +51,9 @@ var selectedMeasureMode = [
             '{"index": 3, "name": "测量下尺模式"}',
             '{"index": 4, "name": "扫描密度"}'
         ];
+var wifiscan_title = "扫描附近设备"
+var wifiscan_tips = "扫描中..."
+var wifiscan_result_title = "附近设备"
+var wifiscan_result_success_tips = "设置wifi成功"
+var wifiscan_result_empty_tips = "没有发现设备"
+var wifiscan_result_faild_tips = "匹配设备失败"

@@ -3,6 +3,7 @@ import Http 1.0
 import Api 1.0
 import Dialog 1.0
 import WifiHlper 1.0
+import "../../String_Zh_Cn.js" as String
 
 Rectangle {
     id:root
@@ -11,6 +12,7 @@ Rectangle {
     property var iconPath:""
     property var rightText: ""
     property var contentName: ""
+    property var refreshContentName: false
     width: parent.width
     height: 39
     color: "white"
@@ -20,8 +22,27 @@ Rectangle {
     WifiHelper{
         id:wifiHelper
         onNetworksResult: {
-            hub.close()
+            scanningwifi_pop.close()
             console.log("get network result  = " + JSON.stringify(list))
+            var wifiResultList = [];
+
+            for(let item of list){
+                if(item.includes("BLK360")){
+                    var myObject = {
+                        name: item
+                    }
+                    wifiResultList.push(myObject);
+                }
+            }
+            console.log("get network filter  = " + JSON.stringify(wifiResultList))
+            if(wifiResultList.size > 0){
+                wifiResultPop.list = wifiResultList
+                wifiResultPop.titleStr = qsTr(String.wifiscan_result_title)
+                wifiResultPop.open()
+            }else{
+                mineTipsPop.tipsContentStr = qsTr(String.wifiscan_result_empty_tips)
+                mineTipsPop.open()
+            }
         }
     }
 
@@ -84,21 +105,42 @@ Rectangle {
                     jumpToUserInfo()
                 }
                 if(index == 3 && visible){
-                    hub.open()
-//                    wifiHelper.startWork()
+                    scanningwifi_pop.open()
+                    wifiHelper.startWork()
+                }
+                if(index == 4){
+                    console.log("click connect wifi")
+//                    wifiHelper.connectToWiFi("LLS082118788","0123456789")
+                    wifiHelper.disConnectWifi()
                 }
             }
         }
     }
 
     onVisibleChanged: {
-        if(index == 2 && visible && !loaded){
-            loadTenantName()
-        }
-        if(index == 0 && visible && !loaded){
-            loadUserName()
+        if(visible && !loaded){
+            refreshContent()
         }
     }
+
+    onRefreshContentNameChanged: {
+        refreshContent()
+    }
+
+    function refreshContent(){
+        if(index == 2){
+            loadTenantName()
+        }
+        if(index == 0){
+            loadUserName()
+        }
+        if(index == 3){
+            var wifi = settingsManager.getValue(settingsManager.currentDevice)
+            console.log("wifi info =" + wifi)
+            contentName = JSON.parse(wifi).wifiName
+        }
+    }
+
     property var loaded: false
 
     function jumpToUserInfo(){
@@ -127,6 +169,7 @@ Rectangle {
             root.contentName = tenantName
             loaded = true
         }
+
 
         function onFail(reply,code){
             console.log(reply,code)

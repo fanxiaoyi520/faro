@@ -98,16 +98,16 @@ Rectangle{
         interval: 200
         onTriggered: {
             hub.close()
-            completeLogin()
             getUserDetail(user_id)
         }
     }
 
     Timer {
         id:timer_userdetail
+        property var tenant_id
         interval: 200
         onTriggered: {
-            getById(user.tenant_id)
+            getById(tenant_id)
         }
     }
 
@@ -190,6 +190,7 @@ Rectangle{
             var user = JSON.parse(settingsManager.getValue(settingsManager.user))
             user.userinfo = JSON.stringify(response.data)
             settingsManager.setValue(settingsManager.user,JSON.stringify(user))
+            timer_userdetail.tenant_id = user.tenant_id
             timer_userdetail.start()
         }
 
@@ -215,7 +216,7 @@ Rectangle{
             user.company = response.data.name
             settingsManager.setValue(settingsManager.user,JSON.stringify(user))
             console.log("complete user data: "+settingsManager.getValue(settingsManager.user))
-            rootWindow.toggleView()
+            completeLogin()
         }
 
         function onFail(reply,code){

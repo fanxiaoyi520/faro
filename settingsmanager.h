@@ -20,6 +20,7 @@ class SettingsManager : public QObject
 //    Q_PROPERTY(QString moreType READ moreType CONSTANT)
 //    Q_PROPERTY(QString selectedMeasureMode READ selectedMeasureMode CONSTANT)
     Q_PROPERTY(QString pubKey_integers READ pubKey_integers CONSTANT)
+    Q_PROPERTY(QString currentDevice READ currentDevice CONSTANT)
 public:
     static SettingsManager* instance();
 
@@ -41,6 +42,7 @@ public:
     QString selectedStageType() const;
     QString selectedItem() const;
     QString selectedMeasureData() const;
+    QString currentDevice() const;
 
     /**
      * @brief 静态数据

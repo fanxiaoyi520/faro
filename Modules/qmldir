@@ -13,3 +13,4 @@ MHeaderListView 1.0 ./Component/MHeaderListView.qml
 TipsPopUp 1.0 ./Component/TipsPopUp.qml
 SelectMeasureModePopUp 1.0 ./Component/SelectMeasureModePopUp.qml
 DefaultTipsPop    1.0   ./Component/DefaultTipsPop.qml
+ScanningWifiLottiePop 1.0 ./Mine/ScanningWifiLottiePop.qml

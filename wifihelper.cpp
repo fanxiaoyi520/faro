@@ -1,7 +1,5 @@
-﻿#include "wifihelper.h"
-#include <thread>
-#include <QDebug>
 
+#include "wifihelper.h"
 
 WifiHelper::WifiHelper(QObject *parent) : QObject(parent), wlanHandle(nullptr),m_running(false)
 {
@@ -24,6 +22,7 @@ WifiHelper::WifiHelper(QObject *parent) : QObject(parent), wlanHandle(nullptr),m
     }
 
     WlanFreeMemory(pIfList);
+    mNativeWifi.openWLAN(mWifiMap);
 }
 
 WifiHelper::~WifiHelper()
@@ -50,6 +49,19 @@ void WifiHelper::startWork()
 }
 
 
+void WifiHelper::connectToWiFi(const QString qssid, const QString qpassword)
+{
+    std::string ssid = qssid.toUtf8().constData();
+    std::string password = qpassword.toUtf8().constData();
+
+    mNativeWifi.passwordToConnectWLAN(ssid,password);
+}
+
+void WifiHelper::disConnectWifi()
+{
+    mNativeWifi.disConnect();
+}
+
 
 
 void WifiHelper::scanNetworks()
@@ -69,7 +81,10 @@ void WifiHelper::scanNetworks()
 
     for (unsigned int i = 0; i < pNetworkList->dwNumberOfItems; ++i) {
         WLAN_AVAILABLE_NETWORK network = pNetworkList->Network[i];
-        list.append(QString::fromUtf8(reinterpret_cast<const char*>(network.dot11Ssid.ucSSID), network.dot11Ssid.uSSIDLength));
+        QString itemNetWork = QString::fromUtf8(reinterpret_cast<const char*>(network.dot11Ssid.ucSSID), network.dot11Ssid.uSSIDLength);
+        if(!list.contains(itemNetWork)){
+            list.append(itemNetWork);
+        }
     }
 
 
