@@ -11,7 +11,10 @@
 #include <QJsonArray>
 #include <QMap>
 #include <QVariant>
-
+#include <QDateTime>
+#include <QUuid>
+#include <QCoreApplication>
+#include "filemanager.h"
 class Util {
 public:
     // 声明静态方法
@@ -23,6 +26,9 @@ public:
     static QStandardItemModel* jsonStringToStandardModel(const QString& jsonString);
     // 将QStandardItemModel转换为JSON字符串
     static QString standardModelToJsonString(const QStandardItemModel* model);
+    static qint64 getTimestampMilliseconds();
+    static qint64 getTimestampSeconds();
+    static QString generateUuid();
 };
 
 #endif // UTIL_H

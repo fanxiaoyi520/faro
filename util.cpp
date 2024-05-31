@@ -80,3 +80,18 @@ QString Util::standardModelToJsonString(const QStandardItemModel* model) {
     return jsonDoc.toJson(QJsonDocument::Indented);
 }
 
+qint64 Util::getTimestampMilliseconds()
+{
+    return QDateTime::currentMSecsSinceEpoch();
+}
+
+qint64 Util::getTimestampSeconds()
+{
+    return QDateTime::currentSecsSinceEpoch();
+}
+
+QString Util::generateUuid()
+{
+    return QUuid::createUuid().toString(QUuid::WithoutBraces);
+}
+

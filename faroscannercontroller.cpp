@@ -1,6 +1,13 @@
 ﻿// FaroScannerController.cpp
 #include "FaroScannerController.h"
 
+FaroScannerController* FaroScannerController::instance() {
+    static FaroScannerController *instance = nullptr;
+    if (!instance) {
+        instance = new FaroScannerController;
+    }
+    return instance;
+}
 FaroScannerController::FaroScannerController(QObject *parent) : QObject(parent)
 {
     scanCtrlSDKPtr = nullptr;
@@ -10,6 +17,11 @@ FaroScannerController::~FaroScannerController()
 {
     // 在析构函数中可能还需要做一些清理工作，比如断开连接等
     // 但是这取决于IScanCtrlSDKPtr的实际接口和生命周期管理
+    if (timer) {
+        timer->stop();
+        delete timer;
+        timer = nullptr;
+    }
     stopScan();
     disconnect();
 }
@@ -32,12 +44,12 @@ bool FaroScannerController::initFaroInternal()
                 L"All rights reserved.\n"
                 L"This software may only be used with written permission "
                 L"of FARO Scanner Production GmbH, Stuttgart, Germany.";
-
         BSTR licenseCode = SysAllocString(licenseText);
         IiQLicensedInterfaceIfPtr licPtr(__uuidof(ScanCtrlSDK));
         try {
             licPtr->License = licenseCode;
             scanCtrlSDKPtr = static_cast<IScanCtrlSDKPtr>(licPtr);
+            scanOpInterfPtr = static_cast<IiQScanOpInterfPtr>(scanCtrlSDKPtr);
         }
         catch (...) {
             qDebug() << "No license for FARO.LS.SDK interface provided";
@@ -59,7 +71,7 @@ bool FaroScannerController::initFaroInternal()
 
 bool FaroScannerController::connect() {
     const QString default_ip = "192.168.43.1";
-    const QString defaultRemoteScanStoragePath = "D:\\fls";
+    const QString defaultRemoteScanStoragePath = FileManager::getFlsPath();
     return connect(default_ip,defaultRemoteScanStoragePath);
 }
 
@@ -73,10 +85,12 @@ bool FaroScannerController::connect(const QString &scannerIP, const QString &rem
 
 bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, const CComBSTR &remoteScanStoragePath)
 {
-    if (!scanCtrlSDKPtr) initFaroInternal();
+    if (!scanCtrlSDKPtr) {
+        initFaroInternal();
+    }
 
-    qDebug() << "scanner IP: " << scannerIP;
     scanCtrlSDKPtr->ScannerIP = scannerIP;
+    scanCtrlSDKPtr->clearExceptions();
     scanCtrlSDKPtr->connect();
     HRESULT hr = scanCtrlSDKPtr->put_RemoteScanStoragePath(remoteScanStoragePath);
     if (SUCCEEDED(hr)) {
@@ -105,26 +119,72 @@ void FaroScannerController::startScan(const QString &m_Resolution, const QString
         scanCtrlSDKPtr->ScanBaseName = _bstr_t_m_ScanName;
         scanCtrlSDKPtr->syncParam();
         scanCtrlSDKPtr->startScan();
+        pollingScannerStatus();
     }
 }
 
 void FaroScannerController::stopScan()
 {
     if (scanCtrlSDKPtr) {
+        if (timer) timer->stop();
         scanCtrlSDKPtr->stopScan();
     }
 }
 
 void FaroScannerController::disconnect() {
     if (scanCtrlSDKPtr) {
+        if (timer) {
+            timer->stop();
+            delete timer;
+            timer = nullptr;
+        }
+        stopScan();
         scanCtrlSDKPtr = nullptr;
+        scanOpInterfPtr = nullptr;
     }
 }
 
 void FaroScannerController::shutDown()
 {
     if (scanCtrlSDKPtr) {
+        if (timer) {
+            timer->stop();
+            delete timer;
+            timer = nullptr;
+        }
         scanCtrlSDKPtr->shutDown();
     }
 }
 
+void FaroScannerController::checkScannerStatus()
+{
+    scanOpInterfPtr->getScannerStatus(&scanStatus);
+    qDebug() << "Scanner status: " << scanStatus;
+
+    if (scanStatus == 0) {
+        //QTimer *timer = qobject_cast<QTimer*>(sender());
+        if (timer) timer->stop();
+        timer->deleteLater();
+        scanProgress(100);
+        emit scannerComplete(scanStatus);
+    } else {
+        getScanProgress();
+    }
+}
+
+void FaroScannerController::pollingScannerStatus(){
+
+    scanStatus = -1;
+    timer = new QTimer();
+    QObject::connect(timer, &QTimer::timeout, this, &FaroScannerController::checkScannerStatus);
+    timer->start(1000);
+}
+
+void FaroScannerController::getScanProgress()
+{
+    int percent = 1;
+    scanOpInterfPtr->getScanProgress(&percent);
+    if (percent > 0) {
+        emit scanProgress(percent);
+    }
+}

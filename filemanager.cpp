@@ -103,25 +103,32 @@ bool FileManager::decompression_zip_file(const QString &selectZipFilePath, const
 {
     if (selectZipFilePath.isEmpty() || savePath.isEmpty())
     {
+        qDebug() << "Selected ZIP file path or save path is empty.";
         return false;
     }
     if (!QFileInfo(selectZipFilePath).isFile() || !QFileInfo(savePath).isDir())
     {
+        qDebug() << "Selected ZIP file is not a file or save path is not a directory.";
         return false;
     }
 
     bool ret = true;
     QZipReader zipReader(selectZipFilePath);
     QVector<QZipReader::FileInfo> zipAllFiles = zipReader.fileInfoList();
+    qDebug() << "Found" << zipAllFiles.size() << "files/directories in the ZIP archive.";
+
     for (const QZipReader::FileInfo& zipFileInfo : zipAllFiles)
     {
         const QString currDir2File = savePath + "/" + zipFileInfo.filePath;
+        qDebug() << "Processing:" << currDir2File;
+
         if (zipFileInfo.isSymLink)
         {
             QString destination = QFile::decodeName(zipReader.fileData(zipFileInfo.filePath));
             if (destination.isEmpty())
             {
                 ret = false;
+                qDebug() << "Skipping symlink:" << zipFileInfo.filePath;
                 continue;
             }
 
@@ -136,7 +143,12 @@ bool FileManager::decompression_zip_file(const QString &selectZipFilePath, const
         }
         if (zipFileInfo.isDir)
         {
-            QDir(savePath).mkpath(currDir2File);
+            if (!QDir().mkpath(currDir2File))
+            {
+                qDebug() << "Failed to create directory:" << currDir2File;
+                return false;
+            }
+            qDebug() << "Directory created:" << currDir2File;
         }
         if (zipFileInfo.isFile)
         {
@@ -168,3 +180,74 @@ bool FileManager::decompression_zip_file(const QString &selectZipFilePath, const
     zipReader.close();
     return ret;
 }
+
+QString FileManager::getFlsPath()
+{
+    QString appDirPath = "C:";//QCoreApplication::applicationDirPath();
+    QString zipFilePath = appDirPath+"/"+FLSDIRECTORY+"/"+QString::number(Util::getTimestampMilliseconds())+"/"+Util::generateUuid();
+    QString flsDirectory = QDir(zipFilePath).filePath(QString());
+    QDir dir;
+    if (!dir.exists(flsDirectory)) {
+        if (!dir.mkpath (flsDirectory)) {
+            qDebug() << "Failed to create directory:" << flsDirectory;
+        } else {
+            qDebug() << "Directory created:" << flsDirectory;
+        }
+    }
+    return flsDirectory;
+}
+
+bool FileManager::removePath(const QString &path)
+{
+    qDebug() << "Trying to remove path:" << path;
+    QFileInfo fileInfo(path);
+    if (fileInfo.exists()) {
+        if (fileInfo.isDir()) {
+            // 删除目录及其内容
+            QDir dir(path);
+            bool success = dir.removeRecursively();
+            if (!success) {
+                qDebug() << "Failed to remove directory";
+            }
+            return success;
+        } else {
+            // 删除文件
+            QFile file(path);
+            bool success = file.remove();
+            if (!success) {
+                qDebug() << "Failed to remove file:" << file.errorString();
+            }
+            return success;
+        }
+    }
+    // 路径不存在，返回 false
+    qDebug() << "Path does not exist:" << path;
+    return false;
+}
+
+QStringList FileManager::getFilesInDirectory(const QString &dirPath, const QStringList &filters)
+{
+    QDir dir(dirPath);
+    if (!dir.exists()) {
+        qWarning() << "Directory does not exist:" << dirPath;
+        return QStringList();
+    }
+
+    // 如果提供了过滤器，则只返回匹配的文件
+    QStringList fileList = dir.entryList(filters, QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+
+    // 如果没有提供过滤器，则获取目录下所有文件
+    if (filters.isEmpty()) {
+        fileList = dir.entryList(QDir::Files | QDir::NoSymLinks | QDir::NoDotAndDotDot);
+    }
+
+    // 如果需要完整的文件路径，可以遍历 fileList 并拼接
+    QStringList fullPathList;
+    for (const QString &fileName : fileList) {
+        fullPathList << dir.filePath(fileName);
+    }
+
+    // 返回文件列表（或完整路径列表）
+    return fullPathList.isEmpty() ? fileList : fullPathList;
+}
+
