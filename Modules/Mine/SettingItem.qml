@@ -108,6 +108,11 @@ Rectangle {
                     scanningwifi_pop.open()
                     wifiHelper.startWork()
                 }
+                if(index == 4){
+                    console.log("click connect wifi")
+//                    wifiHelper.connectToWiFi("LLS082118788","0123456789")
+                    wifiHelper.disConnectWifi()
+                }
             }
         }
     }

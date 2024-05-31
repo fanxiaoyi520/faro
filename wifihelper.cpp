@@ -1,7 +1,4 @@
 #include "wifihelper.h"
-#include <thread>
-#include <QDebug>
-
 
 WifiHelper::WifiHelper(QObject *parent) : QObject(parent), wlanHandle(nullptr),m_running(false)
 {
@@ -24,6 +21,7 @@ WifiHelper::WifiHelper(QObject *parent) : QObject(parent), wlanHandle(nullptr),m
     }
 
     WlanFreeMemory(pIfList);
+    mNativeWifi.openWLAN(mWifiMap);
 }
 
 WifiHelper::~WifiHelper()
@@ -49,6 +47,19 @@ void WifiHelper::startWork()
     }
 }
 
+
+void WifiHelper::connectToWiFi(const QString qssid, const QString qpassword)
+{
+    std::string ssid = qssid.toUtf8().constData();
+    std::string password = qpassword.toUtf8().constData();
+
+    mNativeWifi.passwordToConnectWLAN(ssid,password);
+}
+
+void WifiHelper::disConnectWifi()
+{
+    mNativeWifi.disConnect();
+}
 
 
 
