@@ -8,6 +8,19 @@ FaroScannerController* FaroScannerController::instance() {
     }
     return instance;
 }
+
+FaroScannerController &FaroScannerController::scanProgress(std::function<void (int)> scanProgressHandler)
+{
+    this->scanProgressHandler = scanProgressHandler;
+    return *this;
+}
+
+FaroScannerController &FaroScannerController::complete(std::function<void ()> completeHandler)
+{
+    this->completeHandler = completeHandler;
+    return *this;
+}
+
 FaroScannerController::FaroScannerController(QObject *parent) : QObject(parent)
 {
     scanCtrlSDKPtr = nullptr;
@@ -105,13 +118,14 @@ bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, c
     }
 }
 
-void FaroScannerController::startScan() {
+FaroScannerController& FaroScannerController::startScan() {
     const QString m_Resolution = "8";
     const QString m_ScanName = "SDK_File_";
     startScan(m_Resolution,m_ScanName);
+    return *this;
 }
 
-void FaroScannerController::startScan(const QString &m_Resolution, const QString &m_ScanName)
+FaroScannerController& FaroScannerController::startScan(const QString &m_Resolution, const QString &m_ScanName)
 {
     if (scanCtrlSDKPtr) {
         scanCtrlSDKPtr->Resolution = m_Resolution.toInt();
@@ -121,6 +135,7 @@ void FaroScannerController::startScan(const QString &m_Resolution, const QString
         scanCtrlSDKPtr->startScan();
         pollingScannerStatus();
     }
+    return *this;
 }
 
 void FaroScannerController::stopScan()
@@ -166,7 +181,7 @@ void FaroScannerController::checkScannerStatus()
         if (timer) timer->stop();
         timer->deleteLater();
         scanProgress(100);
-        emit scannerComplete(scanStatus);
+        this->completeHandler();
     } else {
         getScanProgress();
     }
@@ -185,6 +200,6 @@ void FaroScannerController::getScanProgress()
     int percent = 1;
     scanOpInterfPtr->getScanProgress(&percent);
     if (percent > 0) {
-        emit scanProgress(percent);
+        this->scanProgressHandler(percent);
     }
 }

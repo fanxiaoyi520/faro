@@ -6,7 +6,6 @@
 #include "settingsmanager.h"
 #include <QtQml>
 #include <QTextCodec>
-//#include "faroscannercontroller.h"
 #include "faromanager.h"
 #include "wifihelper.h"
 
@@ -43,11 +42,10 @@ int main(int argc, char *argv[])
     qmlRegisterType<QNetworkAccessManager>("QNetworkAccessManager", 1, 0, "QNetworkAccessManager");
     qmlRegisterType<Http>("Http", 1, 0, "Http");
     qmlRegisterType<WifiHelper>("WifiHlper",1,0,"WifiHelper");
+    qmlRegisterType<FaroManager>("FaroManager", 1, 0, "FaroManager");
     qmlRegisterSingletonType<QObject>("Api", 1, 0, "Api",apiProvider);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());
-    qmlRegisterType<FaroManager>("FaroManager", 1, 0, "FaroManager");
-    //qmlRegisterType<FaroScannerController>("FaroScanner", 1, 0, "FaroScannerController");
     engine.addImportPath(QStringLiteral("qrc:/"));
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

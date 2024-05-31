@@ -30,8 +30,12 @@ class FaroScannerController : public QObject
 
 public:
     static FaroScannerController* instance();
-    //    explicit FaroScannerController(QObject *parent = nullptr);
-    //    ~FaroScannerController();
+
+    std::function<void (int)> scanProgressHandler = nullptr;
+    std::function<void ()>                 completeHandler = nullptr;
+
+    FaroScannerController& scanProgress(std::function<void (int)> scanProgressHandler);
+    FaroScannerController& complete(std::function<void ()> completeHandler);
 
     // 初始化FARO SDK
     Q_INVOKABLE bool init();
@@ -39,8 +43,8 @@ public:
     // 连接到扫描仪
     Q_INVOKABLE bool connect();
     Q_INVOKABLE bool connect(const QString &scannerIP, const QString &remoteScanStoragePath);
-    Q_INVOKABLE void startScan();
-    Q_INVOKABLE void startScan(const QString &m_Resolution, const QString &m_ScanName);
+    Q_INVOKABLE FaroScannerController& startScan();
+    Q_INVOKABLE FaroScannerController& startScan(const QString &m_Resolution, const QString &m_ScanName);
     Q_INVOKABLE void stopScan();
     Q_INVOKABLE void disconnect();
     Q_INVOKABLE void shutDown();

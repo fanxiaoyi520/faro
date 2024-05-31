@@ -30,10 +30,11 @@ public slots:
     void startWork();
     void connectToWiFi(const QString qssid, const QString qpassword);
     void disConnectWifi();
-
+    QString queryInterfaceName();
 signals:
     void networksResult(const QStringList list);
-
+    void connectToWiFiResult(bool isSuc);
+    void disConnectWifiResult(bool isSuc);
 private:
     void scanNetworks();
     HANDLE wlanHandle;

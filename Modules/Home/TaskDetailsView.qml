@@ -9,7 +9,7 @@ import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as SettingString
 import FaroManager 1.0
-
+import WifiHlper 1.0
 Item{
     property int page: 0
     property var inputModelData
@@ -31,6 +31,7 @@ Item{
     clip: true
     Toast {id: toastPopup}
     Http {id: http}
+    WifiHelper{id: wifiHelper}
     Dialog{
         id: dialog
         titleStr: qsTr("选择阶段")
@@ -274,6 +275,56 @@ Item{
             "roomId":inputModelData.id,
         }
         console.log("input scanning parameters: "+JSON.stringify(scanParams))
+
+        var wifi = settingsManager.getValue(settingsManager.currentDevice)
+        if (!wifi) {
+            var myWifiObject = {
+                wifiName : "LLS082118788",
+                wifiPass : "0123456789"
+            }
+            settingsManager.setValue(settingsManager.currentDevice,JSON.stringify(myWifiObject))
+            console.log("wifi info =" + wifi)
+            return
+        }
+        console.log("wifi info =" + wifi)
+        function connectResult(isSuc){
+            wifiHelper.connectToWiFiResult.disconnect(connectResult)
+            if (isSuc){
+                enteringScanningPhase(scanParams)
+            } else {
+                console.log("wifi connect fail ...")
+            }
+        }
+        wifiHelper.onConnectToWiFiResult.connect(connectResult)
+        wifiHelper.connectToWiFi(JSON.parse(wifi).wifiName,JSON.parse(wifi).wifiPass)
+    }
+
+    function enteringScanningPhase(scanParams){
+        function scanComplete(){
+            faroManager.onScanComplete.disconnect(scanComplete)
+            faroManager.onScanProgress.disconnect(scanProgress)
+            console.log("received scan complete info ...")
+            faroManager.stopScan()
+            faroManager.disconnect()
+
+            function wifiDisConnect(result){
+                wifiHelper.onDisConnectWifiResult.disconnect(wifiDisConnect)
+                if (result){
+                    console.log("wifi disconnect success")
+                } else {
+                    console.log("wifi disconnect fail")
+                }
+            }
+            wifiHelper.onDisConnectWifiResult.connect(wifiDisConnect)
+            wifiHelper.disConnectWifi()
+        }
+
+        function scanProgress(percent){
+            console.log("scan progress percent: "+percent)
+        }
+
+        faroManager.onScanComplete.connect(scanComplete)
+        faroManager.onScanProgress.connect(scanProgress)
         faroManager.startScan(scanParams)
     }
 

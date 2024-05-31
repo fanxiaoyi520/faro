@@ -6,8 +6,6 @@ FaroManager::FaroManager(QObject *parent)
       (FaroScannerController::instance()),
       http(new Http(this))
 {
-    connect(faroScannerController, &FaroScannerController::scannerComplete, this, &FaroManager::scannerCompleteSlots);
-    connect(faroScannerController, &FaroScannerController::scanProgress, this, &FaroManager::scanProgressSlots);
     connect(http, &Http::qtreplySucSignal, this, &FaroManager::onReplySucSignal);
     connect(http, &Http::qtreplyFailSignal, this, &FaroManager::onReplySucSignal);
 }
@@ -22,7 +20,12 @@ void FaroManager::startScan(const QString &inputParams)
 {
     qDebug() << "scan input params: " << inputParams;
     faroScannerController->connect();
-    faroScannerController->startScan();
+    faroScannerController->startScan()
+            .scanProgress([this](int percent){
+        emit scanProgress(percent);
+    }).complete([this](){
+        emit scanComplete();
+    });
 }
 
 void FaroManager::stopScan()
@@ -93,16 +96,3 @@ void FaroManager::onReplyFailSignal(const QString &error, int errorCode)
     qDebug() << "error: "<< error << "errorCode: " << errorCode;
 }
 
-void FaroManager::scannerCompleteSlots(int status)
-{
-    Q_UNUSED(status);
-    qDebug() << "Scanner complete!!!";
-    faroScannerController->stopScan();
-    faroScannerController->disconnect();
-    uploadFileHandle();
-}
-
-void FaroManager::scanProgressSlots(int percent)
-{
-    qDebug() << "scan progress: " << percent;
-}

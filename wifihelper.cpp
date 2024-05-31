@@ -54,15 +54,22 @@ void WifiHelper::connectToWiFi(const QString qssid, const QString qpassword)
     std::string ssid = qssid.toUtf8().constData();
     std::string password = qpassword.toUtf8().constData();
 
-    mNativeWifi.passwordToConnectWLAN(ssid,password);
+    bool result = mNativeWifi.passwordToConnectWLAN(ssid,password);
+    emit connectToWiFiResult(result);
 }
 
 void WifiHelper::disConnectWifi()
 {
-    mNativeWifi.disConnect();
+    emit disConnectWifiResult(mNativeWifi.disConnect());
 }
 
-
+QString WifiHelper::queryInterfaceName()
+{
+    std::string connectedWifi;
+    int signalQuality;
+    mNativeWifi.queryInterface(connectedWifi,signalQuality);
+    return QString::fromStdString(connectedWifi);
+}
 
 void WifiHelper::scanNetworks()
 {

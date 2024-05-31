@@ -36,7 +36,8 @@ public:
 	@return 成功返回true,失败返回false	*/
 	bool  refreshWLAN(std::map<std::string, int> &wlanMap);
 
-	/*func 查询当前连接网络
+    /*func 查询当前连接网
+     * 络
 	@param connectedWifi 当前连接网络名.若当前未连接网络，此值为空。
 	@param signalQuality 当前连接网络信号强度
 	@return 查询成功返回true,失败返回false	*/
