@@ -6,8 +6,8 @@ FaroManager::FaroManager(QObject *parent)
       (FaroScannerController::instance()),
       http(new Http(this))
 {
-    connect(http, &Http::qtreplySucSignal, this, &FaroManager::onReplySucSignal);
-    connect(http, &Http::qtreplyFailSignal, this, &FaroManager::onReplySucSignal);
+    QObject::connect(http, &Http::qtreplySucSignal, this, &FaroManager::onReplySucSignal);
+    QObject::connect(http, &Http::qtreplyFailSignal, this, &FaroManager::onReplySucSignal);
 }
 
 bool FaroManager::init()
@@ -15,16 +15,25 @@ bool FaroManager::init()
     return faroScannerController->init();
 }
 
+int FaroManager::connect()
+{
+    return faroScannerController->connect();
+}
 
 void FaroManager::startScan(const QString &inputParams)
 {
     qDebug() << "scan input params: " << inputParams;
-    faroScannerController->connect();
+    inputModel = Util::parseJsonStringToObject(inputParams);
     faroScannerController->startScan()
             .scanProgress([this](int percent){
         emit scanProgress(percent);
-    }).complete([this](){
+    }).complete([this](QString flsPath){
+        defaultFlsPath = &flsPath;
         emit scanComplete();
+    }).scanAbnormal([this](int scanStatus){
+        Q_UNUSED(scanStatus);
+        faroScannerController->disconnect();
+        emit scanAbnormal(scanStatus);
     });
 }
 
@@ -45,9 +54,10 @@ void FaroManager::shutDown()
 
 //扫描完成之后压缩文件为zip上传
 void FaroManager::uploadFileHandle(){
+    qDebug() << "default fls path: " << *defaultFlsPath;
     Api *api = Api::instance();
     QString url = api->admin_sys_file_upload();
-    QString zipFilePath = FileManager::getFlsPath()+"/"+ZIPDIRECTORY;
+    QString zipFilePath = *defaultFlsPath+"/"+ZIPDIRECTORY;
     qDebug() << "zipFilePath:" << zipFilePath;
     QString zipDirectory = QDir(zipFilePath).filePath(QString());
     QDir dir;
@@ -58,8 +68,8 @@ void FaroManager::uploadFileHandle(){
             qDebug() << "Directory created:" << zipDirectory;
         }
     }
-
-    QString selectFile2DirPath = "D:\\fls\\SDK_File_000.fls";
+    QString selectFile2DirPath = FileManager::getFilesInDirectory(*defaultFlsPath,QStringList() << "*.fls").first();
+    qDebug() << "fls path: " << selectFile2DirPath;
     QString savePath = zipDirectory;
     bool result = fileManager->compression_zip_file(selectFile2DirPath, savePath);
     if (result) {
@@ -72,12 +82,11 @@ void FaroManager::uploadFileHandle(){
 
     bool isOnline = NetworkHelper::checkNetworkStatus();
     qDebug() << "Current network status:" << isOnline;
-    if (isOnline){
-        http->upload(url,needUploadZipPath);
-    }
-
-    NetworkHelper::registerNetworkStatusChangedCallback([](bool isOnline) {
+    NetworkHelper::registerNetworkStatusChangedCallback([this,url](bool isOnline) {
         qDebug() << "Network status changed. Device is online:" << isOnline;
+        if (isOnline){
+            http->upload(url,needUploadZipPath);
+        }
     });
 }
 
@@ -89,10 +98,12 @@ void FaroManager::onReplySucSignal(const QString &response)
     bool isremoveSuc = FileManager::removePath(needUploadZipPath);
     qDebug() << "isremoveSuc: " + QString::number(isremoveSuc) << response;
     */
+    emit uploadFileSucResult(response);
 }
 
 void FaroManager::onReplyFailSignal(const QString &error, int errorCode)
 {
     qDebug() << "error: "<< error << "errorCode: " << errorCode;
+    emit uploadFileFailResult(error,errorCode);
 }
 

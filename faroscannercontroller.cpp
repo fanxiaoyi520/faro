@@ -15,9 +15,15 @@ FaroScannerController &FaroScannerController::scanProgress(std::function<void (i
     return *this;
 }
 
-FaroScannerController &FaroScannerController::complete(std::function<void ()> completeHandler)
+FaroScannerController &FaroScannerController::complete(std::function<void (const QString &)> completeHandler)
 {
     this->completeHandler = completeHandler;
+    return *this;
+}
+
+FaroScannerController &FaroScannerController::scanAbnormal(std::function<void (int)> scanAbnormalHandler)
+{
+    this->scanAbnormalHandler = scanAbnormalHandler;
     return *this;
 }
 
@@ -85,6 +91,7 @@ bool FaroScannerController::initFaroInternal()
 bool FaroScannerController::connect() {
     const QString default_ip = "192.168.43.1";
     const QString defaultRemoteScanStoragePath = FileManager::getFlsPath();
+    flsPath = defaultRemoteScanStoragePath;
     return connect(default_ip,defaultRemoteScanStoragePath);
 }
 
@@ -180,8 +187,9 @@ void FaroScannerController::checkScannerStatus()
         //QTimer *timer = qobject_cast<QTimer*>(sender());
         if (timer) timer->stop();
         timer->deleteLater();
-        scanProgress(100);
-        this->completeHandler();
+        this->completeHandler(flsPath);
+    } else if (scanStatus == 1) {
+        this->scanAbnormalHandler(scanStatus);
     } else {
         getScanProgress();
     }

@@ -20,19 +20,25 @@ public slots:
     void onReplySucSignal(const QString &response);
     void onReplyFailSignal(const QString &error, int errorCode);
 
+    int connect();
     void startScan(const QString &inputParams);
     bool init();
     void stopScan();
     void disconnect();
     void shutDown();
+    void uploadFileHandle();
 signals:
     void scanComplete();
     void scanProgress(int percent);
+    void scanAbnormal(int percent);
+    void uploadFileSucResult(const QString &response);
+    void uploadFileFailResult(const QString &error, int errorCode);
 private:
     FaroScannerController *faroScannerController;
     Http *http;
     FileManager *fileManager;
-    void uploadFileHandle();
+    QJsonObject inputModel;
+    QString *defaultFlsPath;
 };
 
 #endif // FAROMANAGER_H

@@ -32,11 +32,12 @@ public:
     static FaroScannerController* instance();
 
     std::function<void (int)> scanProgressHandler = nullptr;
-    std::function<void ()>                 completeHandler = nullptr;
+    std::function<void (const QString &)>                 completeHandler = nullptr;
+    std::function<void (int)>                 scanAbnormalHandler = nullptr;
 
     FaroScannerController& scanProgress(std::function<void (int)> scanProgressHandler);
-    FaroScannerController& complete(std::function<void ()> completeHandler);
-
+    FaroScannerController& complete(std::function<void (const QString &)> completeHandler);
+    FaroScannerController& scanAbnormal(std::function<void (int)> scanAbnormalHandler);
     // 初始化FARO SDK
     Q_INVOKABLE bool init();
 
@@ -48,9 +49,6 @@ public:
     Q_INVOKABLE void stopScan();
     Q_INVOKABLE void disconnect();
     Q_INVOKABLE void shutDown();
-signals:
-    void scannerComplete(int status);
-    void scanProgress(int percent);
 
 private slots:
     void checkScannerStatus();
@@ -69,6 +67,7 @@ private:
     void getScanProgress();
     int scanStatus;
     QTimer *timer;
+    QString flsPath;
 };
 
 #endif // FAROSCANNERCONTROLLER_H

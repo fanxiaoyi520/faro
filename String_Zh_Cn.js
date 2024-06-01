@@ -57,3 +57,27 @@ var wifiscan_result_title = "附近设备"
 var wifiscan_result_success_tips = "设置wifi成功"
 var wifiscan_result_empty_tips = "没有发现设备"
 var wifiscan_result_faild_tips = "匹配设备失败"
+var unable_obtain_device_WiFi = "没有获取到设备Wi-Fi"
+var device_conncet_fail_tips = "设备连接失败,请稍后再试"
+var file_sync_suc = "扫描和文件同步成功"
+var scanning_in_progress = "正在扫描和同步点云文件中"
+var starting_connection_to_machine = "正在启动连接机器..."
+var station_being_calculated = "该测站正在计算中"
+var uploading_pointcloud_file = "正在上传点云文件..."
+var upload_file_suc = "上传文件成功"
+var upload_file_fial = "上传文件失败"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

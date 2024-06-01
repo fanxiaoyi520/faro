@@ -10,6 +10,7 @@ import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as SettingString
 import FaroManager 1.0
 import WifiHlper 1.0
+
 Item{
     property int page: 0
     property var inputModelData
@@ -65,9 +66,17 @@ Item{
         id: recalculatePopUp
         tipsContentStr: qsTr("执行成功")
         isVisibleCancel: false
-        onConfirmAction: {
-
-        }
+        onConfirmAction: {}
+    }
+    TipsPopUp{
+        id: nonerworkPopUp
+        tipsContentStr: qsTr(SettingString.unable_obtain_device_WiFi)
+        isVisibleCancel: false
+        onConfirmAction: {}
+    }
+    ScanningFaroPop{
+        id: scanningFaroPop
+        lottieType: 0
     }
     MorePopUp {
         id: morePopUp
@@ -222,8 +231,25 @@ Item{
         enlargeImagePopUp.open()
     }
 
+    ///扫描点击事件
     function scanAction(scanModel){
         inputCellModel = scanModel
+
+        if (inputCellModel.calculationStatus === 1) {
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.station_being_calculated)
+            nonerworkPopUp.open()
+            return
+        }
+
+        if (inputCellModel.stationTaskNo !== null
+                || inputCellModel.stationTaskNo !== ""
+                || inputCellModel.stationTaskNo !== undefined){
+            var model = scanModel
+            tipsSwitchPopUp.inputModel = model
+            tipsSwitchPopUp.open()
+            return
+        }
+
         tipsPopUp.inputModel = scanModel
         tipsPopUp.open()
     }
@@ -274,8 +300,16 @@ Item{
             "filePath":"",
             "roomId":inputModelData.id,
         }
-        console.log("input scanning parameters: "+JSON.stringify(scanParams))
 
+        console.log("input scanning parameters: "+JSON.stringify(scanParams))
+        console.log("~inoutModel: "+JSON.stringify(inoutModel))
+        console.log("~selectedMeasureData: "+JSON.stringify(selectedMeasureData))
+        console.log("~roomTaskVoModel: "+JSON.stringify(roomTaskVoModel))
+        console.log("~inputCellModel: "+JSON.stringify(inputCellModel))
+        wifiConectHandle(scanParams,checked)
+    }
+
+    function wifiConectHandle(scanParams,checked){
         var wifi = settingsManager.getValue(settingsManager.currentDevice)
         if (!wifi) {
             var myWifiObject = {
@@ -287,30 +321,50 @@ Item{
             return
         }
         console.log("wifi info =" + wifi)
+
         function connectResult(isSuc){
             wifiHelper.connectToWiFiResult.disconnect(connectResult)
-            if (isSuc){
-                enteringScanningPhase(scanParams)
+            //var currentWifiName = wifiHelper.queryInterfaceName()
+            //console.log("current Wifi Name: " + currentWifiName)
+            if (isSuc/* && currentWifiName === JSON.parse(wifi).wifiName*/){
+                console.log("wifi connect suc ...")
+                enteringScanningPhase(scanParams,checked)
             } else {
                 console.log("wifi connect fail ...")
+                nonerworkPopUp.open()
             }
         }
         wifiHelper.onConnectToWiFiResult.connect(connectResult)
         wifiHelper.connectToWiFi(JSON.parse(wifi).wifiName,JSON.parse(wifi).wifiPass)
     }
 
-    function enteringScanningPhase(scanParams){
+    function enteringScanningPhase(scanParams,checked){
+        ///扫描完成回调
         function scanComplete(){
             faroManager.onScanComplete.disconnect(scanComplete)
             faroManager.onScanProgress.disconnect(scanProgress)
             console.log("received scan complete info ...")
+            if (!checked){
+                scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
+                scanningFaroPop.close()
+            } else {
+                scanningFaroPop.tipsconnect = qsTr(SettingString.uploading_pointcloud_file)
+                scanningFaroPop.lottieType = 1
+            }
+
             faroManager.stopScan()
             faroManager.disconnect()
 
             function wifiDisConnect(result){
                 wifiHelper.onDisConnectWifiResult.disconnect(wifiDisConnect)
+                if (!checked){
+                    nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
+                    nonerworkPopUp.open()
+                }
+                console.log("--------------checked------------:"+checked)
                 if (result){
                     console.log("wifi disconnect success")
+                    if (checked) uploadFile()
                 } else {
                     console.log("wifi disconnect fail")
                 }
@@ -319,16 +373,72 @@ Item{
             wifiHelper.disConnectWifi()
         }
 
+        ///扫描进度
         function scanProgress(percent){
             console.log("scan progress percent: "+percent)
+            scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + percent + "%)"
+        }
+
+        ///扫描异常
+        function scanAbnormal(scanStatus){
+            scanningFaroPop.close()
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.device_conncet_fail_tips)
+            nonerworkPopUp.open()
         }
 
         faroManager.onScanComplete.connect(scanComplete)
         faroManager.onScanProgress.connect(scanProgress)
-        faroManager.startScan(scanParams)
+        faroManager.scanAbnormal.connect(scanAbnormal)
+        var connectResult = faroManager.connect()
+        console.log("connect result: "+connectResult)
+        if (connectResult !== 1) {
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.device_conncet_fail_tips)
+            nonerworkPopUp.open()
+        } else {
+            scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
+            scanningFaroPop.open()
+            faroManager.startScan(JSON.stringify(scanParams))
+        }
     }
 
     //MARK: network
+    function isJson(str) {
+        try {
+            JSON.parse(str);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function uploadFile(){
+        function onReply(reply){
+            faroManager.uploadFileSucResult.disconnect(onReply)
+            if (isJson(reply)) {
+                var response = JSON.parse(reply)
+                console.log("upload file result data: "+reply)
+                scanningFaroPop.close()
+                nonerworkPopUp.tipsContentStr = qsTr(SettingString.upload_file_suc)
+                nonerworkPopUp.open()
+            } else {
+                nonerworkPopUp.tipsContentStr = qsTr(SettingString.upload_file_fial)
+                nonerworkPopUp.open()
+            }
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            faroManager.uploadFileFailResult.disconnect(onFail)
+            scanningFaroPop.close()
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.upload_file_fial)
+            nonerworkPopUp.open()
+        }
+
+        faroManager.uploadFileSucResult.connect(onReply)
+        faroManager.uploadFileFailResult.connect(onFail)
+        faroManager.uploadFileHandle()
+    }
+
     function getBuildingRoomListByFloorId(floorId){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)

@@ -126,5 +126,8 @@
         <file>images/json/scaning.json</file>
         <file>Modules/Component/SelectMeasureListButtonView.qml</file>
         <file>Modules/Mine/ScanningWifiLottiePop.qml</file>
+        <file>Modules/Component/ScanningFaroPop.qml</file>
+        <file>images/json/upload_file.json</file>
+        <file>images/json/wating.json</file>
     </qresource>
 </RCC>
