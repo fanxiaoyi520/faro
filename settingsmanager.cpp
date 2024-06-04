@@ -70,6 +70,11 @@ QString SettingsManager::currentDevice() const
     return "currentDevice";
 }
 
+QString SettingsManager::fileInfoData() const
+{
+    return "fileInfoData";
+}
+
 QString SettingsManager::pubKey_integers() const
 {
     return "integers";

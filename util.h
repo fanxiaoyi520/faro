@@ -29,6 +29,7 @@ public:
     static qint64 getTimestampMilliseconds();
     static qint64 getTimestampSeconds();
     static QString generateUuid();
+    static QString getdownsampleVoxelSize(const QString &stageType);
 };
 
 #endif // UTIL_H

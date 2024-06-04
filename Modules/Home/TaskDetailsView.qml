@@ -24,7 +24,7 @@ Item{
     property double imageBackHeight : parent.width * 0.6
     property double imageBackWidth : parent.width * 0.6
     property var inputCellModel
-
+    property string room_id
     id: selectTaskDetailsView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -76,6 +76,7 @@ Item{
     }
     ScanningFaroPop{
         id: scanningFaroPop
+
         lottieType: 0
     }
     MorePopUp {
@@ -222,6 +223,7 @@ Item{
     //MARK: logic
     function headerClickSwitchAction(index,model){
         console.log("selected header index and model data: "+index,JSON.stringify(model))
+        room_id = model.id
         getBuildingRoomTaskAndGetRoomTaskInfo(model)
     }
 
@@ -278,6 +280,7 @@ Item{
     function startScan(checked,inoutModel){
         console.log("is auto upload file: "+checked)
         console.log("start scan ...")
+
         var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
         var scanParams = {
             "activeColoring": selectedMeasureData ? selectedMeasureData.activeColoring : "0",
@@ -297,8 +300,7 @@ Item{
             "floorName":roomTaskVoModel.floorName,
             "roomName":roomTaskVoModel.roomName,
             "stageType":roomTaskVoModel.stageType,
-            "filePath":"",
-            "roomId":inputModelData.id,
+            "roomId":room_id,
         }
 
         console.log("input scanning parameters: "+JSON.stringify(scanParams))
@@ -340,10 +342,11 @@ Item{
 
     function enteringScanningPhase(scanParams,checked){
         ///扫描完成回调
-        function scanComplete(){
+        function scanComplete(filePath){
             faroManager.onScanComplete.disconnect(scanComplete)
             faroManager.onScanProgress.disconnect(scanProgress)
-            console.log("received scan complete info ...")
+
+            scanCompleteDataHandle(scanParams,filePath)
             if (!checked){
                 scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
                 scanningFaroPop.close()
@@ -361,10 +364,9 @@ Item{
                     nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
                     nonerworkPopUp.open()
                 }
-                console.log("--------------checked------------:"+checked)
                 if (result){
                     console.log("wifi disconnect success")
-                    if (checked) uploadFile()
+                    if (checked) uploadFile(filePath)
                 } else {
                     console.log("wifi disconnect fail")
                 }
@@ -396,9 +398,36 @@ Item{
             nonerworkPopUp.open()
         } else {
             scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
+            scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
             scanningFaroPop.open()
             faroManager.startScan(JSON.stringify(scanParams))
         }
+    }
+
+    function scanCompleteDataHandle(scanParams,filePath){
+        console.log("scan params: "+scanParams+" file path: "+filePath)
+        scanParams.filePath = filePath
+        var newscanParams = scanParams
+        console.log("new scan params: "+JSON.stringify(scanParams))
+        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("get file json data: "+filejson)
+        if (!filejson) {
+            var filedatas = []
+            filedatas.push(JSON.stringify(scanParams))
+            settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(filedatas))
+        } else {
+            var datas = JSON.parse(filejson)
+            if (Array.isArray(datas)){
+                datas.push(JSON.stringify(scanParams))
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
+            } else {
+                var nulldatas = []
+                nulldatas.push(JSON.stringify(scanParams))
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(nulldatas))
+            }
+        }
+        var newfilejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("new data: "+filejson)
     }
 
     //MARK: network
@@ -411,15 +440,17 @@ Item{
         }
     }
 
-    function uploadFile(){
+    function uploadFile(filePath){
         function onReply(reply){
             faroManager.uploadFileSucResult.disconnect(onReply)
             if (isJson(reply)) {
                 var response = JSON.parse(reply)
                 console.log("upload file result data: "+reply)
+                performCalculation(JSON.stringify(response.data))
                 scanningFaroPop.close()
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.upload_file_suc)
                 nonerworkPopUp.open()
+                deleSavedFile(filePath)
             } else {
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.upload_file_fial)
                 nonerworkPopUp.open()
@@ -439,6 +470,46 @@ Item{
         faroManager.uploadFileHandle()
     }
 
+    function deleSavedFile(filePath){
+        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("get file json data 2: "+filejson)
+        if (filejson) {
+            var datas = JSON.parse(filejson)
+            if (Array.isArray(datas)){
+                var uniqueArray = datas.filter((value, index, self) => {
+                                                   console.log("file path value: "+JSON.parse(value).filePath)
+                                                   return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
+                                               });
+                console.log("new: "+JSON.stringify(uniqueArray))
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(uniqueArray))
+            } else {
+                console.log("file make error ...")
+                var nulldatas = []
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(nulldatas))
+            }
+        }
+        var newfilejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("new data 2: "+filejson)
+        fileManager.removePath(filePath)
+    }
+
+    function performCalculation(result){
+        function onReply(reply){
+            faroManager.performCalculationSucResult.disconnect(onReply)
+            console.log("perform calculation data: "+reply)
+            getBuildingRoomListByFloorId()
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            faroManager.performCalculationFailResult.disconnect(onFail)
+        }
+
+        faroManager.performCalculationSucResult.connect(onReply)
+        faroManager.performCalculationFailResult.connect(onFail)
+        faroManager.performCalculation(result)
+    }
+
     function getBuildingRoomListByFloorId(floorId){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
@@ -447,6 +518,7 @@ Item{
             console.log("complete building room listByFloorId data: "+reply)
             if (response.data.length <=0) return;
             roomsList = response.data
+            room_id = roomsList[0].id
             getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
         }
 

@@ -2,31 +2,30 @@
 #define NETWORKHELPER_H
 
 #include <QObject>
-#include <QNetworkConfigurationManager>
-#include <QDebug>
-#include <QMutex>
+#include <QTimer>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 #include <functional>
-class NetworkHelper : public QObject
-{
+
+class NetworkHelper : public QObject {
     Q_OBJECT
 public:
-    static bool checkNetworkStatus();
+    explicit NetworkHelper(QObject *parent = nullptr);
+    ~NetworkHelper();
 
-    // 提供一个信号来通知网络状态的变化
-    static void registerNetworkStatusChangedCallback(const std::function<void(bool)>& callback);
+    void setNetworkStatusCallback(std::function<void(bool)> callback);
+    void stopMonitoring();
+
+private slots:
+    void checkNetworkStatus();
+    void onNetworkReplyFinished();
 
 private:
-    static QNetworkConfigurationManager *networkConfigurationManager;
-    static QMutex mutex; // 用于保护静态变量，确保线程安全
-    static std::vector<std::function<void(bool)>> callbacks; // 存储所有注册的回调函数
-
-    // 静态成员需要在类外进行初始化
-    static void initStaticMembers();
-
-    // 槽函数，响应网络配置变化
-private slots:
-    static void onNetworkConfigurationChanged(const QNetworkConfiguration &config);
-
+    QNetworkAccessManager *manager;
+    QTimer *checkTimer;
+    std::function<void(bool)> networkStatusCallback;
+    bool isMonitoring;
 };
 
 #endif // NETWORKHELPER_H

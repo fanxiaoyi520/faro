@@ -94,4 +94,9 @@ QString Api::admin_sys_file_upload() const
     return QString("/admin/sys-file/upload");
 }
 
+QString Api::building_roomTaskExecute_calculateStationTask() const
+{
+    return QString("/building/roomTaskExecute/calculateStationTask");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

@@ -25,7 +25,7 @@ class Api : public QObject {
     Q_PROPERTY(QString building_measureDevice_searchDevice READ building_measureDevice_searchDevice CONSTANT)
     Q_PROPERTY(QString admin_sys_file_listFileByFileIds READ admin_sys_file_listFileByFileIds CONSTANT)
     Q_PROPERTY(QString admin_sys_file_upload READ admin_sys_file_upload CONSTANT)
-
+    Q_PROPERTY(QString building_roomTaskExecute_calculateStationTask READ building_roomTaskExecute_calculateStationTask CONSTANT)
 
 public:
     static Api* instance();
@@ -47,6 +47,7 @@ public:
     QString building_measureDevice_searchDevice() const;
     QString admin_sys_file_listFileByFileIds() const;
     QString admin_sys_file_upload() const;
+    QString building_roomTaskExecute_calculateStationTask() const;
 private:
     Api(QObject *parent = nullptr);
     Q_DISABLE_COPY(Api)

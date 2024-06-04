@@ -95,3 +95,13 @@ QString Util::generateUuid()
     return QUuid::createUuid().toString(QUuid::WithoutBraces);
 }
 
+QString Util::getdownsampleVoxelSize(const QString &stageType)
+{
+    if(stageType == "1") {
+        return "0.006";
+    } else if (stageType == "2") {
+        return "0.005";
+    } else {
+        return "0.004";
+    }
+}

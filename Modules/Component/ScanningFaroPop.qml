@@ -8,6 +8,7 @@ Popup {
     id:popup_wifi
     property int lottieType: 0
     property var tipsconnect
+    property var title
     modal: true
     width: parent.width
     height: parent.height
@@ -33,7 +34,7 @@ Popup {
 
         Text {
             id: text_title
-            text: qsTr(String.wifiscan_title)
+            text: qsTr(title)
             anchors.top: parent.top
             anchors.topMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
@@ -87,14 +88,14 @@ Popup {
     }
 
     onOpened: {
-         console.log("open......")
+        console.log("open......")
         timer.start()
         lottieScaning.source = getCurrentLottieType(lottieType)
         lottieScaning.start()
     }
 
     onClosed: {
-         console.log("close......")
+        console.log("close......")
         lottieScaning.stop()
         timer.stop()
     }

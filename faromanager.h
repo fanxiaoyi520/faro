@@ -9,6 +9,9 @@
 #include <QCoreApplication>
 #include "networkhelper.h"
 #include "wifihelper.h"
+//#include "EasyQtSql/src/EasyQtSql.h"
+//#include "EasyQtSql/filemodel.h"
+//#include "EasyQtSql/sqlmanager.h"
 #include "faroscannercontroller.h"
 class FaroManager : public QObject
 {
@@ -19,6 +22,8 @@ public:
 public slots:
     void onReplySucSignal(const QString &response);
     void onReplyFailSignal(const QString &error, int errorCode);
+    void onCalculationSucSignal(const QString &response);
+    void onCalculationFailSignal(const QString &error, int errorCode);
 
     int connect();
     void startScan(const QString &inputParams);
@@ -27,18 +32,22 @@ public slots:
     void disconnect();
     void shutDown();
     void uploadFileHandle();
+    void performCalculation(const QString &response);
 signals:
-    void scanComplete();
+    void scanComplete(const QString& filePath);
     void scanProgress(int percent);
     void scanAbnormal(int percent);
     void uploadFileSucResult(const QString &response);
     void uploadFileFailResult(const QString &error, int errorCode);
+    void performCalculationSucResult(const QString &response);
+    void performCalculationFailResult(const QString &error, int errorCode);
 private:
     FaroScannerController *faroScannerController;
     Http *http;
-    FileManager *fileManager;
+    //FileManager *fileManager;
     QJsonObject inputModel;
     QString *defaultFlsPath;
+    NetworkHelper networkHelper;
 };
 
 #endif // FAROMANAGER_H

@@ -117,6 +117,8 @@ bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, c
         // Path set successfully
         scanCtrlSDKPtr->RemoteScanAccess = RSAEnabled;
         scanCtrlSDKPtr->PutStorageMode(SMRemote);
+        scanCtrlSDKPtr->PutScanMode(StationaryGrey);
+        //scanCtrlSDKPtr->PutMeasurementRate(1);
         return true;
     } else {
         // Handle error

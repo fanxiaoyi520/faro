@@ -1,9 +1,17 @@
 #include "filemanager.h"
 
-FileManager::FileManager(QObject *parent) : QObject(parent)
-{
-
+FileManager* FileManager::instance() {
+    static FileManager *instance = nullptr;
+    if (!instance) {
+        instance = new FileManager;
+    }
+    return instance;
 }
+
+//FileManager::FileManager(QObject *parent) : QObject(parent)
+//{
+
+//}
 
 QFileInfoList FileManager::ergodic_compression_file(QZipWriter *writer, const QString &rootPath, QString dirPath)
 {

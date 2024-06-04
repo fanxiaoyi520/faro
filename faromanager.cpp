@@ -6,8 +6,11 @@ FaroManager::FaroManager(QObject *parent)
       (FaroScannerController::instance()),
       http(new Http(this))
 {
+
     QObject::connect(http, &Http::qtreplySucSignal, this, &FaroManager::onReplySucSignal);
-    QObject::connect(http, &Http::qtreplyFailSignal, this, &FaroManager::onReplySucSignal);
+    QObject::connect(http, &Http::qtreplyFailSignal, this, &FaroManager::onReplyFailSignal);
+    QObject::connect(http, &Http::replySucSignal, this, &FaroManager::onCalculationSucSignal);
+    QObject::connect(http, &Http::replyFailSignal, this, &FaroManager::onCalculationFailSignal);
 }
 
 bool FaroManager::init()
@@ -29,7 +32,7 @@ void FaroManager::startScan(const QString &inputParams)
         emit scanProgress(percent);
     }).complete([this](QString flsPath){
         defaultFlsPath = &flsPath;
-        emit scanComplete();
+        emit scanComplete(flsPath);
     }).scanAbnormal([this](int scanStatus){
         Q_UNUSED(scanStatus);
         faroScannerController->disconnect();
@@ -71,7 +74,7 @@ void FaroManager::uploadFileHandle(){
     QString selectFile2DirPath = FileManager::getFilesInDirectory(*defaultFlsPath,QStringList() << "*.fls").first();
     qDebug() << "fls path: " << selectFile2DirPath;
     QString savePath = zipDirectory;
-    bool result = fileManager->compression_zip_file(selectFile2DirPath, savePath);
+    bool result = FileManager::instance()->compression_zip_file(selectFile2DirPath, savePath);
     if (result) {
         qDebug() << "Compression successful!";
     } else {
@@ -80,12 +83,12 @@ void FaroManager::uploadFileHandle(){
     needUploadZipPath = FileManager::getFilesInDirectory(savePath,QStringList() << "*.zip").first();
     qDebug() << "needUploadZipPath: " << needUploadZipPath;
 
-    bool isOnline = NetworkHelper::checkNetworkStatus();
-    qDebug() << "Current network status:" << isOnline;
-    NetworkHelper::registerNetworkStatusChangedCallback([this,url](bool isOnline) {
-        qDebug() << "Network status changed. Device is online:" << isOnline;
+
+    networkHelper.setNetworkStatusCallback([this,url](bool isOnline) {
+        qDebug() << "Network status changed:" << (isOnline ? "Online" : "Offline");
         if (isOnline){
             http->upload(url,needUploadZipPath);
+            networkHelper.stopMonitoring();
         }
     });
 }
@@ -106,4 +109,49 @@ void FaroManager::onReplyFailSignal(const QString &error, int errorCode)
     qDebug() << "error: "<< error << "errorCode: " << errorCode;
     emit uploadFileFailResult(error,errorCode);
 }
+
+void FaroManager::onCalculationSucSignal(const QString &response)
+{
+    qDebug() << "calculation response: "<< response;
+    emit performCalculationSucResult(response);
+}
+
+void FaroManager::onCalculationFailSignal(const QString &error, int errorCode)
+{
+    qDebug() << "error: "<< error << "errorCode: " << errorCode;
+    emit performCalculationFailResult(error,errorCode);
+}
+
+void FaroManager::performCalculation(const QString &response){
+    QJsonObject fileModel = Util::parseJsonStringToObject(response);
+    QMap<QString, QVariant> paramsMap;
+    paramsMap.insert("roomId",inputModel.value("roomId"));
+    paramsMap.insert("stationId",inputModel.value("stationId"));
+    paramsMap.insert("stageType",inputModel.value("stageType"));
+    paramsMap.insert("fileId",fileModel.value("fileId"));
+    paramsMap.insert("equipmentModel","Faro-Focus-X");
+    paramsMap.insert("scanningMode","1/20"/*inputModel.value("scanningMode")*/);
+    paramsMap.insert("scanningDataFormat","xyzi");
+    paramsMap.insert("fileType","fls");
+    QMap<QString, QVariant> modeTable;
+    modeTable.insert("masonry_mode",inputModel.value("masonry_mode"));
+    modeTable.insert("map_mode",inputModel.value("map_mode"));
+    paramsMap.insert("modeTable",modeTable);
+    QMap<QString, QVariant> inpPcdInfo;
+    inpPcdInfo.insert("downsample_voxel_size",Util::getdownsampleVoxelSize(inputModel.value("stageType").toString()));
+    inpPcdInfo.insert("is_cropped",1);
+    inpPcdInfo.insert("is_downsampled",1);
+    QVariantList values;
+    values << "0.0" << "0.0" << "0.0";
+    inpPcdInfo.insert("scanner_xyz",values);
+    int xyCropDist = inputModel.value("xyCropDist").toInt() <= 0 ? 6 : inputModel.value("xyCropDist").toInt();
+    int zCropDist = inputModel.value("zCropDist").toInt() <= 0 ? 3 : inputModel.value("zCropDist").toInt();
+    inpPcdInfo.insert("xy_crop_dist",xyCropDist);
+    inpPcdInfo.insert("z_crop_dist",zCropDist);
+    paramsMap.insert("inpPcdInfo",inpPcdInfo);
+
+    qDebug() << "calculate input parasm: " << Util::mapToJson(paramsMap);
+    http->post(Api::instance()->building_roomTaskExecute_calculateStationTask(),paramsMap);
+}
+
 

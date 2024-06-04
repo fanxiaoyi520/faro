@@ -66,9 +66,9 @@ var station_being_calculated = "该测站正在计算中"
 var uploading_pointcloud_file = "正在上传点云文件..."
 var upload_file_suc = "上传文件成功"
 var upload_file_fial = "上传文件失败"
-
-
-
+var minute = "分"
+var station_waiting_measurement = "该测站正在等待测量…"
+var scan_station_id = "扫描测站号:"
 
 
 
