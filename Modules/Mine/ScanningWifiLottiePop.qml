@@ -47,6 +47,7 @@ Popup {
             anchors{
                 top: text_title.bottom
                 topMargin: 8
+                
             }
         }
 

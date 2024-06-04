@@ -89,7 +89,7 @@ Popup {
                         width: parent.width * 0.7
 
                         Text {
-                            text: JSON.parse(modelData).name
+                            text: modelData.name
                             color: "#3C3C3C"
                             elide: Qt.ElideRight
                             anchors.left: parent.left
@@ -207,7 +207,7 @@ Popup {
     function sureAction(){
         popup.close()
         console.log("sure clicked and currentIndex: " + currentIndex)
-        confirmOptionsAction(JSON.parse(list[currentIndex]))
+        confirmOptionsAction(list[currentIndex])
     }
 }
 

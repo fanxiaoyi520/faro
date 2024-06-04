@@ -517,10 +517,11 @@ HttpClient& HttpClient::param(const QString &name, const QVariant &value) {
 
 // 添加多个请求的参数
 HttpClient& HttpClient::params(const QMap<QString, QVariant> &ps) {
+    QUrlQuery query;
     for (auto iter = ps.cbegin(); iter != ps.cend(); ++iter) {
-        d->params.addQueryItem(iter.key(), iter.value().toString());
+        query.addQueryItem(iter.key(), iter.value().toString());
     }
-
+    d->params = query;
     return *this;
 }
 

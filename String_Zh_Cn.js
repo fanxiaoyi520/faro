@@ -67,6 +67,11 @@ var uploading_pointcloud_file = "正在上传点云文件..."
 var upload_file_suc = "上传文件成功"
 var upload_file_fial = "上传文件失败"
 
+var result_statistics_all = "全部:"
+var result_statistics_success = "成功:"
+var result_statistics_faild = "失败:"
+var result_task_type_room = "房间任务"
+var result_task_stationno_tips = "测站号:"
 
 
 

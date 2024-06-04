@@ -129,5 +129,8 @@
         <file>Modules/Component/ScanningFaroPop.qml</file>
         <file>images/json/upload_file.json</file>
         <file>images/json/wating.json</file>
+        <file>Modules/Result/ItemviewResult.qml</file>
+        <file>images/ic_fail.png</file>
+        <file>images/ic_success.png</file>
     </qresource>
 </RCC>

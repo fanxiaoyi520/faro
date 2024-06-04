@@ -84,6 +84,16 @@ QString Api::building_measureDevice_searchDevice() const
     return QString("/building/measureDevice/searchDevice");
 }
 
+QString Api::building_measureTask_pager() const
+{
+    return QString("/building/taskNotify/page");
+}
+
+QString Api::building_tasknotify_statistics() const
+{
+    return QString("/building/taskNotify/statistics");
+}
+
 QString Api::admin_sys_file_listFileByFileIds() const
 {
     return QString("/admin/sys-file/listFileByFileIds");

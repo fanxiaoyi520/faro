@@ -27,15 +27,17 @@ Rectangle {
             var wifiResultList = [];
 
             for(let item of list){
-                if(item.includes("BLK360")){
+//                if(item.includes("BLK360")){
                     var myObject = {
                         name: item
                     }
                     wifiResultList.push(myObject);
-                }
+//                }
             }
             console.log("get network filter  = " + JSON.stringify(wifiResultList))
-            if(wifiResultList.size > 0){
+            console.log("wifiresultlist size =" + wifiResultList.size)
+            console.log("wifiresultlist length =" + wifiResultList.length)
+            if(wifiResultList.length > 0){
                 wifiResultPop.list = wifiResultList
                 wifiResultPop.titleStr = qsTr(String.wifiscan_result_title)
                 wifiResultPop.open()
@@ -162,6 +164,7 @@ Rectangle {
         var user = JSON.parse(settingsManager.getValue(settingsManager.user))
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
+            http.onReplyFailSignal.disconnect(onFail)
             hub.close()
 //            console.log("tenant reply: "+reply)
             var response = JSON.parse(reply)
@@ -173,7 +176,8 @@ Rectangle {
 
         function onFail(reply,code){
             console.log(reply,code)
-            http.replyFailSignal.disconnect(onFail)
+            http.onReplySucSignal.disconnect(onReply)
+            http.onReplyFailSignal.disconnect(onFail)
             hub.close()
         }
 
