@@ -132,5 +132,6 @@
         <file>Modules/Result/ItemviewResult.qml</file>
         <file>images/ic_fail.png</file>
         <file>images/ic_success.png</file>
+        <file>Modules/Home/HomeGridItemView.qml</file>
     </qresource>
 </RCC>
