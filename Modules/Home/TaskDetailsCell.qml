@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
-
+import "../../String_Zh_Cn.js" as Settings
 Rectangle {
     property var model
     property double ratioWidth : 1.0
@@ -78,14 +78,33 @@ Rectangle {
             anchors.left: subTitle.right
             anchors.leftMargin: 10
         }
+        Rectangle{
+            id: scoreRect
+            anchors.left: arrowimg.right
+            anchors.leftMargin: 10
+            anchors.verticalCenter: arrowimg.verticalCenter
+            width: parent.width * 0.1
+            height: 23
+            radius: 11.5
+            color: "#0C1890FF"
+            visible: setScoresIsHidden(model)
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                id: scoreTitle
+                text: Math.round(model.percentageScore !== null ? model.percentageScore : 0.00)+Settings.minute
+                color: "#1890FF"
+                font.pixelSize: 14
+            }
+        }
         Text {
             id: tipsTitle
-            text: "该测站正在等待测量…"
+            text: tipsTitleContent(model)
             anchors.left: parent.left
             anchors.leftMargin: 23.5
             anchors.top: parent.top
             anchors.topMargin: 47
-            color: "#2E2E2E"
+            color: tipsTitleColor(model)
             font.pixelSize: 13
         }
         Rectangle {
@@ -155,5 +174,21 @@ Rectangle {
                 }
             }
         }
+    }
+
+    function setScoresIsHidden(model){
+        return !model.percentageScore ? false : model.status === 2
+    }
+
+    function tipsTitleColor(model){
+        if (model.status === 2) {
+            return "#999999"
+        }
+        return "#2e2e2e"
+    }
+
+    function tipsTitleContent(model){
+        console.log("detais cell model: "+JSON.stringify(model))
+        return Settings.station_waiting_measurement
     }
 }

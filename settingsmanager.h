@@ -15,12 +15,9 @@ class SettingsManager : public QObject
     Q_PROPERTY(QString selectedStageType READ selectedStageType CONSTANT)
     Q_PROPERTY(QString selectedItem READ selectedItem CONSTANT)
     Q_PROPERTY(QString selectedMeasureData READ selectedMeasureData CONSTANT)
-
-//    Q_PROPERTY(QString stageType READ stageType CONSTANT)
-//    Q_PROPERTY(QString moreType READ moreType CONSTANT)
-//    Q_PROPERTY(QString selectedMeasureMode READ selectedMeasureMode CONSTANT)
     Q_PROPERTY(QString pubKey_integers READ pubKey_integers CONSTANT)
     Q_PROPERTY(QString currentDevice READ currentDevice CONSTANT)
+    Q_PROPERTY(QString fileInfoData READ fileInfoData CONSTANT)
 public:
     static SettingsManager* instance();
 
@@ -43,14 +40,11 @@ public:
     QString selectedItem() const;
     QString selectedMeasureData() const;
     QString currentDevice() const;
-
+    QString fileInfoData() const;
     /**
      * @brief 静态数据
      * @return
      */
-//    QString stageType() const;
-//    QString moreType() const;
-//    QString selectedMeasureMode() const;
     QString pubKey_integers() const;
 private:
     QSettings settings;

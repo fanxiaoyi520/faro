@@ -73,9 +73,8 @@ function setStatusImageSource(modelData){
 }
 
 function setStationType(modelData){
-
     if (modelData) {
-        var stationType = modelData.stationType;
+        var stationType = modelData;
         switch (stationType){
         case 1:
             return "客厅"
@@ -116,4 +115,8 @@ function setStatusStr(modelData){
     } else {
         return "未开启"
     }
+}
+
+function roundToTwoDecimalPlaces(num) {
+    return +(Math.round(num + "e+2")  + "e-2");
 }

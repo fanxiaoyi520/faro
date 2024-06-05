@@ -73,7 +73,9 @@ var result_statistics_faild = "失败:"
 var result_task_type_room = "房间任务"
 var result_task_stationno_tips = "测站号:"
 
-
+var minute = "分"
+var station_waiting_measurement = "该测站正在等待测量…"
+var scan_station_id = "扫描测站号:"
 
 
 
