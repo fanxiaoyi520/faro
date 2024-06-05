@@ -27,12 +27,12 @@ Rectangle {
             var wifiResultList = [];
 
             for(let item of list){
-//                if(item.includes("BLK360")){
+                if(item.includes("LLS")){
                     var myObject = {
                         name: item
                     }
                     wifiResultList.push(myObject);
-//                }
+                }
             }
             console.log("get network filter  = " + JSON.stringify(wifiResultList))
             console.log("wifiresultlist size =" + wifiResultList.size)
