@@ -63,12 +63,6 @@ Item{
         onConfirmAndSwitchAction: startScan(checked,inputModel)
     }
     TipsPopUp{
-        id: recalculatePopUp
-        tipsContentStr: qsTr("执行成功")
-        isVisibleCancel: false
-        onConfirmAction: {}
-    }
-    TipsPopUp{
         id: nonerworkPopUp
         tipsContentStr: qsTr(SettingString.unable_obtain_device_WiFi)
         isVisibleCancel: false
@@ -76,6 +70,10 @@ Item{
     }
     ScanningFaroPop{
         id: scanningFaroPop
+        lottieType: 0
+    }
+    ScanningFaroPop{
+        id: recalculatePopUp
         lottieType: 0
     }
     MorePopUp {
@@ -254,15 +252,26 @@ Item{
         tipsPopUp.open()
     }
 
-    function moreAction(){
+    function moreAction(scanModel){
         morePopUp.open()
+        inputCellModel = scanModel
     }
 
     function moreCellClickAction(model){
         morePopUp.close()
         if (model.index === 0) {
             console.log("start recalculate")
+            if (inputCellModel.calculationStatus === 1) {
+                nonerworkPopUp.tipsContentStr = qsTr(SettingString.station_being_calculated)
+                nonerworkPopUp.open()
+                return
+            }
+
+            recalculatePopUp.tipsconnect = SettingString.recalculating
+            recalculatePopUp.title = SettingString.recalculate
+            recalculatePopUp.lottieType = 0
             recalculatePopUp.open()
+            recalculate()
             return
         }
         if (model.index === 1) {
@@ -275,6 +284,33 @@ Item{
             selectMeasureModePopUp.open()
             return
         }
+    }
+
+    ///重新计算
+    function recalculate(){
+        function onReply(reply){
+            http.onReplySucSignal.disconnect(onReply)
+            console.log("complete building roomTaskExecute return: "+reply)
+            var response = JSON.parse(reply)
+            recalculatePopUp.close()
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.execution_successful)
+            nonerworkPopUp.open()
+            getBuildingRoomListByFloorId()
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFail)
+            recalculatePopUp.close()
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.execution_fail)
+            nonerworkPopUp.open()
+        }
+
+        http.onReplySucSignal.connect(onReply)
+        http.replyFailSignal.connect(onFail)
+        console.log("taskNo: "+JSON.stringify(inputCellModel.stationTaskNo))
+        http.post(Api.building_roomTaskExecute_rerun,
+                  {"taskNo":inputCellModel.stationTaskNo})
     }
 
     function startScan(checked,inoutModel){

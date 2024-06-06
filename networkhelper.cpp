@@ -13,7 +13,7 @@ NetworkHelper::~NetworkHelper() {
 
 void NetworkHelper::setNetworkStatusCallback(std::function<void(bool)> callback) {
     isMonitoring = true;
-    checkTimer->start(5000);
+    checkTimer->start(2500);
     networkStatusCallback = callback;
 }
 

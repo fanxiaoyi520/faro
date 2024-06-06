@@ -99,4 +99,9 @@ QString Api::building_roomTaskExecute_calculateStationTask() const
     return QString("/building/roomTaskExecute/calculateStationTask");
 }
 
+QString Api::building_roomTaskExecute_rerun() const
+{
+    return QString("/building/roomTaskExecute/rerun");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

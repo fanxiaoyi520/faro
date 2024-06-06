@@ -9,6 +9,8 @@
 #include "faromanager.h"
 #include "wifihelper.h"
 #include "filemanager.h"
+#include "crashwatcher.h"
+#include <csignal>
 
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
@@ -29,9 +31,13 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(codec);
 
     QGuiApplication app(argc, argv);
-
     app.setOrganizationName("YYZS");
     app.setApplicationName("Measure");
+
+    ///异常处理
+    CrashWatcher watcher;
+    app.installNativeEventFilter(&watcher);
+    signal(SIGABRT, CrashWatcher::handleAbort);
 
     /**
         QSettings settings("YYZS","Measure");

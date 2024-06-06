@@ -69,8 +69,10 @@ var upload_file_fial = "上传文件失败"
 var minute = "分"
 var station_waiting_measurement = "该测站正在等待测量…"
 var scan_station_id = "扫描测站号:"
-
-
+var recalculate = "重新计算"
+var recalculating = "正在进行重新弄计算,请稍后..."
+var execution_successful = "执行成功"
+var execution_fail = "执行失败"
 
 
 

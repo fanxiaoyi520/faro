@@ -261,6 +261,7 @@ void FaroScannerController::getScanOrientation(const QString& filePath)
     */
     HRESULT result;
     result = iQLibIfPtr->load(cStr);
+
     iQLibIfPtr->getScanOrientation(scanNo,&x,&y,&z,&angle);
     qDebug() << "------------x: " << x << " y: " << y << " z: " << z << " angle: " << angle;
 }

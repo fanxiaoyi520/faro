@@ -172,7 +172,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("more clicked")
-                    moreAction()
+                    moreAction(model)
                 }
             }
         }
