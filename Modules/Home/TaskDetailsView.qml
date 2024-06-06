@@ -76,7 +76,6 @@ Item{
     }
     ScanningFaroPop{
         id: scanningFaroPop
-
         lottieType: 0
     }
     MorePopUp {
@@ -85,8 +84,6 @@ Item{
     }
     SelectMeasureModePopUp{
         id: selectMeasureModePopUp
-        stageType: roomTaskVoModel.stageType
-        stationType: inputCellModel.stationType
     }
     Hub{id: hub}
     EnlargeImage{
@@ -209,6 +206,7 @@ Item{
         id: itemDelegate
         TaskDetailsCell{
             model: modelData
+            cellroom_id: room_id
         }
     }
 
@@ -272,6 +270,8 @@ Item{
             return
         }
         if (model.index === 2) {
+            selectMeasureModePopUp.stageType = roomTaskVoModel.stageType
+            selectMeasureModePopUp.stationType = inputCellModel.stationType
             selectMeasureModePopUp.open()
             return
         }
@@ -301,6 +301,7 @@ Item{
             "roomName":roomTaskVoModel.roomName,
             "stageType":roomTaskVoModel.stageType,
             "roomId":room_id,
+            "stationTaskNo": inputCellModel.stationTaskNo
         }
 
         console.log("input scanning parameters: "+JSON.stringify(scanParams))
@@ -399,6 +400,7 @@ Item{
         } else {
             scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
             scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
+            scanningFaroPop.lottieType = 0
             scanningFaroPop.open()
             faroManager.startScan(JSON.stringify(scanParams))
         }
@@ -431,22 +433,13 @@ Item{
     }
 
     //MARK: network
-    function isJson(str) {
-        try {
-            JSON.parse(str);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    }
-
     function uploadFile(filePath){
         function onReply(reply){
             faroManager.uploadFileSucResult.disconnect(onReply)
-            if (isJson(reply)) {
+            if (GlobalFunc.isJson(reply)) {
                 var response = JSON.parse(reply)
                 console.log("upload file result data: "+reply)
-                performCalculation(JSON.stringify(response.data))
+                performCalculation(JSON.stringify(response.data),filePath)
                 scanningFaroPop.close()
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.upload_file_suc)
                 nonerworkPopUp.open()
@@ -493,7 +486,7 @@ Item{
         fileManager.removePath(filePath)
     }
 
-    function performCalculation(result){
+    function performCalculation(result,filePath){
         function onReply(reply){
             faroManager.performCalculationSucResult.disconnect(onReply)
             console.log("perform calculation data: "+reply)
@@ -507,7 +500,7 @@ Item{
 
         faroManager.performCalculationSucResult.connect(onReply)
         faroManager.performCalculationFailResult.connect(onFail)
-        faroManager.performCalculation(result)
+        faroManager.performCalculation(result,filePath)
     }
 
     function getBuildingRoomListByFloorId(floorId){

@@ -8,6 +8,8 @@ Rectangle {
     property var model
     property double ratioWidth : 1.0
     property double oldWidth : parent.width
+    property string cellroom_id
+
     width: parent.width
     height: 82.5
     Component.onCompleted: {
@@ -188,6 +190,19 @@ Rectangle {
     }
 
     function tipsTitleContent(model){
+        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("task details cell file json: "+filejson)
+        if (GlobalFunc.isJson(filejson)){
+            var fileModel = JSON.parse(filejson)
+            if (Array.isArray(fileModel)){
+                var uniqueArray = fileModel.filter((value, index, self) => {
+                                                       console.log("file path value: "+JSON.parse(value).stationId)
+                                                       console.log("file path value: "+model.stationId)
+                                                       return JSON.parse(value).stationId === model.stationId && JSON.parse(value).roomId === model.roomId
+                                                   });
+                console.log("---------------:"+uniqueArray)
+            }
+        }
         console.log("detais cell model: "+JSON.stringify(model))
         return Settings.station_waiting_measurement
     }

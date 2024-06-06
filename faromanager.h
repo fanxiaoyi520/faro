@@ -32,7 +32,7 @@ public slots:
     void disconnect();
     void shutDown();
     void uploadFileHandle();
-    void performCalculation(const QString &response);
+    void performCalculation(const QString &response,const QString &filePath);
 signals:
     void scanComplete(const QString& filePath);
     void scanProgress(int percent);

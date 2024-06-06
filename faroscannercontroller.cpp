@@ -30,6 +30,8 @@ FaroScannerController &FaroScannerController::scanAbnormal(std::function<void (i
 FaroScannerController::FaroScannerController(QObject *parent) : QObject(parent)
 {
     scanCtrlSDKPtr = nullptr;
+    scanOpInterfPtr = nullptr;
+    iQLibIfPtr = nullptr;
 }
 
 FaroScannerController::~FaroScannerController()
@@ -88,6 +90,42 @@ bool FaroScannerController::initFaroInternal()
     return true;
 }
 
+bool FaroScannerController::initIiQLibInternal()
+{
+    try {
+        const wchar_t* licenseText1 =
+                L"FARO Open Runtime License\n"
+                L"Key: 434ELNNRTCTXXMKT8KVUSPUPS\n"
+                L"\n"
+                L"The software is the registered property of "
+                L"FARO Scanner Production GmbH, Stuttgart, Germany.\n"
+                L"All rights reserved.\n"
+                L"This software may only be used with written permission "
+                L"of FARO Scanner Production GmbH, Stuttgart, Germany.";
+        BSTR licenseCode1 = SysAllocString(licenseText1);
+        IiQLicensedInterfaceIfPtr licPtr1(__uuidof(iQLibIf));
+        try {
+            licPtr1->License = licenseCode1;
+            iQLibIfPtr = static_cast<IiQLibIfPtr>(licPtr1);
+        }
+        catch (...) {
+            qDebug() << "No license for iQOpen interface provided";
+            return false;
+        }
+    }
+    catch (...) {
+        qDebug() << "Cannot access iQOpen";
+        return false;
+    }
+
+    if (iQLibIfPtr == NULL) {
+        qDebug() << "Failed to initialize iQOpen";
+        return false;
+    }
+
+    return true;
+}
+
 bool FaroScannerController::connect() {
     const QString default_ip = "192.168.43.1";
     const QString defaultRemoteScanStoragePath = FileManager::getFlsPath();
@@ -118,6 +156,10 @@ bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, c
         scanCtrlSDKPtr->RemoteScanAccess = RSAEnabled;
         scanCtrlSDKPtr->PutStorageMode(SMRemote);
         scanCtrlSDKPtr->PutScanMode(StationaryGrey);
+        //        scanCtrlSDKPtr->PutResolution(1);
+        //        int aa = scanCtrlSDKPtr->GetResolution();
+        //        qDebug() << "Get Resolution: " << aa;
+
         //scanCtrlSDKPtr->PutMeasurementRate(1);
         return true;
     } else {
@@ -128,7 +170,7 @@ bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, c
 }
 
 FaroScannerController& FaroScannerController::startScan() {
-    const QString m_Resolution = "8";
+    const QString m_Resolution = "20";
     const QString m_ScanName = "SDK_File_";
     startScan(m_Resolution,m_ScanName);
     return *this;
@@ -168,6 +210,14 @@ void FaroScannerController::disconnect() {
     }
 }
 
+void FaroScannerController::iQLibIfPtrDisconnect()
+{
+    if (iQLibIfPtr) {
+        qDebug() << "进来啦...";
+        iQLibIfPtr = nullptr;
+    }
+}
+
 void FaroScannerController::shutDown()
 {
     if (scanCtrlSDKPtr) {
@@ -178,6 +228,41 @@ void FaroScannerController::shutDown()
         }
         scanCtrlSDKPtr->shutDown();
     }
+}
+
+void FaroScannerController::getScanOrientation(const QString& filePath)
+{
+
+    initIiQLibInternal();
+    QDir dir(filePath);
+    if (!dir.exists()) {
+        qDebug() << "Directory does not exist:" << filePath;
+        return;
+    }
+    QString newFilePath = dir.filePath("SDK_File_005.fls");
+    std::string stdStr = newFilePath.toStdString();
+    const char* cStr = stdStr.c_str();
+
+    _bstr_t bstr(cStr);
+    qDebug() << "cStr: " << cStr;
+
+    qDebug() << "file path use scan result: " << newFilePath;
+    QString m_ScanNo = "0";
+    int scanNo = m_ScanNo.toInt();
+    double x,y,z,angle;
+
+    /**
+    int getScanOrientation (
+        int scan,
+        double * x,
+        double * y,
+        double * z,
+        double * angle );
+    */
+    HRESULT result;
+    result = iQLibIfPtr->load(cStr);
+    iQLibIfPtr->getScanOrientation(scanNo,&x,&y,&z,&angle);
+    qDebug() << "------------x: " << x << " y: " << y << " z: " << z << " angle: " << angle;
 }
 
 void FaroScannerController::checkScannerStatus()

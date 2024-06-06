@@ -5,6 +5,7 @@ import QtQuick.Controls 2.12
 import Http 1.0
 import Api 1.0
 import Dialog 1.0
+import "../../Util/GlobalFunc.js" as GlobalFunc
 
 ScrollView{
     property var list: []
@@ -45,10 +46,16 @@ ScrollView{
     }
 
     Component.onCompleted: {
-        var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
-        if (organizationalTree.length > 0) {
-            list = organizationalTree.data[0].children
-            item_tree.model = list
+        var tree = settingsManager.getValue(settingsManager.organizationalTree)
+        if (GlobalFunc.isJson(tree)) {
+            var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
+            if (organizationalTree.length > 0) {
+                list = organizationalTree.data[0].children
+                item_tree.model = list
+            } else {
+                hub.open()
+                getNumberOfOrganizations()
+            }
         } else {
             hub.open()
             getNumberOfOrganizations()

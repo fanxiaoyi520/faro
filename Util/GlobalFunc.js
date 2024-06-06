@@ -120,3 +120,12 @@ function setStatusStr(modelData){
 function roundToTwoDecimalPlaces(num) {
     return +(Math.round(num + "e+2")  + "e-2");
 }
+
+function isJson(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}

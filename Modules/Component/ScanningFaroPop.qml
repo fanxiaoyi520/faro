@@ -7,8 +7,8 @@ import "../../String_Zh_Cn.js" as String
 Popup {
     id:popup_wifi
     property int lottieType: 0
-    property var tipsconnect
-    property var title
+    property var tipsconnect: String.starting_connection_to_machine
+    property var title: String.scan_station_id
     modal: true
     width: parent.width
     height: parent.height
@@ -57,8 +57,6 @@ Popup {
             anchors{
                 top: rect_dive.bottom
                 topMargin: 8
-                left: parent.left
-                right: parent.right
                 bottom: text_tips.top
                 leftMargin: 16
                 rightMargin: 16
@@ -103,7 +101,7 @@ Popup {
     function getCurrentLottieType(lottieType){
         if (lottieType === 0) return Qt.resolvedUrl("../../images/json/wating.json")
         if (lottieType === 1) return Qt.resolvedUrl("../../images/json/upload_file.json")
-        if (lottieType === 1) return Qt.resolvedUrl("../../images/json/scaning.json")
+        if (lottieType === 2) return Qt.resolvedUrl("../../images/json/scaning.json")
         return Qt.resolvedUrl("../../images/json/wating.json")
     }
 }

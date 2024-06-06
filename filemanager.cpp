@@ -207,30 +207,31 @@ QString FileManager::getFlsPath()
 
 bool FileManager::removePath(const QString &path)
 {
-    qDebug() << "Trying to remove path:" << path;
-    QFileInfo fileInfo(path);
-    if (fileInfo.exists()) {
-        if (fileInfo.isDir()) {
-            // 删除目录及其内容
-            QDir dir(path);
-            bool success = dir.removeRecursively();
-            if (!success) {
-                qDebug() << "Failed to remove directory";
-            }
-            return success;
-        } else {
-            // 删除文件
-            QFile file(path);
-            bool success = file.remove();
-            if (!success) {
-                qDebug() << "Failed to remove file:" << file.errorString();
-            }
-            return success;
-        }
-    }
-    // 路径不存在，返回 false
-    qDebug() << "Path does not exist:" << path;
-    return false;
+    return true;
+//    qDebug() << "Trying to remove path:" << path;
+//    QFileInfo fileInfo(path);
+//    if (fileInfo.exists()) {
+//        if (fileInfo.isDir()) {
+//            // 删除目录及其内容
+//            QDir dir(path);
+//            bool success = dir.removeRecursively();
+//            if (!success) {
+//                qDebug() << "Failed to remove directory";
+//            }
+//            return success;
+//        } else {
+//            // 删除文件
+//            QFile file(path);
+//            bool success = file.remove();
+//            if (!success) {
+//                qDebug() << "Failed to remove file:" << file.errorString();
+//            }
+//            return success;
+//        }
+//    }
+//    // 路径不存在，返回 false
+//    qDebug() << "Path does not exist:" << path;
+//    return false;
 }
 
 QStringList FileManager::getFilesInDirectory(const QString &dirPath, const QStringList &filters)

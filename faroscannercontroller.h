@@ -15,9 +15,10 @@
 #else
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.0.0' processorArchitecture='x86' publicKeyToken='1d23f5635ba800ab'\"")
 #endif
-#import "C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\iQOpen.dll" no_namespace
-#import "C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\FARO.LS.SDK.dll" no_namespace
-
+//#import "C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\iQOpen.dll" no_namespace
+//#import "C:\Windows\WinSxS\amd64_faro.ls_1d23f5635ba800ab_1.1.702.0_none_3590af4b356bcd81\FARO.LS.SDK.dll" no_namespace
+#import "thirdparty/iQOpen.dll" no_namespace
+#import "thirdparty/FARO.LS.SDK.dll" no_namespace
 //#ifdef _DEBUG
 //#define new DEBUG_NEW
 //#undef THIS_FILE
@@ -48,8 +49,9 @@ public:
     Q_INVOKABLE FaroScannerController& startScan(const QString &m_Resolution, const QString &m_ScanName);
     Q_INVOKABLE void stopScan();
     Q_INVOKABLE void disconnect();
+    Q_INVOKABLE void iQLibIfPtrDisconnect();
     Q_INVOKABLE void shutDown();
-
+    Q_INVOKABLE void getScanOrientation(const QString& filePath);
 private slots:
     void checkScannerStatus();
 private:
@@ -57,9 +59,10 @@ private:
     ~FaroScannerController();
     IScanCtrlSDKPtr scanCtrlSDKPtr;
     IiQScanOpInterfPtr scanOpInterfPtr;
+    IiQLibIfPtr iQLibIfPtr;
     // 初始化FARO SDK的内部实现
     bool initFaroInternal();
-
+    bool initIiQLibInternal();
     // 连接到扫描仪的内部实现
     bool connectToScannerInternal(const _bstr_t &scannerIP, const CComBSTR &remoteScanStoragePath);
 

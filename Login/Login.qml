@@ -13,7 +13,7 @@ Rectangle{
     height: 400
     Toast {id: toastPopup}
     Http {id: http}
-    Dialog{
+    LoginDialog{
         id: dialog
         onConfirmOptionsAction: {
             console.log("dialog selected data: " + JSON.stringify(model))

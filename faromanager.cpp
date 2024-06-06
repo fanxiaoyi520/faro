@@ -122,7 +122,13 @@ void FaroManager::onCalculationFailSignal(const QString &error, int errorCode)
     emit performCalculationFailResult(error,errorCode);
 }
 
-void FaroManager::performCalculation(const QString &response){
+void FaroManager::performCalculation(const QString &response,const QString &filePath){
+
+    qDebug() << "default fls path : " << filePath;
+
+    faroScannerController->getScanOrientation(filePath);
+    faroScannerController->iQLibIfPtrDisconnect();
+
     QJsonObject fileModel = Util::parseJsonStringToObject(response);
     QMap<QString, QVariant> paramsMap;
     paramsMap.insert("roomId",inputModel.value("roomId"));

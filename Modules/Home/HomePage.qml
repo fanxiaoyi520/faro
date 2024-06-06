@@ -6,6 +6,7 @@ import Http 1.0
 import Api 1.0
 import Dialog 1.0
 import "../../String_Zh_Cn.js" as SettingString
+import "../../Util/GlobalFunc.js" as GlobalFunc
 
 StackView{
     property var modellist: []
@@ -127,10 +128,16 @@ StackView{
     }
 
     Component.onCompleted: {
-        var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
-        if (organizationalTree.data.length > 0) {
-            var selectedProjectData = JSON.parse(settingsManager.getValue(settingsManager.selectedProject))
-            sourcelist = modellist = selectedProjectData
+        var tree = settingsManager.getValue(settingsManager.organizationalTree)
+        if (GlobalFunc.isJson(tree)) {
+            var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
+            if (organizationalTree.data.length > 0) {
+                var selectedProjectData = JSON.parse(settingsManager.getValue(settingsManager.selectedProject))
+                sourcelist = modellist = selectedProjectData
+            } else {
+                hub.open()
+                getNumberOfOrganizations()
+            }
         } else {
             hub.open()
             getNumberOfOrganizations()

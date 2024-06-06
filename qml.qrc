@@ -129,5 +129,6 @@
         <file>Modules/Component/ScanningFaroPop.qml</file>
         <file>images/json/upload_file.json</file>
         <file>images/json/wating.json</file>
+        <file>Login/LoginDialog.qml</file>
     </qresource>
 </RCC>

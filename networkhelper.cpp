@@ -4,7 +4,7 @@
 
 NetworkHelper::NetworkHelper(QObject *parent) : QObject(parent), manager(new QNetworkAccessManager(this)), checkTimer(new QTimer(this)), isMonitoring(true) {
     connect(checkTimer, &QTimer::timeout, this, &NetworkHelper::checkNetworkStatus);
-    checkTimer->start(5000); // 每5秒检查一次网络状态
+    //checkTimer->start(5000); // 每5秒检查一次网络状态
 }
 
 NetworkHelper::~NetworkHelper() {
@@ -12,6 +12,8 @@ NetworkHelper::~NetworkHelper() {
 }
 
 void NetworkHelper::setNetworkStatusCallback(std::function<void(bool)> callback) {
+    isMonitoring = true;
+    checkTimer->start(5000);
     networkStatusCallback = callback;
 }
 

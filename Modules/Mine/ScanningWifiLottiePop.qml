@@ -61,7 +61,7 @@ Popup {
                 rightMargin: 16
                 bottomMargin: 8
             }
-            anchors.horizontalCenter: parent.horizontalCenter
+//            anchors.horizontalCenter: parent.horizontalCenter
             id:lottieScaning
             width:  parent.width
             height: parent.height - text_title.height - text_tips.height - 57
