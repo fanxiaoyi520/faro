@@ -1,0 +1,56 @@
+import QtQuick 2.14
+import "../../String_Zh_Cn.js" as String
+
+Column{
+    property var datas: []
+    property var selectAll: false
+    property var uploadItemItem: []
+    width: parent.width
+    spacing: 0
+    Text {
+        id: text_project_name
+        text: (datas.length > 0)? JSON.parse(datas[0]).projectName : ""
+        font.pixelSize: 16
+        font.bold: true
+    }
+    Rectangle{
+        height: 8
+        width: parent.width
+    }
+
+    Text {
+        id: text_sub_name
+        font.pixelSize: 16
+        Component.onCompleted: {
+            var dataItem = JSON.parse(datas[0])
+            console.log("itemview datas = " + datas.length)
+            var stageType = JSON.parse(String.stageType[JSON.parse(datas[0]).stageType - 1]).name
+            var typeName = String.result_task_type_room
+            text_sub_name.text = dataItem.blockName + "_" + dataItem.unitName + "_"+ dataItem.floorName + "_"+ dataItem.roomName + "_"+ typeName + "_"+ stageType
+        }
+    }
+
+    Rectangle{
+        height: 8
+        width: parent.width
+    }
+
+    Repeater{
+        width: parent.width
+        model: datas.length
+        delegate:UploadItemItemView{
+            id:uploaditemitem
+           fileInfo : JSON.parse(datas[index])
+           Component.onCompleted: {
+               uploadItemItem.push(uploaditemitem)
+           }
+        }
+    }
+
+    onSelectAllChanged: {
+        for(var i = 0;i < uploadItemItem.length;i++){
+            uploadItemItem[i].selectAll = selectAll
+        }
+    }
+
+}

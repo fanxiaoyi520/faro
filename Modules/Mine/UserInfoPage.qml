@@ -181,6 +181,7 @@ Column{
     function loadUserInfo(){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
+            http.replyFailSignal.disconnect(onFail)
             hub.close()
 //            console.log("userinfo reply: "+reply)
             var response = JSON.parse(reply)
@@ -189,6 +190,7 @@ Column{
 
         function onFail(reply,code){
             console.log(reply,code)
+            http.onReplySucSignal.disconnect(onReply)
             http.replyFailSignal.disconnect(onFail)
             hub.close()
         }

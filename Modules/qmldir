@@ -15,3 +15,4 @@ SelectMeasureModePopUp 1.0 ./Component/SelectMeasureModePopUp.qml
 DefaultTipsPop    1.0   ./Component/DefaultTipsPop.qml
 ScanningWifiLottiePop 1.0 ./Mine/ScanningWifiLottiePop.qml
 ScanningFaroPop 1.0 ./Component/ScanningFaroPop.qml
+UploadPage 1.0 ./Mine/UploadPage.qml

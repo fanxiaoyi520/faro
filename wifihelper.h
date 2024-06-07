@@ -40,7 +40,7 @@ private:
     HANDLE wlanHandle;
     GUID interfaceGuid;
     std::thread m_thread;
-    bool m_running;
+    bool m_running = false;
     NativeWifiConnect mNativeWifi;
     std::map<std::string, int>		mWifiMap;
 };

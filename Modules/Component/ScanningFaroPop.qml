@@ -88,6 +88,7 @@ Popup {
     onOpened: {
         console.log("open......")
         timer.start()
+
         lottieScaning.source = getCurrentLottieType(lottieType)
         lottieScaning.start()
     }

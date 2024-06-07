@@ -311,6 +311,7 @@ Popup {
     function sureAction(){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
+            http.replyFailSignal.disconnect(onFail)
             hub.close()
             console.log("changepass reply: "+reply)
                var response = JSON.parse(reply)
@@ -334,6 +335,7 @@ Popup {
             tipspop.tipsContentStr = response.msg
             tipspop.isVisibleCancel = false
             tipspop.open()
+            http.onReplySucSignal.disconnect(onReply)
             http.replyFailSignal.disconnect(onFail)
             hub.close()
         }

@@ -25,6 +25,8 @@ class Api : public QObject {
     Q_PROPERTY(QString building_measureDevice_searchDevice READ building_measureDevice_searchDevice CONSTANT)
     Q_PROPERTY(QString admin_sys_file_listFileByFileIds READ admin_sys_file_listFileByFileIds CONSTANT)
     Q_PROPERTY(QString admin_sys_file_upload READ admin_sys_file_upload CONSTANT)
+    Q_PROPERTY(QString building_measureTask_pager READ building_measureTask_pager CONSTANT)
+    Q_PROPERTY(QString building_tasknotify_statistics READ building_tasknotify_statistics CONSTANT)
     Q_PROPERTY(QString building_roomTaskExecute_calculateStationTask READ building_roomTaskExecute_calculateStationTask CONSTANT)
     Q_PROPERTY(QString building_roomTaskExecute_rerun READ building_roomTaskExecute_rerun CONSTANT)
 
@@ -46,6 +48,8 @@ public:
     QString building_room_listByFloorId() const;
     QString building_roomTask_getRoomTaskInfo() const;
     QString building_measureDevice_searchDevice() const;
+    QString building_measureTask_pager() const;
+    QString building_tasknotify_statistics() const;
     QString admin_sys_file_listFileByFileIds() const;
     QString admin_sys_file_upload() const;
     QString building_roomTaskExecute_calculateStationTask() const;

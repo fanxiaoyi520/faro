@@ -33,6 +33,8 @@ public slots:
     void shutDown();
     void uploadFileHandle();
     void performCalculation(const QString &response,const QString &filePath);
+    void performCalculation(const QString &response,const QString &filePath,const QString &calParams);
+    void zipFileHandle();
 signals:
     void scanComplete(const QString& filePath);
     void scanProgress(int percent);

@@ -27,7 +27,7 @@ Rectangle {
             var wifiResultList = [];
 
             for(let item of list){
-                if(item.includes("BLK360")){
+                if(item.includes("LLS")){
                     var myObject = {
                         name: item
                     }
@@ -35,7 +35,9 @@ Rectangle {
                 }
             }
             console.log("get network filter  = " + JSON.stringify(wifiResultList))
-            if(wifiResultList.size > 0){
+            console.log("wifiresultlist size =" + wifiResultList.size)
+            console.log("wifiresultlist length =" + wifiResultList.length)
+            if(wifiResultList.length > 0){
                 wifiResultPop.list = wifiResultList
                 wifiResultPop.titleStr = qsTr(String.wifiscan_result_title)
                 wifiResultPop.open()
@@ -108,10 +110,9 @@ Rectangle {
                     scanningwifi_pop.open()
                     wifiHelper.startWork()
                 }
-                if(index == 4){
-                    console.log("click connect wifi")
-//                    wifiHelper.connectToWiFi("LLS082118788","0123456789")
-                    wifiHelper.disConnectWifi()
+                if(index == 1){
+                    userInfoLoader.source = "UploadPage.qml"
+                    mineStack.push(userInfoLoader)
                 }
             }
         }
@@ -162,6 +163,7 @@ Rectangle {
         var user = JSON.parse(settingsManager.getValue(settingsManager.user))
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
+            http.onReplyFailSignal.disconnect(onFail)
             hub.close()
 //            console.log("tenant reply: "+reply)
             var response = JSON.parse(reply)
@@ -173,7 +175,8 @@ Rectangle {
 
         function onFail(reply,code){
             console.log(reply,code)
-            http.replyFailSignal.disconnect(onFail)
+            http.onReplySucSignal.disconnect(onReply)
+            http.onReplyFailSignal.disconnect(onFail)
             hub.close()
         }
 
