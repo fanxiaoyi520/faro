@@ -79,8 +79,8 @@ var cancel_scan = "取消扫描"
 var start_scan = "开始扫描"
 var tasks_details = "任务详情"
 var no_datas = "暂无数据"
-
-
+var more = "更多"
+var selection_stage = "选择阶段"
 
 
 

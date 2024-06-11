@@ -163,7 +163,7 @@ Rectangle {
                 id: moretitle
                 Layout.fillWidth: true
                 y: 5
-                text: qsTr("更多")
+                text: qsTr(Settings.more)
                 color: "#000000"
                 font.pixelSize: 13
             }

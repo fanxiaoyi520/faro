@@ -35,7 +35,7 @@ Item{
     WifiHelper{id: wifiHelper}
     Dialog{
         id: dialog
-        titleStr: qsTr("选择阶段")
+        titleStr: qsTr(SettingString.selection_stage)
         onConfirmOptionsAction: {
             console.log("dialog selected data: " + JSON.stringify(model))
             settingsManager.setValue(settingsManager.selectedStageType,JSON.stringify(model))

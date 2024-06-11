@@ -49,14 +49,14 @@ Popup{
             }
         }
 
-        PinchArea {
-            anchors.fill: parent
-            pinch.target: imageViewer
-            onPinchUpdated: {
-                imageViewer.scale *= pinch.scale
-                pinch.scale = 1.0
-            }
-        }
+//        PinchArea {
+//            anchors.fill: parent
+//            pinch.target: imageViewer
+//            onPinchUpdated: {
+//                imageViewer.scale *= pinch.scale
+//                pinch.scale = 1.0
+//            }
+//        }
     }
     padding: 0
 }
