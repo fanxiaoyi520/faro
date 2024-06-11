@@ -27,7 +27,7 @@ void FaroManager::startScan(const QString &inputParams)
 {
     qDebug() << "scan input params: " << inputParams;
     inputModel = Util::parseJsonStringToObject(inputParams);
-    faroScannerController->startScan()
+    faroScannerController->startScan(inputParams)
             .scanProgress([this](int percent){
         emit scanProgress(percent);
     }).complete([this](QString flsPath){
@@ -127,8 +127,8 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     qDebug() << "default fls path : " << filePath;
 
     faroScannerController->getScanOrientation(filePath);
+    faroScannerController->disconnect();
     faroScannerController->iQLibIfPtrDisconnect();
-
     QJsonObject fileModel = Util::parseJsonStringToObject(response);
     QMap<QString, QVariant> paramsMap;
     paramsMap.insert("roomId",inputModel.value("roomId"));

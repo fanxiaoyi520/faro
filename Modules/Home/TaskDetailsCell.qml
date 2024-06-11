@@ -190,8 +190,8 @@ Rectangle {
     }
 
     function tipsTitleContent(model){
-        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
-        console.log("task details cell file json: "+filejson)
+        var filejson = settingsManager.getValue(settingsManager.fileInfoData);
+        console.log("filejson: "+filejson)
         if (GlobalFunc.isJson(filejson)){
             var fileModel = JSON.parse(filejson)
             if (Array.isArray(fileModel)){

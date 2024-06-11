@@ -143,13 +143,16 @@ bool FaroScannerController::connect(const QString &scannerIP, const QString &rem
 
 bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, const CComBSTR &remoteScanStoragePath)
 {
+    Q_UNUSED(remoteScanStoragePath);
     if (!scanCtrlSDKPtr) {
         initFaroInternal();
     }
 
     scanCtrlSDKPtr->ScannerIP = scannerIP;
     scanCtrlSDKPtr->clearExceptions();
+    scanCtrlSDKPtr->PutScanMode(StationaryGrey);
     scanCtrlSDKPtr->connect();
+    /**
     HRESULT hr = scanCtrlSDKPtr->put_RemoteScanStoragePath(remoteScanStoragePath);
     if (SUCCEEDED(hr)) {
         // Path set successfully
@@ -167,17 +170,44 @@ bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, c
         qDebug() << "Failed to set remote scan storage path";
         return false;
     }
+    */
+    return true;
 }
 
-FaroScannerController& FaroScannerController::startScan() {
+FaroScannerController& FaroScannerController::startScan(const QString &inputParams) {
+    qDebug() << "start scan input params: " << inputParams;
+    QJsonObject inputMap = Util::parseJsonStringToObject(inputParams);
+    /**保存规则*/
+    QString name = inputMap.value("roomId").toString()+"_"+inputMap.value("stationId").toString()+"_"+inputMap.value("taskNo").toString()+"_";
+    qDebug() << "name: " << name;
     const QString m_Resolution = "20";
-    const QString m_ScanName = "SDK_File_";
-    startScan(m_Resolution,m_ScanName);
+    const QString m_ScanName = name;
+    startScan(inputParams,m_Resolution,m_ScanName);
     return *this;
 }
 
-FaroScannerController& FaroScannerController::startScan(const QString &m_Resolution, const QString &m_ScanName)
+QString FaroScannerController::getScanPathName() {
+    int result;
+    BSTR path = nullptr;
+    result = scanOpInterfPtr->getScanPathName(&path);
+
+    QString qstringPath;
+    if (result == 0) {
+        if (path) {
+            qstringPath = QString::fromWCharArray(path);
+        }
+
+        SysFreeString(path);
+    } else {
+        qDebug() << "err";
+    }
+
+    return qstringPath;
+}
+
+FaroScannerController& FaroScannerController::startScan(const QString &inputParams,const QString &m_Resolution, const QString &m_ScanName)
 {
+    Q_UNUSED(inputParams);
     if (scanCtrlSDKPtr) {
         scanCtrlSDKPtr->Resolution = m_Resolution.toInt();
         _bstr_t _bstr_t_m_ScanName = m_ScanName.toStdWString().c_str();
@@ -213,7 +243,6 @@ void FaroScannerController::disconnect() {
 void FaroScannerController::iQLibIfPtrDisconnect()
 {
     if (iQLibIfPtr) {
-        qDebug() << "进来啦...";
         iQLibIfPtr = nullptr;
     }
 }
@@ -268,6 +297,7 @@ void FaroScannerController::getScanOrientation(const QString& filePath)
 
 void FaroScannerController::checkScannerStatus()
 {
+    qDebug() << "is connected: " << scanOpInterfPtr->isConnected();
     scanOpInterfPtr->getScannerStatus(&scanStatus);
     qDebug() << "Scanner status: " << scanStatus;
 
@@ -275,7 +305,13 @@ void FaroScannerController::checkScannerStatus()
         //QTimer *timer = qobject_cast<QTimer*>(sender());
         if (timer) timer->stop();
         timer->deleteLater();
-        this->completeHandler(flsPath);
+        QString path = getScanPathName();
+        int index = path.indexOf("/Scans");
+        if (index != -1) {
+            path.replace(index, QString("/Scans").length(), "G:");
+        }
+        qDebug() << "get scan path name: " << path;
+        this->completeHandler(path/*flsPath*/);
     } else if (scanStatus == 1) {
         this->scanAbnormalHandler(scanStatus);
     } else {

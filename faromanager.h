@@ -9,6 +9,7 @@
 #include <QCoreApplication>
 #include "networkhelper.h"
 #include "wifihelper.h"
+#include <thread>
 //#include "EasyQtSql/src/EasyQtSql.h"
 //#include "EasyQtSql/filemodel.h"
 //#include "EasyQtSql/sqlmanager.h"
