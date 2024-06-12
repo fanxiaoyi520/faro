@@ -118,6 +118,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.rightMargin: parent.width * 0.18
         }
+
         ColumnLayout{
             id: scanColumnLayout
             anchors.verticalCenter: parent.verticalCenter
@@ -147,6 +148,17 @@ Rectangle {
                 }
             }
         }
+
+        Rectangle{
+            id: reddort
+            color: "red"
+            width: 6;height: 6
+            anchors.right: moreColumnLayout.right
+            anchors.top: moreColumnLayout.top
+            radius: 3
+            visible: model.status === 0 && filtering(model)
+        }
+
         ColumnLayout{
             id: moreColumnLayout
             anchors.verticalCenter: parent.verticalCenter
@@ -191,6 +203,23 @@ Rectangle {
 
     function tipsTitleContent(model){
         console.log("cell display model: "+JSON.stringify(model))
+        var uniqueModel = filtering(model)
+        console.log("detais cell model: "+JSON.stringify(model))
+        if (model.status === 0) {
+            return Settings.station_waiting_scan
+        } else if (model.status === 1 && uniqueModel && uniqueModel.filePath !== "") {
+            return Settings.station_waiting_upload_file
+        } else if (model.status === 1) {
+            return Settings.station_waiting_calculated
+        } else if (model.status === 2) {
+            return model.operationTime
+        } else if (model.status === 3) {
+            return Settings.station_calculated_fail
+        }
+        return Settings.station_waiting_measurement
+    }
+
+    function filtering(model) {
         var filejson = settingsManager.getValue(settingsManager.fileInfoData);
         console.log("filejson: "+filejson)
         var uniqueModel
@@ -204,22 +233,8 @@ Rectangle {
                                                        console.log("cellroom_id: "+model.roomId)
                                                        return JSON.parse(value).stationId === model.stationId && JSON.parse(value).roomId === model.roomId
                                                    });
-                console.log("---------------:"+uniqueModel)
             }
         }
-
-        console.log("detais cell model: "+JSON.stringify(model))
-        if (model.status === 0) {
-            return Settings.station_waiting_scan
-        } else if (model.status === 1 && uniqueModel && uniqueModel.filePath) {
-            return Settings.station_waiting_upload_file
-        } else if (model.status === 1) {
-            return Settings.station_waiting_calculated
-        } else if (model.status === 2) {
-            return model.operationTime
-        } else if (model.status === 3) {
-            return Settings.station_calculated_fail
-        }
-        return Settings.station_waiting_measurement
+        return uniqueModel
     }
 }
