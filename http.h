@@ -40,8 +40,8 @@ signals:
     void qtreplyFailSignal(const QString &error, int errorCode);
 private:
     QNetworkAccessManager *manager;
-    //QString BASE_URL = "http://192.168.2.222:9002";
-    QString BASE_URL = "http://gateway.metadigital.net.cn";
+    QString BASE_URL = "http://192.168.2.222:9002";
+    //QString BASE_URL = "http://gateway.metadigital.net.cn";
 };
 
 #endif // HTTP_H

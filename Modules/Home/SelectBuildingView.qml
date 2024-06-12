@@ -231,9 +231,13 @@ ScrollView{
             http.onReplySucSignal.disconnect(onReply)
             var response = JSON.parse(reply)
             console.log("complete building block page data: "+reply)
-            if (response.data.length <=0) return;
+            if (response.data.length <=0) {
+                hub.close()
+                return;
+            }
             if(response.data.records.length === 0) {
                 list = response.data.records
+                hub.close()
                 return
             }
             assemblySelectedProjectData(response.data.records)

@@ -193,24 +193,26 @@ Rectangle {
         console.log("cell display model: "+JSON.stringify(model))
         var filejson = settingsManager.getValue(settingsManager.fileInfoData);
         console.log("filejson: "+filejson)
-        var uniqueArray
+        var uniqueModel
         if (GlobalFunc.isJson(filejson)){
             var fileModel = JSON.parse(filejson)
             if (Array.isArray(fileModel)){
-                uniqueArray = fileModel.filter((value, index, self) => {
+                uniqueModel = fileModel.find((value, index, self) => {
                                                        console.log("JSON.parse(value).stationId: "+JSON.parse(value).stationId)
                                                        console.log("model.stationId: "+model.stationId)
                                                        console.log("JSON.parse(value).roomId: "+model.roomId)
                                                        console.log("cellroom_id: "+model.roomId)
                                                        return JSON.parse(value).stationId === model.stationId && JSON.parse(value).roomId === model.roomId
                                                    });
-                console.log("---------------:"+uniqueArray)
+                console.log("---------------:"+uniqueModel)
             }
         }
 
         console.log("detais cell model: "+JSON.stringify(model))
         if (model.status === 0) {
             return Settings.station_waiting_scan
+        } else if (model.status === 1 && uniqueModel && uniqueModel.filePath) {
+            return Settings.station_waiting_upload_file
         } else if (model.status === 1) {
             return Settings.station_waiting_calculated
         } else if (model.status === 2) {
