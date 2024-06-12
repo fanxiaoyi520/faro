@@ -306,11 +306,13 @@ void FaroScannerController::checkScannerStatus()
         if (timer) timer->stop();
         timer->deleteLater();
         QString path = getScanPathName();
+        /**
         int index = path.indexOf("/Scans");
         if (index != -1) {
             path.replace(index, QString("/Scans").length(), "G:");
         }
         qDebug() << "get scan path name: " << path;
+        */
         this->completeHandler(path/*flsPath*/);
     } else if (scanStatus == 1) {
         this->scanAbnormalHandler(scanStatus);

@@ -11,7 +11,6 @@
 #include "filemanager.h"
 #include "crashwatcher.h"
 #include <csignal>
-#include "util.h"
 
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
@@ -65,7 +64,6 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
 
-    qDebug() << "aaaaaaaaaaaaaaaa: " << Util::getDriveLetter();
     return app.exec();
 }
 
