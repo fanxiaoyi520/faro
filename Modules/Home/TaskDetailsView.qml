@@ -25,6 +25,7 @@ Item{
     property double imageBackWidth : parent.width * 0.6
     property var inputCellModel
     property string room_id
+    property int selectHeaderIndex: 0
     id: selectTaskDetailsView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -219,6 +220,7 @@ Item{
     //MARK: logic
     function headerClickSwitchAction(index,model){
         console.log("selected header index and model data: "+index,JSON.stringify(model))
+        selectHeaderIndex = index
         room_id = model.id
         getBuildingRoomTaskAndGetRoomTaskInfo(model)
     }
@@ -559,7 +561,7 @@ Item{
             console.log("complete building room listByFloorId data: "+reply)
             if (response.data.length <=0) return;
             roomsList = response.data
-            room_id = roomsList[0].id
+            room_id = roomsList[selectHeaderIndex].id
             getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
         }
 

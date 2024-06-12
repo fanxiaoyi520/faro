@@ -120,6 +120,6 @@ QString Util::getDriveLetter()
             qDebug() << "device path:" << device.rootPath();
         }
     }
-    if (move_devices.length() == 0) return "";
+    if (move_devices.length() == 0) return "C:/";
     return move_devices.length() > 1 ? move_devices[1].rootPath() : move_devices[0].rootPath();
 }

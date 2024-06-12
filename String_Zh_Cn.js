@@ -74,7 +74,6 @@ var result_task_type_room = "房间任务"
 var result_task_stationno_tips = "测站号:"
 
 var minute = "分"
-var station_waiting_measurement = "该测站正在等待测量…"
 var scan_station_id = "扫描测站号:"
 var recalculate = "重新计算"
 var recalculating = "正在进行重新弄计算,请稍后..."
@@ -106,5 +105,7 @@ var no_datas = "暂无数据"
 var more = "更多"
 var selection_stage = "选择阶段"
 var main_stage_one = "主体阶段（一阶段）"
-
-
+var station_waiting_scan = "该测站正在等待扫描..."
+var station_calculated_fail = "该测站计算失败"
+var station_waiting_calculated = "该测站正在等待计算..."
+var station_waiting_upload_file = "该测站正在等待上传文件"
