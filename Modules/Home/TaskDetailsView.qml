@@ -18,7 +18,7 @@ Item{
     property var roomTaskVoModel
     property var list:[]
     property int currentRow: 0
-    property string selectedStageName: "主体阶段（一阶段）"
+    property string selectedStageName: SettingString.main_stage_one
     property string projectName: "Measure"
     property string imageUrl : ""
     property double imageBackHeight : parent.width * 0.6
@@ -457,7 +457,7 @@ Item{
         console.log("new scan params: "+JSON.stringify(scanParams))
         var filejson = settingsManager.getValue(settingsManager.fileInfoData)
         console.log("get file json data: ",filejson)
-        if (!filejson) {
+        if (!filejson || filejson === undefined) {
             var filedatas = []
             filedatas.push(JSON.stringify(scanParams))
             settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(filedatas))

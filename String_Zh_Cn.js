@@ -81,6 +81,6 @@ var tasks_details = "任务详情"
 var no_datas = "暂无数据"
 var more = "更多"
 var selection_stage = "选择阶段"
-
+var main_stage_one = "主体阶段（一阶段）"
 
 
