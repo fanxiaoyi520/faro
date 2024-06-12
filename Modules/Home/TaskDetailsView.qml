@@ -18,7 +18,7 @@ Item{
     property var roomTaskVoModel
     property var list:[]
     property int currentRow: 0
-    property string selectedStageName: "主体阶段（一阶段）"
+    property string selectedStageName: SettingString.main_stage_one
     property string projectName: "Measure"
     property string imageUrl : ""
     property double imageBackHeight : parent.width * 0.6

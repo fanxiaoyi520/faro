@@ -1,4 +1,5 @@
 ﻿#include "util.h"
+#include <windows.h>
 
 // 实现静态方法
 QJsonObject Util::parseJsonStringToObject(const QString &jsonString) {
@@ -104,4 +105,21 @@ QString Util::getdownsampleVoxelSize(const QString &stageType)
     } else {
         return "0.004";
     }
+}
+
+QString Util::getDriveLetter()
+{
+    QList<QStorageInfo> devices = QStorageInfo::mountedVolumes();
+    QList<QStorageInfo> move_devices;
+    for (const QStorageInfo &device : devices) {
+        std::wstring wideRootPath = device.rootPath().toStdWString();
+        const wchar_t* wchRootPath = wideRootPath.c_str();
+        UINT driveType = GetDriveTypeW(wchRootPath);
+        if (driveType == DRIVE_REMOVABLE) {
+            move_devices.append(device);
+            qDebug() << "device path:" << device.rootPath();
+        }
+    }
+    if (move_devices.length() == 0) return "";
+    return move_devices.length() > 1 ? move_devices[1].rootPath() : move_devices[0].rootPath();
 }

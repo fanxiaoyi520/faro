@@ -15,6 +15,7 @@
 #include <QUuid>
 #include <QCoreApplication>
 #include "filemanager.h"
+#include <QStorageInfo>
 class Util {
 public:
     // 声明静态方法
@@ -30,6 +31,7 @@ public:
     static qint64 getTimestampSeconds();
     static QString generateUuid();
     static QString getdownsampleVoxelSize(const QString &stageType);
+    static QString getDriveLetter();
 };
 
 #endif // UTIL_H
