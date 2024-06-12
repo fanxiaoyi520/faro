@@ -2,11 +2,11 @@ import QtQuick 2.0
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
-
+import "../String_Zh_Cn.js" as Settings
 Popup {
     property var list: []
     property int currentIndex: 0
-    property var titleStr: "选择租户"
+    property var titleStr: Settings.selection_tenant
     signal confirmOptionsAction(var model)
     onListChanged: {
         console.log("List has changed:" + list[0], list.length)
@@ -146,7 +146,7 @@ Popup {
                 anchors.leftMargin: 60
                 width: (parent.width-60*2-24)/2
                 height: 41
-                text: qsTr("取消")
+                text: qsTr(Settings.cancel)
                 font.pixelSize: 16
                 font.bold: true
                 highlighted: true
@@ -176,7 +176,7 @@ Popup {
                 anchors.rightMargin: 60
                 width: (parent.width-60*2-24)/2
                 height: 41
-                text: qsTr("确定")
+                text: qsTr(Settings.confirm)
                 highlighted: true
                 font.pixelSize: 16
                 font.bold: true

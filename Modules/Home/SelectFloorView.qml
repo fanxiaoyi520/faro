@@ -247,7 +247,10 @@ ScrollView{
             console.log("complete building unit page data: "+reply)
             if (response.data.length <=0) return;
             unitList = response.data
-            if (unitList.length === 0) return
+            if (unitList.length === 0) {
+                hub.close()
+                return
+            }
             accordingToUnitIdSearchFloor(0)
         }
 

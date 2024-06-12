@@ -313,7 +313,12 @@ void FaroScannerController::checkScannerStatus()
         }
         qDebug() << "get scan path name: " << path;
         */
-        this->completeHandler(path/*flsPath*/);
+        qDebug() << "scan complete path: " << path;
+        if (path.isEmpty()) {
+            this->scanAbnormalHandler(scanStatus);
+        } else {
+            this->completeHandler(path/*flsPath*/);
+        }
     } else if (scanStatus == 1) {
         this->scanAbnormalHandler(scanStatus);
     } else {

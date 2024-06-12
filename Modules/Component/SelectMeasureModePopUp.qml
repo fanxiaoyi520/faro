@@ -31,7 +31,8 @@ Popup {
     property int xy_crop_dist: 6
     property int z_crop_dist: 3
     property int map_mode: 1
-    property int scanningMode: 4
+    property string scanningMode: "1/20"
+    property int scanningIndex: 7
 
     modal: true
     focus: true
@@ -93,6 +94,7 @@ Popup {
                 sub_map_mode: map_mode
                 sub_masonry_mode: masonry_mode
                 sub_scanningMode: scanningMode
+                sub_scanningIndex: scanningIndex
                 sub_xy_crop_dist: xy_crop_dist
                 sub_z_crop_dist: z_crop_dist
             }
@@ -141,20 +143,21 @@ Popup {
             masonry_mode = selectedMeasureData.masonry_mode
             if (stationType === 1) {
                 if(stageType === "2") {
-                    if(selectedMeasureData.masonry_mode === 1 && selectedMeasureData.scanningMode > 3){
-                        scanningMode = 3
+                    if(selectedMeasureData.masonry_mode === 1 && selectedMeasureData.scanningIndex > 7){
+                        scanningMode = "1/16"
                     }
                 } else {
-                    scanningMode = selectedMeasureData.scanningMode > 3 ? 3 : selectedMeasureData.scanningMode
+                    scanningMode = selectedMeasureData.scanningIndex > 7 ? "1/16" : selectedMeasureData.scanningMode
                 }
             } else {
-                scanningMode = stageType === "2" ? ((masonry_mode === 1 && selectedMeasureData.scanningMode > 3) ? 3 : selectedMeasureData.scanningMode) : selectedMeasureData.scanningMode
+                scanningMode = stageType === "2" ? ((masonry_mode === 1 && selectedMeasureData.scanningIndex > 7) ? "1/16" : selectedMeasureData.scanningMode) : selectedMeasureData.scanningMode
             }
         } else {
             var defaultParams = {
                 "activeColoring": "0",
                 "map_mode": 4,
-                "scanningMode": 4,
+                "scanningMode": "1/16",
+                "scanningIndex": 7,
                 "masonry_mode": 0,
                 "xy_crop_dist": 6,
                 "z_crop_dist": 3,
@@ -163,9 +166,9 @@ Popup {
             map_mode = 1
             masonry_mode = stageType === "2" ? 1 : 0
             if(stationType === 1) {
-                scanningMode = 3
+                scanningMode = "1/16"
             } else {
-                scanningMode = stageType === "2" ? 3 : 4
+                scanningMode = stageType === "2" ? "1/16" : "1/20"
             }
         }
     }
@@ -192,7 +195,8 @@ Popup {
 
     function parent_scanningDensity(index,model){
         console.log("scanning density: "+index+" model: "+model)
-        scanningMode = index
+        scanningMode = model
+        scanningIndex = index
     }
 
     function sureAction(){
@@ -203,6 +207,7 @@ Popup {
             "z_crop_dist": z_crop_dist,
             "map_mode": map_mode,
             "scanningMode": scanningMode,
+            "scanningIndex": scanningIndex,
             "activeColoring": "0",
         }
         settingsManager.setValue(settingsManager.selectedMeasureData,JSON.stringify(selectedMeasureData))

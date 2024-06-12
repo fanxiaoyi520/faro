@@ -51,6 +51,11 @@ var selectedMeasureMode = [
             '{"index": 3, "name": "测量下尺模式"}',
             '{"index": 4, "name": "扫描密度"}'
         ];
+var loginMode = [
+            '{"index": 0, "name": "普通模式"}',
+            '{"index": 1, "name": "专业模式"}'
+        ];
+
 var wifiscan_title = "扫描附近设备"
 var wifiscan_tips = "扫描中..."
 var wifiscan_result_title = "附近设备"
@@ -109,3 +114,7 @@ var station_waiting_scan = "该测站正在等待扫描..."
 var station_calculated_fail = "该测站计算失败"
 var station_waiting_calculated = "该测站正在等待计算..."
 var station_waiting_upload_file = "该测站正在等待上传文件"
+var selection_tenant = "选择租户"
+var login_mode = "登录模式"
+var normal_mode = "普通模式"
+var major_mode = "专业模式"
