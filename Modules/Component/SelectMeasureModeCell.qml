@@ -21,7 +21,8 @@ Rectangle {
     property int sub_xy_crop_dist: 6
     property int sub_z_crop_dist: 3
     property int sub_map_mode: 1
-    property int sub_scanningMode: 4
+    property string sub_scanningMode: "1/20"
+    property int sub_scanningIndex: 7
 
     id: basecellid
     width: parent.width
@@ -138,11 +139,11 @@ Rectangle {
             }
             SelectMeasureListButtonView{
                 id: selectMeasureListButtonView
-                list: ["密集+","密集","标准","精简"]
+                list: ["1/1","1/2","1/4","1/5","1/8","1/10","1/16","1/20","1/32"]
                 anchors.top: cell4.celltitle.bottom
                 anchors.topMargin: 12
                 visible: isControlLaunch2 ? true : false
-                selectIndex: sub_scanningMode-1
+                selectIndex: sub_scanningIndex-1
                 onClickSelectAction: scanningDensity(index,model)
             }
         }

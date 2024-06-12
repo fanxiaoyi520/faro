@@ -4,13 +4,14 @@ import QtQuick.Controls 2.5
 import Dialog 1.0
 import Api 1.0
 import Http 1.0
-
+import "../String_Zh_Cn.js" as Settings
 Rectangle{
     signal completeLogin()
     property alias loginbtn: loginbtn
     property var tenant_id: "1"
-    width: 640
-    height: 400
+    property string loginName: Settings.normal_mode
+    property int currentRow: 0
+
     Toast {id: toastPopup}
     Http {id: http}
     LoginDialog{
@@ -23,73 +24,119 @@ Rectangle{
     }
     Hub{id: hub}
 
-    Image {
-        id: logoimage
-        source: "../images/login_logo.png"
-        width: 222;height: 81.5
+    /**登录模式
+    Dialog{
+        id: loginModeDialog
+        titleStr: qsTr(Settings.login_mode)
+        list: Settings.loginMode
+        onConfirmOptionsAction: {
+            loginName = model.name
+            currentRow = model.index
+        }
+    }
+
+    Rectangle{
+        id: loginModeBtn
         anchors.top: parent.top
-        anchors.topMargin: 30
+        anchors.topMargin: 20
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        height: 34
+        width: parent.width *  0.25
+        radius: 17
+        color: "#F7F7F7"
+        z: 10
+        Text{
+            id: subtext
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            text: qsTr(loginName)
+            color: "#666666"
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                loginModeDialog.list = Settings.loginMode
+                loginModeDialog.open()
+            }
+        }
+    }
+    */
+
+    Rectangle{
+        width: 640
+        height: 400
         anchors.horizontalCenter: parent.horizontalCenter
-    }
+        anchors.verticalCenter: parent.verticalCenter
+
+        Image {
+            id: logoimage
+            source: "../images/login_logo.png"
+            width: 222;height: 81.5
+            anchors.top: parent.top
+            anchors.topMargin: 30
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
 
 
-    LoginTextField {
-        id: accountfield
-        anchors.top: logoimage.bottom
-        anchors.topMargin: 57
-        inputfield.focus: true
-        Keys.onBacktabPressed: passwordfield
-        inputfield.placeholderText: qsTr("请输入账号")
-        leftimage.source: "../images/login_user.png"
-        rightimage.source: "../images/login_close.png"
-        focus: true
-        inputfield.maximumLength: 11
-        inputfield.inputMethodHints: Qt.ImhDigits | Qt.ImhFormattedNumbersOnly
-        inputfield.validator: RegExpValidator {
-            regExp: /^[A-Za-z0-9]+$/
+        LoginTextField {
+            id: accountfield
+            anchors.top: logoimage.bottom
+            anchors.topMargin: 57
+            inputfield.focus: true
+            Keys.onBacktabPressed: passwordfield
+            inputfield.placeholderText: qsTr("请输入账号")
+            leftimage.source: "../images/login_user.png"
+            rightimage.source: "../images/login_close.png"
+            focus: true
+            inputfield.maximumLength: 11
+            inputfield.inputMethodHints: Qt.ImhDigits | Qt.ImhFormattedNumbersOnly
+            inputfield.validator: RegExpValidator {
+                regExp: /^[A-Za-z0-9]+$/
+            }
         }
-    }
 
-    LoginTextField {
-        id: passwordfield
-        anchors.top: accountfield.bottom
-        anchors.topMargin: 24
-        inputfield.focus: true
-        inputfield.placeholderText: qsTr("请输入密码")
-        Keys.onBacktabPressed: accountfield
-        leftimage.source: "../images/login_lock.png"
-        rightimage.source: "../images/login_close.png"
-        inputfield.validator: RegExpValidator {
-            regExp: /[a-zA-Z0-9-]+/
+        LoginTextField {
+            id: passwordfield
+            anchors.top: accountfield.bottom
+            anchors.topMargin: 24
+            inputfield.focus: true
+            inputfield.placeholderText: qsTr("请输入密码")
+            Keys.onBacktabPressed: accountfield
+            leftimage.source: "../images/login_lock.png"
+            rightimage.source: "../images/login_close.png"
+            inputfield.validator: RegExpValidator {
+                regExp: /[a-zA-Z0-9-]+/
+            }
+            inputfield.echoMode: TextInput.Password
         }
-        inputfield.echoMode: TextInput.Password
-    }
 
-    Button{
-        id: loginbtn
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 30
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: 320
-        height: 53
-        text: qsTr("登录")
-        font.capitalization: Font.MixedCase
-        font.pixelSize: 18
-        highlighted: true
-        palette.buttonText: "#FFFFFF"
-        background: Rectangle{
-            id: btnrect
-            color: "#1890FF"
-            radius: 12
+        Button{
+            id: loginbtn
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 30
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 320
+            height: 53
+            text: qsTr("登录")
+            font.capitalization: Font.MixedCase
+            font.pixelSize: 18
+            highlighted: true
+            palette.buttonText: "#FFFFFF"
+            background: Rectangle{
+                id: btnrect
+                color: "#1890FF"
+                radius: 12
+            }
+            layer.enabled: true
+            layer.effect: DropShadow{
+                horizontalOffset: 0
+                verticalOffset: 12
+                radius: 50
+                color: "#1A1890FF"
+            }
+            onClicked: login()
         }
-        layer.enabled: true
-        layer.effect: DropShadow{
-            horizontalOffset: 0
-            verticalOffset: 12
-            radius: 50
-            color: "#1A1890FF"
-        }
-        onClicked: login()
     }
 
     Timer {

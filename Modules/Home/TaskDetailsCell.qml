@@ -193,10 +193,11 @@ Rectangle {
         console.log("cell display model: "+JSON.stringify(model))
         var filejson = settingsManager.getValue(settingsManager.fileInfoData);
         console.log("filejson: "+filejson)
+        var uniqueArray
         if (GlobalFunc.isJson(filejson)){
             var fileModel = JSON.parse(filejson)
             if (Array.isArray(fileModel)){
-                var uniqueArray = fileModel.filter((value, index, self) => {
+                uniqueArray = fileModel.filter((value, index, self) => {
                                                        console.log("JSON.parse(value).stationId: "+JSON.parse(value).stationId)
                                                        console.log("model.stationId: "+model.stationId)
                                                        console.log("JSON.parse(value).roomId: "+model.roomId)
@@ -206,6 +207,7 @@ Rectangle {
                 console.log("---------------:"+uniqueArray)
             }
         }
+
         console.log("detais cell model: "+JSON.stringify(model))
         if (model.status === 0) {
             return Settings.station_waiting_scan

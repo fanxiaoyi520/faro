@@ -5,6 +5,7 @@ import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 
 Rectangle{
+    property var model
     property var imgUrl
 
     id: headerRect

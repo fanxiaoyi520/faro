@@ -198,6 +198,7 @@ Item{
         id: headerDelegate
         TaskDetailsListHeaderView{
             imgUrl: imageUrl
+            model: roomTaskVoModel
         }
     }
 
@@ -323,7 +324,7 @@ Item{
         var scanParams = {
             "activeColoring": selectedMeasureData ? selectedMeasureData.activeColoring : "0",
             "map_mode": selectedMeasureData ? selectedMeasureData.map_mode : "4",
-            "scanningMode": selectedMeasureData ? selectedMeasureData.scanningMode : "4",
+            "scanningMode": selectedMeasureData ? selectedMeasureData.scanningMode : "1/20",
             "masonry_mode": selectedMeasureData ? selectedMeasureData.masonry_mode : 0,
             "xy_crop_dist": selectedMeasureData ? selectedMeasureData.xy_crop_dist : 6,
             "z_crop_dist": selectedMeasureData ? selectedMeasureData.z_crop_dist : 3,
@@ -585,7 +586,8 @@ Item{
                 return;
             }
             list = response.data.stations
-            admin_sys_file_listFileByFileIds([response.data.houseTypeDrawing])
+            var urlStr = response.data.vectorgraph !== null ? mdoel.vectorgraph : response.data.houseTypeDrawing
+            admin_sys_file_listFileByFileIds([urlStr])
         }
 
         function onFail(reply,code){

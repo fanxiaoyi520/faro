@@ -28,7 +28,8 @@ Window {
         var defaultParams = {
             "activeColoring": "0",
             "map_mode": 1,
-            "scanningMode": 4,
+            "scanningMode": "1/20",
+            "scanningIndex": 7,
             "masonry_mode": 0,
             "xy_crop_dist": 6,
             "z_crop_dist": 3,
@@ -79,6 +80,7 @@ Window {
             Login {
                 anchors.centerIn: parent
                 onCompleteLogin: toggleView()
+                anchors.fill: parent
             }
         }
     }
