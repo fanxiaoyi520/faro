@@ -54,7 +54,6 @@ public:
     QString admin_sys_file_upload() const;
     QString building_roomTaskExecute_calculateStationTask() const;
     QString building_roomTaskExecute_rerun() const;
-
 private:
     Api(QObject *parent = nullptr);
     Q_DISABLE_COPY(Api)

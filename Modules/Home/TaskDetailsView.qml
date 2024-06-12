@@ -35,7 +35,7 @@ Item{
     WifiHelper{id: wifiHelper}
     Dialog{
         id: dialog
-        titleStr: qsTr("选择阶段")
+        titleStr: qsTr(SettingString.selection_stage)
         onConfirmOptionsAction: {
             console.log("dialog selected data: " + JSON.stringify(model))
             settingsManager.setValue(settingsManager.selectedStageType,JSON.stringify(model))
@@ -47,7 +47,7 @@ Item{
     }
     TipsPopUp{
         id: tipsPopUp
-        tipsContentStr: qsTr("是否重新开始扫描")
+        tipsContentStr: qsTr(SettingString.is_restart_scan)
         onConfirmAction: {
             var model = inputModel
             tipsSwitchPopUp.inputModel = model
@@ -56,10 +56,10 @@ Item{
     }
     TipsPopUp{
         id: tipsSwitchPopUp
-        tipsContentStr: qsTr("扫描后是否自动上传")
+        tipsContentStr: qsTr(SettingString.is_start_scan)
         switchvisible: true
-        cancelBtnStr: qsTr("取消扫描")
-        sureBtnStr: qsTr("开始扫描")
+        cancelBtnStr: qsTr(SettingString.cancel_scan)
+        sureBtnStr: qsTr(SettingString.start_scan)
         onConfirmAndSwitchAction: startScan(checked,inputModel)
     }
     TipsPopUp{
@@ -97,7 +97,7 @@ Item{
     }
     BaseNavigationBar{
         id: navigationBar
-        title: qsTr("任务详情")
+        title: qsTr(SettingString.tasks_details)
         Rectangle{
             id: stageTypeBtn
             anchors.verticalCenter: parent.verticalCenter
@@ -187,7 +187,7 @@ Item{
                 width: parent.width
                 height: parent.height
                 id: noDataView
-                textStr: qsTr("暂无数据")
+                textStr: qsTr(SettingString.no_datas)
             }
             visible: list && list.length > 0 && imageUrl ? false : true
         }
@@ -383,8 +383,11 @@ Item{
         function scanComplete(filePath){
             faroManager.onScanComplete.disconnect(scanComplete)
             faroManager.onScanProgress.disconnect(scanProgress)
-
             scanCompleteDataHandle(scanParams,filePath)
+            getBuildingRoomListByFloorId()
+            scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
+            scanningFaroPop.close()
+            /**
             if (!checked){
                 scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
                 scanningFaroPop.close()
@@ -392,6 +395,7 @@ Item{
                 scanningFaroPop.tipsconnect = qsTr(SettingString.uploading_pointcloud_file)
                 scanningFaroPop.lottieType = 1
             }
+            */
 
             faroManager.stopScan()
             faroManager.zipFileHandle()
@@ -399,6 +403,9 @@ Item{
 
             function wifiDisConnect(result){
                 wifiHelper.onDisConnectWifiResult.disconnect(wifiDisConnect)
+                nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
+                nonerworkPopUp.open()
+                /**
                 if (!checked){
                     nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
                     nonerworkPopUp.open()
@@ -409,6 +416,7 @@ Item{
                 } else {
                     console.log("wifi disconnect fail")
                 }
+                */
             }
             wifiHelper.onDisConnectWifiResult.connect(wifiDisConnect)
             wifiHelper.disConnectWifi()
@@ -563,6 +571,7 @@ Item{
 
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
+        console.log("inputModelData.id: "+ inputModelData.id)
         http.get(Api.building_room_listByFloorId,{"floorId":inputModelData.id})
     }
 

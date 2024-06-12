@@ -45,13 +45,14 @@ public:
     // 连接到扫描仪
     Q_INVOKABLE bool connect();
     Q_INVOKABLE bool connect(const QString &scannerIP, const QString &remoteScanStoragePath);
-    Q_INVOKABLE FaroScannerController& startScan();
-    Q_INVOKABLE FaroScannerController& startScan(const QString &m_Resolution, const QString &m_ScanName);
+    Q_INVOKABLE FaroScannerController& startScan(const QString &inputParams);
+    Q_INVOKABLE FaroScannerController& startScan(const QString &inputParams,const QString &m_Resolution, const QString &m_ScanName);
     Q_INVOKABLE void stopScan();
     Q_INVOKABLE void disconnect();
     Q_INVOKABLE void iQLibIfPtrDisconnect();
     Q_INVOKABLE void shutDown();
     Q_INVOKABLE void getScanOrientation(const QString& filePath);
+    Q_INVOKABLE QString getScanPathName();
 private slots:
     void checkScannerStatus();
 private:
@@ -74,3 +75,5 @@ private:
 };
 
 #endif // FAROSCANNERCONTROLLER_H
+
+

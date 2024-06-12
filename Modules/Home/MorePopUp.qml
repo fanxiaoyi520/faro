@@ -7,7 +7,7 @@ import "../../String_Zh_Cn.js" as SettingString
 Popup {
     property var list: SettingString.moreType
     property int currentIndex: 0
-    property var titleStr: "更多"
+    property var titleStr: SettingString.more
     signal confirmOptionsAction(var model)
     onListChanged: {
         console.log("List has changed:", list.length)

@@ -80,6 +80,7 @@ var recalculate = "重新计算"
 var recalculating = "正在进行重新弄计算,请稍后..."
 var execution_successful = "执行成功"
 var execution_fail = "执行失败"
+
 var upload = "上传文件"
 var upload_progress = "上传文件%1d/%2d"
 var upload_success = "上传完成"
@@ -96,12 +97,14 @@ var all_selected = "全选"
 var upload_up = "上传"
 var upload_del = "删除"
 
-
-
-
-
-
-
+var is_start_scan = "是否开始扫描?"
+var is_restart_scan = "是否重新开始扫描"
+var cancel_scan = "取消扫描"
+var start_scan = "开始扫描"
+var tasks_details = "任务详情"
+var no_datas = "暂无数据"
+var more = "更多"
+var selection_stage = "选择阶段"
 
 
 

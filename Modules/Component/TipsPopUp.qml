@@ -66,7 +66,7 @@ Popup {
                 elide:  Text.ElideRight
                 wrapMode: Text.WrapAnywhere
                 height: parent.height
-                width: switchvisible ? parent.width - 74 : parent.width
+                width: parent.width/*switchvisible ? parent.width - 74 : parent.width*/
                 font.pixelSize: 16
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
@@ -74,6 +74,7 @@ Popup {
                 color: "#3C3C3C"
             }
 
+            /**
             Switch {
                 id: poposwitch
                 anchors.verticalCenter: tipscontent.verticalCenter
@@ -84,6 +85,7 @@ Popup {
                 visible: switchvisible
                 onCheckedChanged: switchAction(checked)
             }
+            */
         }
 
         Item {
@@ -154,7 +156,7 @@ Popup {
 //                    radius: 20.5
 //                    color: "#1A1890FF"
 //                }
-                onClicked: sureAction(poposwitch.checked,inputModel)
+                onClicked: sureAction(true/*poposwitch.checked*/,inputModel)
             }
         }
     }
