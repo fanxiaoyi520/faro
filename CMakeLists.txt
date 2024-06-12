@@ -15,6 +15,7 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 list(APPEND QML_DIRS "${CMAKE_SOURCE_DIR}") #qmldir路径
 set(QML_IMPORT_PATH "${QML_DIRS}" CACHE STRING "qml import paths")
 file(GLOB SRC_FILES "${SRC_DIR}/*.cpp")
+file(GLOB SRC_ICON_FILES "${SRC_DIR}/*.rc")
 file(GLOB INC_FILES "${SRC_DIR}/*.h")
 
 #[[
@@ -56,6 +57,7 @@ if(ANDROID)
 else()
     add_executable(Measure
       main.cpp
+      icon.rc
       qml.qrc
       ${PROJECT_SOURCES} ${PROJECT_HEADERS}
       #${CPP_EasyQtSql} ${H_EasyQtSql} ${H_SRC_EasyQtSql}
