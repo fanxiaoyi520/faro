@@ -235,6 +235,7 @@ Rectangle {
                                                    });
             }
         }
+        console.log("unique model: " + JSON.stringify(uniqueModel))
         return uniqueModel
     }
 }
