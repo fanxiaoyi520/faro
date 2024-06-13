@@ -11,6 +11,7 @@
 #include "filemanager.h"
 #include "crashwatcher.h"
 #include <csignal>
+#include "faroscannercontroller.h"
 
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
@@ -63,6 +64,9 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+
+
+    FaroScannerController::instance()->convertFlsToPly("D:/SDK_File_020.fls","D:/ghhhx.ply");
 
     return app.exec();
 }

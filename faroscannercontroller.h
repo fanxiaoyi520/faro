@@ -10,6 +10,10 @@
 #include "networkhelper.h"
 #include <QTimer>
 #include <QStorageInfo>
+#include <QMutex>
+#include <QPointer>
+#include "syncplyapi.h"
+#include <cmath>
 
 #ifdef _WIN64
 // Yes - type is 'win32' even on WIN64!
@@ -53,13 +57,22 @@ public:
     Q_INVOKABLE void disconnect();
     Q_INVOKABLE void iQLibIfPtrDisconnect();
     Q_INVOKABLE void shutDown();
-    Q_INVOKABLE void getScanOrientation(const QString& filePath);
+    // 转换fls文件为ply文件~含下采样
+    Q_INVOKABLE void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath);
+    Q_INVOKABLE void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
     Q_INVOKABLE QString getScanPathName();
 private slots:
     void checkScannerStatus();
 private:
-    explicit FaroScannerController(QObject *parent = nullptr);
+//    explicit FaroScannerController(QObject *parent = nullptr);
+//    ~FaroScannerController();
+    FaroScannerController(QObject *parent = nullptr);
     ~FaroScannerController();
+    FaroScannerController(const FaroScannerController&) = delete;
+    FaroScannerController& operator=(const FaroScannerController&) = delete;
+    static QPointer<FaroScannerController> instancePtr;
+    static QMutex mutex;
+
     IScanCtrlSDKPtr scanCtrlSDKPtr;
     IiQScanOpInterfPtr scanOpInterfPtr;
     IiQLibIfPtr iQLibIfPtr;
@@ -74,6 +87,7 @@ private:
     int scanStatus;
     QTimer *timer;
     QString flsPath;
+    SyncPlyApi syncPlyApi;
 };
 
 #endif // FAROSCANNERCONTROLLER_H

@@ -13,6 +13,7 @@
 #define	FILE_MAX_SIZE 1024*1024
 #define FLSDIRECTORY "fls"
 #define ZIPDIRECTORY "zip"
+#define PLYDIRECTORY "ply"
 class FileManager : public QObject
 {
     Q_OBJECT
@@ -25,7 +26,7 @@ public:
     static FileManager *instance();
     static QString getFlsPath();
     static QStringList getFilesInDirectory(const QString &dirPath, const QStringList &filters = QStringList());
-
+    static bool createEmptyFile(const QString &fileName);
 public slots:
     bool removePath(const QString &path);
 signals:
