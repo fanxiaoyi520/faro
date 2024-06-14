@@ -1,12 +1,16 @@
 ﻿// FaroScannerController.cpp
-#include "FaroScannerController.h"
+#include "faroscannercontroller.h"
+#include <QMutex>
+
+QPointer<FaroScannerController> FaroScannerController::instancePtr = nullptr;
+QMutex FaroScannerController::mutex;
 
 FaroScannerController* FaroScannerController::instance() {
-    static FaroScannerController *instance = nullptr;
-    if (!instance) {
-        instance = new FaroScannerController;
+    QMutexLocker locker(&mutex);
+    if (!instancePtr) {
+        instancePtr = new FaroScannerController();
     }
-    return instance;
+    return instancePtr;
 }
 
 FaroScannerController &FaroScannerController::scanProgress(std::function<void (int)> scanProgressHandler)
@@ -36,8 +40,6 @@ FaroScannerController::FaroScannerController(QObject *parent) : QObject(parent)
 
 FaroScannerController::~FaroScannerController()
 {
-    // 在析构函数中可能还需要做一些清理工作，比如断开连接等
-    // 但是这取决于IScanCtrlSDKPtr的实际接口和生命周期管理
     if (timer) {
         timer->stop();
         delete timer;
@@ -178,7 +180,7 @@ FaroScannerController& FaroScannerController::startScan(const QString &inputPara
     qDebug() << "start scan input params: " << inputParams;
     QJsonObject inputMap = Util::parseJsonStringToObject(inputParams);
     /**保存规则*/
-    QString name = inputMap.value("roomId").toString()+"_"+inputMap.value("stationId").toString()+"_"+inputMap.value("taskNo").toString()+"_";
+    QString name = "Faro_"+inputMap.value("roomId").toString()+"_"+inputMap.value("stationId").toString()+"_"+inputMap.value("taskNo").toString()+"_";
     qDebug() << "name: " << name;
     const QString m_Resolution = "20";
     const QString m_ScanName = name;
@@ -259,40 +261,63 @@ void FaroScannerController::shutDown()
     }
 }
 
-void FaroScannerController::getScanOrientation(const QString& filePath)
+void FaroScannerController::convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath)
+{
+    convertFlsToPly(inFlsFilePath,outPlyFilePath,6,3);
+}
+
+void FaroScannerController::FaroScannerController::convertFlsToPly(const QString &inFlsFilePath,
+                                                                   const QString &outPlyFilePath,
+                                                                   int xyCropDist,
+                                                                   int zCropDist)
 {
 
     initIiQLibInternal();
-    QDir dir(filePath);
-    if (!dir.exists()) {
-        qDebug() << "Directory does not exist:" << filePath;
-        return;
-    }
-    QString newFilePath = dir.filePath("SDK_File_005.fls");
-    std::string stdStr = newFilePath.toStdString();
+    HRESULT result;
+    std::string stdStr = inFlsFilePath.toStdString();
     const char* cStr = stdStr.c_str();
-
     _bstr_t bstr(cStr);
-    qDebug() << "cStr: " << cStr;
+    result = iQLibIfPtr->load(cStr);
+    qDebug() << "result: " << result;
 
-    qDebug() << "file path use scan result: " << newFilePath;
+    int scans = iQLibIfPtr->getNumScans();
+    qDebug() << "scans: " << scans;
+    int row = iQLibIfPtr->getScanNumRows(0);
+    int col = iQLibIfPtr->getScanNumCols(0);
+    qDebug() << "row: " << row;
+    qDebug() << "col: " << col;
+
     QString m_ScanNo = "0";
     int scanNo = m_ScanNo.toInt();
-    double x,y,z,angle;
+    double Rx,Ry,Rz,angle;
+    iQLibIfPtr->getScanOrientation(scanNo,&Rx,&Ry,&Rz,&angle);
+    qDebug() << Rx << "  " << Ry << "  " << Rz << "  " << angle;
+    double x,y,z;
+    int refl;
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+            CartesianPoint cartesian{};
+            iQLibIfPtr->getScanPoint(0,i,j,&x,&y,&z,&refl);
+            cartesian.x = (Rx*Rx*(1-cos(angle))+cos(angle))*x
+                    + (Ry*Rx*(1-cos(angle))-Rz*sin(angle))*y
+                    + (Rz*Rx*(1-cos(-angle))+Ry*sin(angle))*z;
 
-    /**
-    int getScanOrientation (
-        int scan,
-        double * x,
-        double * y,
-        double * z,
-        double * angle );
-    */
-    HRESULT result;
-    result = iQLibIfPtr->load(cStr);
+            cartesian.y = (Rx*Ry*(1-cos(angle))+Rz*sin(angle))*x
+                    + (Ry*Ry*(1-cos(angle))+cos(angle))*y
+                    + (Rz*Ry*(1-cos(-angle))-Rx*sin(angle))*z;
 
-    iQLibIfPtr->getScanOrientation(scanNo,&x,&y,&z,&angle);
-    qDebug() << "------------x: " << x << " y: " << y << " z: " << z << " angle: " << angle;
+            cartesian.z = (Rx*Rz*(1-cos(angle))-Ry*sin(angle))*x
+                    + (Ry*Rz*(1-cos(angle))+Rx*sin(angle))*y
+                    + (Rz*Rz*(1-cos(-angle))+cos(angle))*z;
+            cartesian.intensity = refl/255.0;
+            syncPlyApi.myXYZData.push_back(cartesian);
+        }
+    }
+
+    syncPlyApi.downSamplePoint(xyCropDist,zCropDist);
+    std::ofstream outfile(outPlyFilePath.toStdString());
+    syncPlyApi.SavePly(outfile,syncPlyApi.myXYZData);
+    syncPlyApi.myXYZData.clear();
 }
 
 void FaroScannerController::checkScannerStatus()

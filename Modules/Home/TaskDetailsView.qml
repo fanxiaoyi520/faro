@@ -471,13 +471,18 @@ Item{
         } else {
             var datas = JSON.parse(filejson)
             if (Array.isArray(datas)){
-                datas = datas.filter((value, index, self) => {
-                                                    var iscon = JSON.parse(value).stationId !== scanParams.stationId
-                                                    && JSON.parse(value).roomId !== scanParams.roomId
-                                                    && JSON.parse(value).stageType !== scanParams.stageType
-                                                    return iscon
-                                                });
-                datas.push(JSON.stringify(scanParams))
+                let index = datas.findIndex(value => {
+                                                var iscon = JSON.parse(value).stationId === scanParams.stationId
+                                                && JSON.parse(value).roomId === scanParams.roomId
+                                                && JSON.parse(value).stageType === scanParams.stageType
+                                                return iscon
+                                            });
+                if (index !== -1) {
+                    datas[index] = JSON.stringify(scanParams);
+                } else {
+                    datas.push(JSON.stringify(scanParams))
+                }
+                console.log("scan params and datas: "+JSON.stringify(datas))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
             } else {
                 var nulldatas = []

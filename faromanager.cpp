@@ -128,7 +128,7 @@ void FaroManager::performCalculation(const QString &response,const QString &file
 
     qDebug() << "default fls path : " << filePath;
 
-    faroScannerController->getScanOrientation(filePath);
+    faroScannerController->convertFlsToPly("",filePath);
     faroScannerController->disconnect();
     faroScannerController->iQLibIfPtrDisconnect();
     QJsonObject fileModel = Util::parseJsonStringToObject(response);

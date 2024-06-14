@@ -298,3 +298,27 @@ QStringList FileManager::getFilesInDirectory(const QString &dirPath, const QStri
     return fullPathList.isEmpty() ? fileList : fullPathList;
 }
 
+bool FileManager::createEmptyFile(const QString &fileName) {
+    QString appDirPath = "D:";
+    QString PLYFilePath = appDirPath+"/"+PLYDIRECTORY+"/"+QString::number(Util::getTimestampMilliseconds())+"/"+Util::generateUuid();
+    QString PLYDirectory = QDir(PLYFilePath).filePath(QString());
+
+    QDir dir;
+    if (!dir.exists(PLYDirectory)) {
+        if (!dir.mkpath (PLYDirectory)) {
+            qDebug() << "Failed to create directory:" << PLYDirectory;
+        } else {
+            qDebug() << "Directory created:" << PLYDirectory;
+        }
+    }
+
+    QString filePath = dir.filePath(fileName);
+    QFile file(filePath);
+    if (!file.exists()) {
+        if (!file.open(QIODevice::WriteOnly)) {
+            return false;
+        }
+        file.close();
+    }
+    return true;
+}
