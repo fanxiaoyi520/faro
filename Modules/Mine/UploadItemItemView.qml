@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
+import "../../String_Zh_Cn.js" as String
 
 Rectangle{
     width: parent.width
@@ -36,9 +37,33 @@ Rectangle{
                 }
             }
         }
+
+        Text {
+            id: text_station_no
+            anchors{
+                left: img_status.right
+                leftMargin: 16
+                verticalCenter: parent.verticalCenter
+            }
+
+            text: qsTr(String.upload_station.replace("%d",fileInfo.taskNo))
+        }
+
+        Text {
+            id: text_date
+            text: qsTr(fileInfo.update_time)
+            anchors{
+                right: parent.right
+                rightMargin: 16
+                verticalCenter: parent.verticalCenter
+            }
+            color: "#666666"
+        }
+
     }
 
     onSelectAllChanged: {
+        console.log("fileInfo = " + JSON.stringify(fileInfo))
          fileInfo.isSelected = selectAll
          isSelectChange(fileInfo.isSelected)
     }

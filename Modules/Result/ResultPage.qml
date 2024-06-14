@@ -28,7 +28,7 @@ StackView{
                 anchors.top: navigationBar.bottom
                 anchors.topMargin: 24
                 height: 31
-                list: ["全部","进行中","已完成"]
+                list: ["全部","计算失败","计算完成"]
                 selectedButtonIndex: 0
                 onSelectedButtonAction: headerFilterData(index)
             }
@@ -285,7 +285,10 @@ StackView{
             }
 
             function headerFilterData(index){
-                    requestMeasureResultPage(index)
+                requestMeasureResultPage(index)
+                if(rect_bottom.all === 0){
+                    requestTaskNotifyStatisitic()
+                }
             }
         }
     }

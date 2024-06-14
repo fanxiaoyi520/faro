@@ -117,7 +117,6 @@ QString Util::getDriveLetter()
         UINT driveType = GetDriveTypeW(wchRootPath);
         if (driveType == DRIVE_REMOVABLE) {
             move_devices.append(device);
-            qDebug() << "device path:" << device.rootPath();
         }
     }
     if (move_devices.length() == 0) return "C:/";

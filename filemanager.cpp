@@ -95,10 +95,12 @@ bool FileManager::compression_zip_file(const QString &selectFile2DirPath, const 
     {
         QString zipRootFolder = selectFile2DirPath.mid(selectFile2DirPath.lastIndexOf("/") + 1);
         QString selectDirUpDir = selectFile2DirPath.left(selectFile2DirPath.lastIndexOf("/"));
+        qDebug() << "zipRootFolder =" << zipRootFolder;
+        qDebug() << "selectDirUpDir =" << selectDirUpDir;
         QString saveFilePath = savePath + "/" + zipRootFolder + ".zip";
 
         QZipWriter writer(saveFilePath);
-        writer.addDirectory(zipRootFolder);
+//        writer.addDirectory(zipRootFolder);
         QFileInfoList fileList = ergodic_compression_file(&writer, selectDirUpDir, selectFile2DirPath);
         writer.close();
         if (0 == fileList.size())
@@ -189,6 +191,24 @@ bool FileManager::decompression_zip_file(const QString &selectZipFilePath, const
     return ret;
 }
 
+QString FileManager::compression_zip_by_filepath(const QString &filePath)
+{
+    QString resultPath = "";
+    QString originPath = filePath;
+    originPath.replace(0,7,Util::getDriveLetter());
+    qDebug() << "new usbPath = " << originPath;
+    QDir originDir = QDir(originPath);
+    originDir.cdUp();
+    QString parentPath = originDir.absolutePath();
+    bool ret = FileManager::compression_zip_file(originPath,parentPath);
+    if(ret){
+        QString zipRootFolder = filePath.mid(filePath.lastIndexOf("/") + 1);
+        resultPath = parentPath + "/" + zipRootFolder + ".zip";
+        qDebug() << "new zipPath = " << resultPath;
+    }
+    return resultPath;
+}
+
 QString FileManager::getFlsPath()
 {
     QString appDirPath = "C:";//QCoreApplication::applicationDirPath();
@@ -237,20 +257,7 @@ bool FileManager::removePath(const QString &path)
 bool FileManager::isFileExist(const QString &path)
 {
     QFileInfo fileInfo(path);
-
-    if (fileInfo.exists() && fileInfo.isDir()) {
-        QDir dir(path);
-
-        QStringList filters;
-        filters << "*.zip";
-        dir.setNameFilters(filters);
-
-        QFileInfoList fileList = dir.entryInfoList();
-
-        return !fileList.isEmpty();
-    }
-
-    return false;
+    return fileInfo.exists();
 }
 
 QString FileManager::getZipFilePath(const QString &path)

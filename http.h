@@ -12,6 +12,7 @@
 #include "settingsmanager.h"
 #include <QString>
 #include <thread>
+#include "uploadnetthread.h"
 
 class Http : public QObject
 {

@@ -100,6 +100,7 @@ var upload_del_tips = "确定要删除所选的%d个文件吗?"
 var all_selected = "全选"
 var upload_up = "上传"
 var upload_del = "删除"
+var upload_station = "测站%d"
 
 var is_start_scan = "是否开始扫描?"
 var is_restart_scan = "是否重新开始扫描"

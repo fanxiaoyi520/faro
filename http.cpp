@@ -220,7 +220,7 @@ void Http::loginPost(QString url,
 
 void Http::upload(QString url,QString path)
 {
-    qDebug() << "enter upload";
+    qDebug() << "enter upload path = " + path;
 //    if (!m_running) {
 //        m_thread = std::thread(&Http::uploadExcuseThread,this,url,path);
 //        m_running = true;
@@ -231,6 +231,11 @@ void Http::upload(QString url,QString path)
 //        upload(url,path);
 //    }
     uploadExcuseThread(url,path);
+
+//    auto myUploadThread = new UploadNetThread(url,path);
+//    connect(myUploadThread, &UploadNetThread::qtreplySucSignal, this,&Http::qtreplySucSignal);
+//    connect(myUploadThread, &UploadNetThread::qtreplyFailSignal, this, &Http::qtreplyFailSignal);
+//    myUploadThread->start();
 }
 
 QString Http::getActiveWifi()
@@ -247,6 +252,7 @@ void Http::uploadExcuseThread(QString url,QString path)
         headersMap.insert("Tenant_id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
+
     } else {
         qDebug() << "user info is empty";
     }

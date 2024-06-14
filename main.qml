@@ -14,12 +14,12 @@ Window {
     height: 400
     //visibility: "Maximized"
     title: qsTr("Measure")
-    property var currentView: login
+    property var currentView: mainview
 
-    Component.onCompleted: {
-        initData()
-        initView()
-    }
+//    Component.onCompleted: {
+//        initData()
+//        initView()
+//    }
 
     //initialize default select measure data
     function initData(){

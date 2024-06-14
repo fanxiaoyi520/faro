@@ -5,6 +5,7 @@ import Modules 1.0
 import Http 1.0
 import Api 1.0
 import FaroManager 1.0
+import Util 1.0
 import "../../String_Zh_Cn.js" as String
 
 Rectangle{
@@ -119,7 +120,7 @@ Rectangle{
         width: parent.width;
         height: rect_root.height - rect_bottom.height - rect_top.height
         anchors.top: rect_top.bottom
-        anchors.topMargin: 16
+        anchors.topMargin: 4
         anchors.bottom: rect_bottom.top
         Component{
             id:component_data
@@ -150,6 +151,7 @@ Rectangle{
         Loader{
             id:loder_content
             anchors.fill : parent
+            anchors.margins: 16
             sourceComponent: (groupedList.length > 0)? component_data : noDataViewComponent
         }
 
@@ -230,13 +232,14 @@ Rectangle{
                 }
                 onClicked: {
                     console.log("uploadPage: " + JSON.stringify(selectList))
-                    if(selectList.length == 0){
-                        tipsPop_tips.tipsContentStr = String.upload_no_select_tips
-                        tipsPop_tips.open()
-                    }else{
-                        tipsPop_del.tipsContentStr = String.upload_del_tips.replace("%d",selectList.length)
-                        tipsPop_del.open()
-                    }
+//                    if(selectList.length == 0){
+//                        tipsPop_tips.tipsContentStr = String.upload_no_select_tips
+//                        tipsPop_tips.open()
+//                    }else{
+//                        tipsPop_del.tipsContentStr = String.upload_del_tips.replace("%d",selectList.length)
+//                        tipsPop_del.open()
+//                    }
+                    fileManager.removePath(selectList[0].filePath)
                 }
             }
         }
@@ -267,6 +270,7 @@ Rectangle{
                     rect_upload.color = "#1890FF"
                 }
                 onClicked: {
+                    console.log("upload select = " + JSON.stringify(selectList))
                     if(selectList.length == 0){
                         tipsPop_tips.tipsContentStr = String.upload_no_select_tips
                         tipsPop_tips.open()
@@ -309,12 +313,25 @@ Rectangle{
         } else {
             var datas = JSON.parse(filejson)
             if (Array.isArray(datas)){
+                datas = datas.map((item)=>{
+                                      var itemObj = JSON.parse(item)
+                                      var filePath = itemObj.filePath;
+                                      if(!filePath.includes("zip")){
+                                          console.log("filePath = " + filePath)
+                                          itemObj.filePath = fileManager.compression_zip_by_filepath(filePath)
+                                      }
+                                      return JSON.stringify(itemObj)
+                                  });
+                console.log("compress after datas = " + JSON.stringify(datas))
                 var fileDatas = datas.filter((value, index, self) => {
-                                                 return fileManager.isFileExist(JSON.parse(value).filePath + "/zip")
+//                                                 console.log("filepath = " + JSON.parse(value).filePath)
+//                                                 console.log(fileManager.isFileExist(JSON.parse(value).filePath))
+//                                                 return fileManager.isFileExist(JSON.parse(value).filePath)
+                                                 return true
                                              });
                 totalFileInfo = fileDatas
                 if(fileDatas.length < datas.length){
-                    settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(fileDatas))
+//                    settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(fileDatas))
                 }
             } else {
                 totalFileInfo = []
@@ -339,6 +356,7 @@ Rectangle{
                 return acc;
             }, []);
 
+
             rect_root.groupedList = resultArray
         }else{
             rect_root.groupedList = []
@@ -357,7 +375,7 @@ Rectangle{
     function uploadFile(index,totalUploadSize){
         function onReply(reply) {
             console.log("upload reply :" + reply)
-           var response = JSON.parse(reply)
+            var response = JSON.parse(reply)
             performCalculation(JSON.stringify(response.data),selectList[index].filePath,totalUploadSize,JSON.stringify(selectList[index]),index)
             http.qtreplySucSignal.disconnect(onReply)
             http.qtreplyFailSignal.disconnect(onFail)
@@ -382,7 +400,7 @@ Rectangle{
 
         http.qtreplySucSignal.connect(onReply)
         http.qtreplyFailSignal.connect(onFail)
-        var fileAbsPath = fileManager.getZipFilePath(selectList[index].filePath + "/zip")
+        var fileAbsPath = selectList[index].filePath
         http.upload(Api.admin_sys_file_upload, fileAbsPath);
         console.log("upload file abspath = " + fileAbsPath)
     }
