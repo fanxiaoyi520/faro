@@ -227,6 +227,7 @@ Item{
         console.log("selected header index and model data: "+index,JSON.stringify(model))
         selectHeaderIndex = index
         room_id = model.id
+        hub.open()
         getBuildingRoomTaskAndGetRoomTaskInfo(model)
     }
 
@@ -536,9 +537,9 @@ Item{
             var datas = JSON.parse(filejson)
             if (Array.isArray(datas)){
                 var uniqueArray = datas.filter((value, index, self) => {
-                      console.log("file path value: "+JSON.parse(value).filePath)
-                      return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
-                 });
+                                                   console.log("file path value: "+JSON.parse(value).filePath)
+                                                   return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
+                                               });
                 console.log("new: "+JSON.stringify(uniqueArray))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(uniqueArray))
             } else {
@@ -572,10 +573,12 @@ Item{
     function getBuildingRoomListByFloorId(floorId){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
-            hub.close()
             var response = JSON.parse(reply)
             console.log("complete building room listByFloorId data: "+reply)
-            if (response.data.length <=0) return;
+            if (response.data.length <=0) {
+                hub.close()
+                return;
+            }
             if (response.data.length <= selectHeaderIndex) selectHeaderIndex = 0
             roomsList = response.data
             room_id = roomsList[selectHeaderIndex].id
@@ -603,10 +606,11 @@ Item{
             if (!response.data || response.data.stations.length <=0) {
                 list = []
                 imageUrl = ""
+                hub.close()
                 return;
             }
             list = response.data.stations
-            var urlStr = response.data.vectorgraph !== null ? mdoel.vectorgraph : response.data.houseTypeDrawing
+            var urlStr = response.data.vectorgraph !== null ? response.data.vectorgraph : response.data.houseTypeDrawing
             admin_sys_file_listFileByFileIds([urlStr])
         }
 
@@ -624,6 +628,7 @@ Item{
 
     function admin_sys_file_listFileByFileIds(urlStrs){
         function onReply(reply){
+            hub.close()
             http.onReplySucSignal.disconnect(onReply)
             console.log("complete admin sys file listFileByFileIds: "+reply)
             var response = JSON.parse(reply)

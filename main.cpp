@@ -12,6 +12,7 @@
 #include "crashwatcher.h"
 #include <csignal>
 #include "faroscannercontroller.h"
+#include "ImageProcessor.h"
 
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine)
@@ -56,6 +57,8 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());
     engine.rootContext()->setContextProperty("fileManager", FileManager::instance());
+    ImageProcessor processor;
+    engine.rootContext()->setContextProperty("imageProcessor", &processor);
     engine.addImportPath(QStringLiteral("qrc:/"));
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

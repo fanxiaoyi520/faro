@@ -139,5 +139,9 @@
         <file>images/mine/ic_unselected.png</file>
         <file>Modules/Mine/UploadItemView.qml</file>
         <file>Modules/Mine/UploadItemItemView.qml</file>
+        <file>images/ic_station_marking.png</file>
+        <file>images/ic_station_marking@2x.png</file>
+        <file>images/ic_station_markinglarger.png</file>
+        <file>images/svglarge.svg</file>
     </qresource>
 </RCC>
