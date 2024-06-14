@@ -98,7 +98,7 @@ StackView{
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 79+16
                 width: parent.width
-                height: parent.height
+                height: parent.height - 1 - headerListButtonGroup.height - 24 - title.height - 20 - navigationBar.height - tabbar.height
                 Loader {
                     id: myLoader
                     sourceComponent: modellist.length === 0 ? noDataViewComponent : homeGridViewComponent
@@ -107,6 +107,9 @@ StackView{
                 Component {
                     id: homeGridViewComponent
                     HomeGridView{
+                        clip: true
+                        width: scrollView.width
+                        height: scrollView.height
                         id: homeGridView
                         list: modellist
                     }
@@ -117,8 +120,8 @@ StackView{
                     NoDataView{
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        width: rect.width
-                        height: rect.height-100-79-54-title.height
+                        width: scrollView.width
+                        height: scrollView.height
                         id: noDataView
                         textStr: qsTr("暂无项目数据")
                     }

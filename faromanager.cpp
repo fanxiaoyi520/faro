@@ -57,9 +57,20 @@ void FaroManager::shutDown()
 
 //扫描完成之后压缩文件为zip上传
 void FaroManager::uploadFileHandle(){
-    qDebug() << "default fls path: " << *defaultFlsPath;
     Api *api = Api::instance();
     QString url = api->admin_sys_file_upload();
+    networkHelper.setNetworkStatusCallback([this,url](bool isOnline) {
+        qDebug() << "Network status changed:" << (isOnline ? "Online" : "Offline");
+        if (isOnline){
+            http->upload(url,needUploadZipPath);
+            networkHelper.stopMonitoring();
+        }
+    });
+}
+
+void FaroManager::zipFileHandle()
+{
+    qDebug() << "default fls path: " << *defaultFlsPath;
     QString zipFilePath = *defaultFlsPath+"/"+ZIPDIRECTORY;
     qDebug() << "zipFilePath:" << zipFilePath;
     QString zipDirectory = QDir(zipFilePath).filePath(QString());
@@ -82,15 +93,6 @@ void FaroManager::uploadFileHandle(){
     }
     needUploadZipPath = FileManager::getFilesInDirectory(savePath,QStringList() << "*.zip").first();
     qDebug() << "needUploadZipPath: " << needUploadZipPath;
-
-
-    networkHelper.setNetworkStatusCallback([this,url](bool isOnline) {
-        qDebug() << "Network status changed:" << (isOnline ? "Online" : "Offline");
-        if (isOnline){
-            http->upload(url,needUploadZipPath);
-            networkHelper.stopMonitoring();
-        }
-    });
 }
 
 void FaroManager::onReplySucSignal(const QString &response)
@@ -168,6 +170,44 @@ void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &o
 void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &outPlyFilePath, int xyCropDist, int zCropDist)
 {
     faroScannerController->convertFlsToPly(inFlsFilePath,outPlyFilePath,xyCropDist,zCropDist);
+}
+void FaroManager::performCalculation(const QString &response,const QString &filePath,const QString &calParams){
+
+    qDebug() << "default fls path : " << filePath;
+
+    //    faroScannerController->getScanOrientation(filePath);
+    //    faroScannerController->iQLibIfPtrDisconnect();
+
+    QJsonObject fileModel = Util::parseJsonStringToObject(response);
+    QJsonObject myCalParams = Util::parseJsonStringToObject(calParams);
+    QMap<QString, QVariant> paramsMap;
+    paramsMap.insert("roomId",myCalParams.value("roomId"));
+    paramsMap.insert("stationId",myCalParams.value("stationId"));
+    paramsMap.insert("stageType",myCalParams.value("stageType"));
+    paramsMap.insert("fileId",fileModel.value("fileId"));
+    paramsMap.insert("equipmentModel","Faro-Focus-X");
+    paramsMap.insert("scanningMode","1/20"/*inputModel.value("scanningMode")*/);
+    paramsMap.insert("scanningDataFormat","xyzi");
+    paramsMap.insert("fileType","fls");
+    QMap<QString, QVariant> modeTable;
+    modeTable.insert("masonry_mode",myCalParams.value("masonry_mode"));
+    modeTable.insert("map_mode",myCalParams.value("map_mode"));
+    paramsMap.insert("modeTable",modeTable);
+    QMap<QString, QVariant> inpPcdInfo;
+    inpPcdInfo.insert("downsample_voxel_size",Util::getdownsampleVoxelSize(myCalParams.value("stageType").toString()));
+    inpPcdInfo.insert("is_cropped",1);
+    inpPcdInfo.insert("is_downsampled",1);
+    QVariantList values;
+    values << "0.0" << "0.0" << "0.0";
+    inpPcdInfo.insert("scanner_xyz",values);
+    int xyCropDist = myCalParams.value("xyCropDist").toInt() <= 0 ? 6 : myCalParams.value("xyCropDist").toInt();
+    int zCropDist = myCalParams.value("zCropDist").toInt() <= 0 ? 3 : myCalParams.value("zCropDist").toInt();
+    inpPcdInfo.insert("xy_crop_dist",xyCropDist);
+    inpPcdInfo.insert("z_crop_dist",zCropDist);
+    paramsMap.insert("inpPcdInfo",inpPcdInfo);
+
+    qDebug() << "calculate input parasm: " << Util::mapToJson(paramsMap);
+    http->post(Api::instance()->building_roomTaskExecute_calculateStationTask(),paramsMap);
 }
 
 

@@ -365,6 +365,7 @@ Item{
             settingsManager.setValue(settingsManager.currentDevice,JSON.stringify(myWifiObject))
             console.log("wifi info =" + wifi)
             return
+
         }
         console.log("wifi info =" + wifi)
 
@@ -404,6 +405,7 @@ Item{
             */
 
             faroManager.stopScan()
+            faroManager.zipFileHandle()
             faroManager.disconnect()
 
             function wifiDisConnect(result){
@@ -463,10 +465,12 @@ Item{
         var newscanParams = scanParams
         console.log("new scan params: "+JSON.stringify(scanParams))
         var filejson = settingsManager.getValue(settingsManager.fileInfoData)
-        console.log("get file json data: ",filejson)
-        if (!filejson || filejson === undefined) {
+        console.log("get file json data: "+filejson)
+        if (!filejson || filejson.length === 0) {
             var filedatas = []
             filedatas.push(JSON.stringify(scanParams))
+            console.log("new data: "+filejson)
+            console.log("new data: "+JSON.stringify(scanParams))
             settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(filedatas))
         } else {
             var datas = JSON.parse(filejson)
@@ -491,7 +495,7 @@ Item{
             }
         }
         var newfilejson = settingsManager.getValue(settingsManager.fileInfoData)
-        console.log("new data: "+filejson)
+        console.log("new data: "+newfilejson)
     }
 
     //MARK: network
@@ -532,9 +536,9 @@ Item{
             var datas = JSON.parse(filejson)
             if (Array.isArray(datas)){
                 var uniqueArray = datas.filter((value, index, self) => {
-                                                   console.log("file path value: "+JSON.parse(value).filePath)
-                                                   return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
-                                               });
+                      console.log("file path value: "+JSON.parse(value).filePath)
+                      return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
+                 });
                 console.log("new: "+JSON.stringify(uniqueArray))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(uniqueArray))
             } else {

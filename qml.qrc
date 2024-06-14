@@ -129,6 +129,15 @@
         <file>Modules/Component/ScanningFaroPop.qml</file>
         <file>images/json/upload_file.json</file>
         <file>images/json/wating.json</file>
+        <file>Modules/Result/ItemviewResult.qml</file>
+        <file>images/ic_fail.png</file>
+        <file>images/ic_success.png</file>
+        <file>Modules/Home/HomeGridItemView.qml</file>
         <file>Login/LoginDialog.qml</file>
+        <file>Modules/Mine/UploadPage.qml</file>
+        <file>images/mine/ic_selected.png</file>
+        <file>images/mine/ic_unselected.png</file>
+        <file>Modules/Mine/UploadItemView.qml</file>
+        <file>Modules/Mine/UploadItemItemView.qml</file>
     </qresource>
 </RCC>

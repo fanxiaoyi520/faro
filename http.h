@@ -11,6 +11,7 @@
 #include "httpclient.h"
 #include "settingsmanager.h"
 #include <QString>
+#include <thread>
 
 class Http : public QObject
 {
@@ -26,12 +27,14 @@ public:
 
     Q_INVOKABLE void post(QString url);
     Q_INVOKABLE void post(QString url,const QMap<QString, QVariant> &ps);
+    Q_INVOKABLE void postForm(QString url);
     Q_INVOKABLE void put(QString url,const QMap<QString, QVariant> &ps);
     Q_INVOKABLE void loginPost(QString url,const QMap<QString, QVariant> &ps,const QMap<QString, QVariant> &headers);
 
-    Q_INVOKABLE void upload(QString url,QString path);
-
     Q_INVOKABLE QString getActiveWifi();
+
+public slots:
+    void upload(QString url,QString path);
 
 signals:
     void replySucSignal(const QString &response);
@@ -41,7 +44,10 @@ signals:
 private:
     QNetworkAccessManager *manager;
     QString BASE_URL = "http://192.168.2.222:9002";
-    //QString BASE_URL = "http://gateway.metadigital.net.cn";
+    void uploadExcuseThread(QString url,QString path);
+    std::thread m_thread;
+    bool m_running = false;
+//    QString BASE_URL = "http://gateway.metadigital.net.cn";
 };
 
 #endif // HTTP_H

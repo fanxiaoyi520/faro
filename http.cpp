@@ -62,6 +62,7 @@ void Http::post(QString url)
     this->post(url, defaultParams);
 }
 
+
 void Http::post(QString url, const QMap<QString, QVariant> &ps)
 {
     QMap<QString, QVariant> paramsMap;
@@ -103,6 +104,38 @@ void Http::post(QString url, const QMap<QString, QVariant> &ps)
         replyFail(error,errorCode);
     }).post();
 }
+
+void Http::postForm(QString url)
+{
+    //    QMap<QString, QVariant> paramsMap;
+    //    for(int i = 0; i < ps.keys().size(); i++) {
+    //        paramsMap.insert(ps.keys().at(i),ps.values().at(i));
+    //    }
+    QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
+    QMap<QString, QString>headersMap;
+    if(!user.isEmpty()) {
+        qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
+        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("lang","zh_CN");
+        headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
+    } else {
+        qDebug() << "user info is empty";
+    }
+    qDebug() << "headers: "<< headersMap;
+    //    qDebug() << "params: " << paramsMap;
+    //    qDebug() << "json: " << Util::mapToJson(paramsMap);
+    HttpClient(BASE_URL+url)
+            .debug(true)
+            //            .params(paramsMap)
+            .headers(headersMap)
+            .success([this](const QString &response) {
+        replyFinished(response);
+    }).fail([this](const QString &error, int errorCode) {
+        replyFail(error,errorCode);
+    }).post();
+}
+
+
 
 void Http::put(QString url, const QMap<QString, QVariant> &ps)
 {
@@ -187,6 +220,26 @@ void Http::loginPost(QString url,
 
 void Http::upload(QString url,QString path)
 {
+    qDebug() << "enter upload";
+//    if (!m_running) {
+//        m_thread = std::thread(&Http::uploadExcuseThread,this,url,path);
+//        m_running = true;
+//    }
+//    else{
+//        m_running = false;
+//        m_thread.join();
+//        upload(url,path);
+//    }
+    uploadExcuseThread(url,path);
+}
+
+QString Http::getActiveWifi()
+{
+    return QString("123");
+}
+
+void Http::uploadExcuseThread(QString url,QString path)
+{
     QJsonObject user = Util::parseJsonStringToObject(SettingsManager::instance()->getValue(SettingsManager::instance()->user()));
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
@@ -198,17 +251,16 @@ void Http::upload(QString url,QString path)
         qDebug() << "user info is empty";
     }
     qDebug() << "headers: "<< headersMap;
+    qDebug() << "url" << url;
+    qDebug() << "path" << path;
     HttpClient(BASE_URL+url)
             .debug(true)
             .headers(headersMap)
             .success([this](const QString &response) {
+         qDebug() << "response" << response;
         emit qtreplySucSignal(response);
     }).fail([this](const QString &error, int errorCode) {
+        qDebug() << "error" << error;
         emit qtreplyFailSignal(error,errorCode);
     }).upload(path);
-}
-
-QString Http::getActiveWifi()
-{
-    return QString("123");
 }

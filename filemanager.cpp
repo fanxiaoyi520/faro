@@ -207,31 +207,69 @@ QString FileManager::getFlsPath()
 
 bool FileManager::removePath(const QString &path)
 {
-    return true;
-//    qDebug() << "Trying to remove path:" << path;
-//    QFileInfo fileInfo(path);
-//    if (fileInfo.exists()) {
-//        if (fileInfo.isDir()) {
-//            // 删除目录及其内容
-//            QDir dir(path);
-//            bool success = dir.removeRecursively();
-//            if (!success) {
-//                qDebug() << "Failed to remove directory";
-//            }
-//            return success;
-//        } else {
-//            // 删除文件
-//            QFile file(path);
-//            bool success = file.remove();
-//            if (!success) {
-//                qDebug() << "Failed to remove file:" << file.errorString();
-//            }
-//            return success;
-//        }
-//    }
-//    // 路径不存在，返回 false
-//    qDebug() << "Path does not exist:" << path;
-//    return false;
+//    return true;
+    qDebug() << "Trying to remove path:" << path;
+    QFileInfo fileInfo(path);
+    if (fileInfo.exists()) {
+        if (fileInfo.isDir()) {
+            // 删除目录及其内容
+            QDir dir(path);
+            bool success = dir.removeRecursively();
+            if (!success) {
+                qDebug() << "Failed to remove directory";
+            }
+            return success;
+        } else {
+            // 删除文件
+            QFile file(path);
+            bool success = file.remove();
+            if (!success) {
+                qDebug() << "Failed to remove file:" << file.errorString();
+            }
+            return success;
+        }
+    }
+    // 路径不存在，返回 false
+    qDebug() << "Path does not exist:" << path;
+    return false;
+}
+
+bool FileManager::isFileExist(const QString &path)
+{
+    QFileInfo fileInfo(path);
+
+    if (fileInfo.exists() && fileInfo.isDir()) {
+        QDir dir(path);
+
+        QStringList filters;
+        filters << "*.zip";
+        dir.setNameFilters(filters);
+
+        QFileInfoList fileList = dir.entryInfoList();
+
+        return !fileList.isEmpty();
+    }
+
+    return false;
+}
+
+QString FileManager::getZipFilePath(const QString &path)
+{
+    QFileInfo fileInfo(path);
+
+    if (fileInfo.exists() && fileInfo.isDir()) {
+        QDir dir(path);
+
+        QStringList filters;
+        filters << "*.zip";
+        dir.setNameFilters(filters);
+
+        QFileInfoList fileList = dir.entryInfoList();
+
+        return fileList[0].absoluteFilePath();
+    }
+
+    return "";
 }
 
 QStringList FileManager::getFilesInDirectory(const QString &dirPath, const QStringList &filters)

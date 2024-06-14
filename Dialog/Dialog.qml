@@ -10,6 +10,15 @@ Popup {
     signal confirmOptionsAction(var model)
     onListChanged: {
         console.log("List has changed:" + list[0], list.length)
+        var objList = []
+        for(var i = 0;i < list.length;i++){
+            if(typeof list[i] === "string"){
+                objList.push(JSON.parse(list[i]))
+            }
+        }
+        if(objList.length !== 0){
+            list = objList
+        }
     }
 
     id: popup
@@ -89,7 +98,7 @@ Popup {
                         width: parent.width * 0.7
 
                         Text {
-                            text: JSON.parse(modelData).name
+                            text: modelData.name
                             color: "#3C3C3C"
                             elide: Qt.ElideRight
                             anchors.left: parent.left
@@ -207,7 +216,7 @@ Popup {
     function sureAction(){
         popup.close()
         console.log("sure clicked and currentIndex: " + currentIndex)
-        confirmOptionsAction(JSON.parse(list[currentIndex]))
+        confirmOptionsAction(list[currentIndex])
     }
 }
 

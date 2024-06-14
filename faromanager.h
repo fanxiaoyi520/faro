@@ -37,6 +37,8 @@ public slots:
     // 转换fls文件为ply文件~含下采样
     void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath);
     void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
+    void performCalculation(const QString &response,const QString &filePath,const QString &calParams);
+    void zipFileHandle();
 signals:
     void scanComplete(const QString& filePath);
     void scanProgress(int percent);
