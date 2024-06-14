@@ -160,4 +160,14 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     http->post(Api::instance()->building_roomTaskExecute_calculateStationTask(),paramsMap);
 }
 
+void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &outPlyFilePath)
+{
+    faroScannerController->convertFlsToPly(inFlsFilePath,outPlyFilePath);
+}
+
+void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &outPlyFilePath, int xyCropDist, int zCropDist)
+{
+    faroScannerController->convertFlsToPly(inFlsFilePath,outPlyFilePath,xyCropDist,zCropDist);
+}
+
 

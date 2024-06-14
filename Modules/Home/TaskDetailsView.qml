@@ -26,11 +26,15 @@ Item{
     property var inputCellModel
     property string room_id
     property int selectHeaderIndex: 0
+    signal callbackOrSyncEventHandling()
     id: selectTaskDetailsView
     Layout.fillWidth: true
     Layout.fillHeight: true
     anchors.fill: parent
     clip: true
+    onCallbackOrSyncEventHandling: {
+        floorCallbackOrSyncEventHandling()
+    }
     Toast {id: toastPopup}
     Http {id: http}
     WifiHelper{id: wifiHelper}
@@ -568,6 +572,7 @@ Item{
             var response = JSON.parse(reply)
             console.log("complete building room listByFloorId data: "+reply)
             if (response.data.length <=0) return;
+            if (response.data.length <= selectHeaderIndex) selectHeaderIndex = 0
             roomsList = response.data
             room_id = roomsList[selectHeaderIndex].id
             getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])

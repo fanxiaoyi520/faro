@@ -4,6 +4,8 @@ import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as Settings
+import "../../Util/GlobalEnum.js" as GlobalEnum
+
 Rectangle {
     property var model
     property double ratioWidth : 1.0
@@ -46,7 +48,7 @@ Rectangle {
         radius: 8
         Image {
             id: cellStatusImage
-            source: GlobalFunc.setStatusImageSource(model)
+            source: setStatusImageSource(model)
             width: 17;height: 17
             anchors.left: parent.left
             anchors.leftMargin: 23.5
@@ -156,7 +158,7 @@ Rectangle {
             anchors.right: moreColumnLayout.right
             anchors.top: moreColumnLayout.top
             radius: 3
-            visible: model.status === 0 && filtering(model)
+            visible: model.status === 0 && filtering(model) !== undefined
         }
 
         ColumnLayout{
@@ -205,9 +207,11 @@ Rectangle {
         console.log("cell display model: "+JSON.stringify(model))
         var uniqueModel = filtering(model)
         console.log("detais cell model: "+JSON.stringify(model))
-        if (model.status === 0) {
+        if (model.status === 0 && uniqueModel === undefined) {
             return Settings.station_waiting_scan
-        } else if (model.status === 1 && uniqueModel && uniqueModel.filePath !== "") {
+        } else if (model.status === 0) {
+            return Settings.station_waiting_upload_file
+        } else if (model.status === 1) {
             return Settings.station_waiting_upload_file
         } else if (model.status === 1) {
             return Settings.station_waiting_calculated
@@ -237,5 +241,29 @@ Rectangle {
         }
         console.log("unique model: " + JSON.stringify(uniqueModel))
         return uniqueModel
+    }
+
+    function setStatusImageSource(modelData){
+        var uniqueModel = filtering(model)
+        if (modelData) {
+            var status = modelData.status;
+            switch (modelData.status){
+            case GlobalEnum.MMProjectStatus.NotTurnedOn:
+                if (uniqueModel === undefined) {
+                    return "../../images/measure_other/measure_ic_not_created@2x.png"
+                } else {
+                    return "../../images/measure_other/measure_ic_progress@2x.png"
+                }
+            case GlobalEnum.MMProjectStatus.InProgress:
+                return "../../images/measure_other/measure_ic_progress@2x.png"
+            case GlobalEnum.MMProjectStatus.Completed:
+                return "../../images/measure_other/measure_complete@2x.png"
+            case GlobalEnum.MMProjectStatus.Close:
+                return "../../images/measure_other/measure_ic_calculation_failed@2x.png"
+            default: break
+            }
+        } else {
+            return "../../images/measure_other/measure_ic_not_created@2x.png"
+        }
     }
 }

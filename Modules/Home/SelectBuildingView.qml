@@ -207,7 +207,7 @@ ScrollView{
     }
 
     //MARK: logic
-    function callbackOrSyncEventHandling(){
+    function kbuildCallbackOrSyncEventHandling(){
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectBuildingView.currentRow = selectedStageType.index
         selectBuildingView.selectedStageName = selectedStageType.name

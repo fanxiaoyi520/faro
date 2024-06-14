@@ -34,6 +34,9 @@ public slots:
     void shutDown();
     void uploadFileHandle();
     void performCalculation(const QString &response,const QString &filePath);
+    // 转换fls文件为ply文件~含下采样
+    void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath);
+    void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
 signals:
     void scanComplete(const QString& filePath);
     void scanProgress(int percent);

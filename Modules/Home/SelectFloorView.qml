@@ -15,8 +15,11 @@ ScrollView{
     property var unitList:[]
     property var list:[]
     property int currentRow: 0
-    property string selectedStageName: "主体阶段（一阶段）"
-
+    property string selectedStageName: SettingString.main_stage_one
+    signal buildCallbackOrSyncEventHandling()
+    onBuildCallbackOrSyncEventHandling: {
+        kbuildCallbackOrSyncEventHandling()
+    }
     id: selectFloorView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -70,7 +73,7 @@ ScrollView{
         }
         onBackAction: {
             rootStackView.pop()
-            callbackOrSyncEventHandling()
+            buildCallbackOrSyncEventHandling()
         }
     }
 
@@ -221,7 +224,8 @@ ScrollView{
         accordingToUnitIdSearchFloor(index)
     }
 
-    function callbackOrSyncEventHandling(){
+    function floorCallbackOrSyncEventHandling(){
+        console.log("signal common ....")
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectFloorView.currentRow = selectedStageType.index
         selectFloorView.selectedStageName = selectedStageType.name
