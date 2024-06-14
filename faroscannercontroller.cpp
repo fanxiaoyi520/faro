@@ -273,6 +273,7 @@ void FaroScannerController::FaroScannerController::convertFlsToPly(const QString
 {
 
     initIiQLibInternal();
+    return;
     HRESULT result;
     std::string stdStr = inFlsFilePath.toStdString();
     const char* cStr = stdStr.c_str();
