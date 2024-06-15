@@ -14,7 +14,7 @@ Rectangle{
     property var listItems: []
     property var successCount: 0
     property var failedCount: 0
-
+    property var pushStackSource: "mine"// mine and home
     width:parent.width
     height: parent.width
 
@@ -56,6 +56,7 @@ Rectangle{
     }
 
     Http{ id:http }
+    /***bug fixing: 不能在这再次调用faroManager.init()*/
     FaroManager {
         id: faroManager
     }
@@ -85,7 +86,11 @@ Rectangle{
                 anchors.fill: parent
                 onClicked: {
                     console.log("click quit")
-                    mineStack.pop()
+                    if (pushStackSource === "mine") {
+                        mineStack.pop()
+                    } else {
+                        rootStackView.pop()
+                    }
                 }
             }
         }

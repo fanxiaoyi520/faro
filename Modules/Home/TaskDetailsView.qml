@@ -38,6 +38,7 @@ Item{
     Toast {id: toastPopup}
     Http {id: http}
     WifiHelper{id: wifiHelper}
+    Loader{ id : userInfoLoader}
     Dialog{
         id: dialog
         titleStr: qsTr(SettingString.selection_stage)
@@ -285,6 +286,7 @@ Item{
         }
         if (model.index === 1) {
             console.log("jump upload file")
+            jumpToUserInfo()
             return
         }
         if (model.index === 2) {
@@ -293,6 +295,12 @@ Item{
             selectMeasureModePopUp.open()
             return
         }
+    }
+
+    function jumpToUserInfo(){
+        userInfoLoader.source = "../Mine/UploadPage.qml"
+        userInfoLoader.item.pushStackSource = "home"
+        rootStackView.push(userInfoLoader)
     }
 
     ///重新计算
