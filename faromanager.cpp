@@ -205,11 +205,15 @@ void FaroManager::convertFlsToZipPly(const QString &filePath)
     QString resultPath = "";
     QString originPath = filePath;
     originPath.replace(0,7,Util::getDriveLetter());
-
-    QString fileName = originPath.mid(originPath.lastIndexOf("/") + 1,originPath.length());
-    faroScannerController->convertFlsToPly(originPath,originPath + "/" + fileName +".ply");
-    QString plyZipPath = FileManager::instance()-> compression_zip_by_filepath(originPath + "/" + fileName +".ply");
-    emit convertFlsToZipPlyResult(plyZipPath);
+    bool isExist = FileManager::instance()->isFileExist(originPath);
+    if(isExist){
+        QString fileName = originPath.mid(originPath.lastIndexOf("/") + 1,originPath.length());
+        faroScannerController->convertFlsToPly(originPath,originPath + "/" + fileName +".ply");
+        QString plyZipPath = FileManager::instance()-> compression_zip_by_filepath(originPath + "/" + fileName +".ply");
+        emit convertFlsToZipPlyResult(plyZipPath);
+    }else{
+           emit convertFlsToZipPlyResult("");
+    }
 }
 
 void FaroManager::startConvertFlsToZipPly(const QString &filePath){
