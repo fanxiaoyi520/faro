@@ -186,10 +186,6 @@ void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &o
 void FaroManager::performCalculation(const QString &response,const QString &filePath,const QString &calParams){
 
     qDebug() << "default fls path : " << filePath;
-
-    //    faroScannerController->getScanOrientation(filePath);
-    //    faroScannerController->iQLibIfPtrDisconnect();
-
     QJsonObject fileModel = Util::parseJsonStringToObject(response);
     QJsonObject myCalParams = Util::parseJsonStringToObject(calParams);
     QMap<QString, QVariant> paramsMap;
@@ -199,8 +195,8 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     paramsMap.insert("fileId",fileModel.value("fileId"));
     paramsMap.insert("equipmentModel","Faro-Focus-X");
     paramsMap.insert("scanningMode","1/20"/*inputModel.value("scanningMode")*/);
-    paramsMap.insert("scanningDataFormat","xyzi");
-    paramsMap.insert("fileType","fls");
+    //    paramsMap.insert("scanningDataFormat","xyzi");
+    paramsMap.insert("fileType","ply");
     QMap<QString, QVariant> modeTable;
     modeTable.insert("masonry_mode",myCalParams.value("masonry_mode"));
     modeTable.insert("map_mode",myCalParams.value("map_mode"));
@@ -217,9 +213,35 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     inpPcdInfo.insert("xy_crop_dist",xyCropDist);
     inpPcdInfo.insert("z_crop_dist",zCropDist);
     paramsMap.insert("inpPcdInfo",inpPcdInfo);
-
     qDebug() << "calculate input parasm: " << Util::mapToJson(paramsMap);
     http->post(Api::instance()->building_roomTaskExecute_calculateStationTask(),paramsMap);
 }
+
+void FaroManager::convertFlsToZipPly(const QString &filePath)
+{
+    QString resultPath = "";
+    QString originPath = filePath;
+    originPath.replace(0,7,Util::getDriveLetter());
+
+    QString fileName = originPath.mid(originPath.lastIndexOf("/") + 1,originPath.length());
+    faroScannerController->convertFlsToPly(originPath,originPath + "/" + fileName +".ply");
+    QString plyZipPath = FileManager::instance()-> compression_zip_by_filepath(originPath + "/" + fileName +".ply");
+    emit convertFlsToZipPlyResult(plyZipPath);
+}
+
+void FaroManager::startConvertFlsToZipPly(const QString &filePath){
+
+    if (!m_running) {
+        m_thread = std::thread(&FaroManager::convertFlsToZipPly, this , filePath);
+        m_running = true;
+    }
+    else{
+        m_running = false;
+        m_thread.join();
+        startConvertFlsToZipPly(filePath);
+    }
+}
+
+
 
 

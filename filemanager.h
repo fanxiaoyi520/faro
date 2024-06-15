@@ -31,6 +31,7 @@ public slots:
     bool removePath(const QString &path);
     bool isFileExist(const QString &path);
     QString getZipFilePath(const QString &path);
+    QString compression_zip_by_filepath(const QString& filePath);
 signals:
 };
 

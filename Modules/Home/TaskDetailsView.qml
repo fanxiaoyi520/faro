@@ -333,7 +333,8 @@ Item{
     function startScan(checked,inoutModel){
         console.log("is auto upload file: "+checked)
         console.log("start scan ...")
-
+        var timer = new Date()
+        console.log("timer = " + timer.toLocaleString())
         var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
         var scanParams = {
             "activeColoring": selectedMeasureData ? selectedMeasureData.activeColoring : "0",
@@ -354,7 +355,8 @@ Item{
             "roomName":roomTaskVoModel.roomName,
             "stageType":roomTaskVoModel.stageType,
             "roomId":room_id,
-            "stationTaskNo": inputCellModel.stationTaskNo
+            "stationTaskNo": inputCellModel.stationTaskNo,
+            "update_time": timer.toLocaleString()
         }
 
         console.log("input scanning parameters: "+JSON.stringify(scanParams))

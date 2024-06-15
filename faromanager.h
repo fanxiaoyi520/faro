@@ -38,6 +38,7 @@ public slots:
     void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath);
     void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
     void performCalculation(const QString &response,const QString &filePath,const QString &calParams);
+    void startConvertFlsToZipPly(const QString &filePath);
     void zipFileHandle();
     void monitorNetworkChanges();
 signals:
@@ -49,6 +50,7 @@ signals:
     void performCalculationSucResult(const QString &response);
     void performCalculationFailResult(const QString &error, int errorCode);
     void monitorNetworkChangesComplete(bool isOnline);
+    void convertFlsToZipPlyResult(QString filePath);
 private:
     FaroScannerController *faroScannerController;
     Http *http;
@@ -56,6 +58,10 @@ private:
     QJsonObject inputModel;
     QString *defaultFlsPath;
     NetworkHelper networkHelper;
+
+    std::thread m_thread;
+    bool m_running = false;
+    void convertFlsToZipPly(const QString &filePath);
 };
 
 #endif // FAROMANAGER_H
