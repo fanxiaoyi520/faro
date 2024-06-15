@@ -401,7 +401,6 @@ Item{
             faroManager.onScanComplete.disconnect(scanComplete)
             faroManager.onScanProgress.disconnect(scanProgress)
             scanCompleteDataHandle(scanParams,filePath)
-            getBuildingRoomListByFloorId()
             scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
             scanningFaroPop.close()
             /**
@@ -416,7 +415,7 @@ Item{
 
             faroManager.stopScan()
             faroManager.disconnect()
-
+            taskDetialViewMonitorNetworkChanges()
             function wifiDisConnect(result){
                 wifiHelper.onDisConnectWifiResult.disconnect(wifiDisConnect)
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
@@ -466,6 +465,16 @@ Item{
             scanningFaroPop.open()
             faroManager.startScan(JSON.stringify(scanParams))
         }
+    }
+
+    function taskDetialViewMonitorNetworkChanges(){
+        faroManager.monitorNetworkChanges()
+        function networkChangesComplete(isOnline){
+            console.log("network changes result: "+isOnline)
+            faroManager.onMonitorNetworkChangesComplete.disconnect(networkChangesComplete)
+            getBuildingRoomListByFloorId()
+        }
+        faroManager.onMonitorNetworkChangesComplete.connect(networkChangesComplete)
     }
 
     function scanCompleteDataHandle(scanParams,filePath){
@@ -590,7 +599,8 @@ Item{
             if (response.data.length <= selectHeaderIndex) selectHeaderIndex = 0
             roomsList = response.data
             room_id = roomsList[selectHeaderIndex].id
-            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
+            console.log("select header index: "+selectHeaderIndex)
+            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[selectHeaderIndex-1])
         }
 
         function onFail(reply,code){
@@ -635,22 +645,22 @@ Item{
     }
 
     function admin_sys_file_listFileByFileIds(urlStrs){
-        function onReply(reply){
+        function onFileReply(reply){
             hub.close()
-            http.onReplySucSignal.disconnect(onReply)
+            http.onReplySucSignal.disconnect(onFileReply)
             console.log("complete admin sys file listFileByFileIds: "+reply)
             var response = JSON.parse(reply)
             imageUrl = "http://"+response.data[0].bucketName+"."+response.data[0].fileUri+"/"+response.data[0].fileName
             console.log("imageUrl: "+imageUrl)
         }
 
-        function onFail(reply,code){
+        function onFileFail(reply,code){
             console.log(reply,code)
-            http.replyFailSignal.disconnect(onFail)
+            http.replyFailSignal.disconnect(onFileFail)
             hub.close()
         }
-        http.onReplySucSignal.connect(onReply)
-        http.replyFailSignal.connect(onFail)
+        http.onReplySucSignal.connect(onFileReply)
+        http.replyFailSignal.connect(onFileFail)
         http.post(Api.admin_sys_file_listFileByFileIds,
                   {"integers":urlStrs})
     }

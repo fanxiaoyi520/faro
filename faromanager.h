@@ -39,6 +39,7 @@ public slots:
     void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
     void performCalculation(const QString &response,const QString &filePath,const QString &calParams);
     void zipFileHandle();
+    void monitorNetworkChanges();
 signals:
     void scanComplete(const QString& filePath);
     void scanProgress(int percent);
@@ -47,6 +48,7 @@ signals:
     void uploadFileFailResult(const QString &error, int errorCode);
     void performCalculationSucResult(const QString &response);
     void performCalculationFailResult(const QString &error, int errorCode);
+    void monitorNetworkChangesComplete(bool isOnline);
 private:
     FaroScannerController *faroScannerController;
     Http *http;

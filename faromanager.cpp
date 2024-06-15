@@ -96,6 +96,17 @@ void FaroManager::zipFileHandle()
     qDebug() << "needUploadZipPath: " << needUploadZipPath;
 }
 
+void FaroManager::monitorNetworkChanges()
+{
+    networkHelper.setNetworkStatusCallback([this](bool isOnline) {
+        qDebug() << "Network status changed:" << (isOnline ? "Online" : "Offline");
+        if (isOnline){
+            networkHelper.stopMonitoring();
+            emit monitorNetworkChangesComplete(isOnline);
+        }
+    });
+}
+
 void FaroManager::onReplySucSignal(const QString &response)
 {
     qDebug() << "response: "<< response;
