@@ -15,6 +15,8 @@ Rectangle{
     property var listItems: []
     property var successCount: 0
     property var failedCount: 0
+    property var index: 0
+    property var totalSize: 0
 
     width:parent.width
     height: parent.width
@@ -24,7 +26,9 @@ Rectangle{
         onConfirmAction: {
             for(var i =0 ;i < selectList.length; i ++){
                 fileManager.removePath(selectList[i].filePath)
+                fileManager.removePath(selectList[i].filePath.replace(".fls",".zip"))
             }
+            delByPath()
             selectList = []
             listItemSelectAll(false)
             refreshFileInfo()
@@ -59,10 +63,9 @@ Rectangle{
     Http{ id:http }
     FaroManager {
         id: faroManager
-        Component.onCompleted: {
-            if(faroManager.init()) {
-                console.log("--------------初始化成功--------------")
-            }
+        onConvertFlsToZipPlyResult: {
+            console.log("enter ply zip result = " + filePath)
+            uploadFile(rect_root.index,rect_root.totalUploadSize,filePath)
         }
     }
     Rectangle{
@@ -232,14 +235,13 @@ Rectangle{
                 }
                 onClicked: {
                     console.log("uploadPage: " + JSON.stringify(selectList))
-//                    if(selectList.length == 0){
-//                        tipsPop_tips.tipsContentStr = String.upload_no_select_tips
-//                        tipsPop_tips.open()
-//                    }else{
-//                        tipsPop_del.tipsContentStr = String.upload_del_tips.replace("%d",selectList.length)
-//                        tipsPop_del.open()
-//                    }
-                    fileManager.removePath(selectList[0].filePath)
+                    if(selectList.length == 0){
+                        tipsPop_tips.tipsContentStr = String.upload_no_select_tips
+                        tipsPop_tips.open()
+                    }else{
+                        tipsPop_del.tipsContentStr = String.upload_del_tips.replace("%d",selectList.length)
+                        tipsPop_del.open()
+                    }
                 }
             }
         }
@@ -301,10 +303,7 @@ Rectangle{
         }
     }
 
-    /**
-      *刷新页面数据，如果文件被删除了更新数据显示
-      */
-    function refreshFileInfo(){
+    function delByPath(){
         var filejson = settingsManager.getValue(settingsManager.fileInfoData)
         console.log("fileInfoData = " + filejson)
         var totalFileInfo = []
@@ -316,22 +315,44 @@ Rectangle{
                 datas = datas.map((item)=>{
                                       var itemObj = JSON.parse(item)
                                       var filePath = itemObj.filePath;
-                                      if(!filePath.includes("zip")){
-                                          console.log("filePath = " + filePath)
-                                          itemObj.filePath = fileManager.compression_zip_by_filepath(filePath)
+                                      for(var i = 0;i<selectList.length;i++){
+                                          if(selectList[i].stageType === itemObj.stageType &&
+                                             selectList[i].stationId === itemObj.stationId &&
+                                             selectList[i].roomId === itemObj.roomId
+                                             ){
+                                              itemObj.filePath = ""
+                                          }
                                       }
                                       return JSON.stringify(itemObj)
                                   });
                 console.log("compress after datas = " + JSON.stringify(datas))
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
+            } else {
+                totalFileInfo = []
+            }
+        }
+    }
+
+    function refreshFileInfo(){
+        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("fileInfoData = " + filejson)
+        var totalFileInfo = []
+        if (!filejson) {
+            totalFileInfo = []
+        } else {
+            var datas = JSON.parse(filejson)
+            if (Array.isArray(datas)){
+                console.log("compress after datas = " + JSON.stringify(datas))
                 var fileDatas = datas.filter((value, index, self) => {
-//                                                 console.log("filepath = " + JSON.parse(value).filePath)
-//                                                 console.log(fileManager.isFileExist(JSON.parse(value).filePath))
-//                                                 return fileManager.isFileExist(JSON.parse(value).filePath)
-                                                 return true
+                                                 var path = JSON.parse(value).filePath
+                                                 console.log("filepath = " + path)
+                                                 console.log("path isEmpty = " + (path === 'undefined' || !path || !/[^\s]/.test(path)))
+                                                 return !(path === 'undefined' || !path || !/[^\s]/.test(path))
                                              });
                 totalFileInfo = fileDatas
+
                 if(fileDatas.length < datas.length){
-//                    settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(fileDatas))
+                    settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(fileDatas))
                 }
             } else {
                 totalFileInfo = []
@@ -369,16 +390,39 @@ Rectangle{
         var totalUploadSize = selectList.length
         upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         upload_pop.open()
-        uploadFile(0)
+        callBackUploadFile(0,totalUploadSize)
+        console.log("successCounr = " + rect_root.successCount + "faildCount = " + rect_root.failedCount + "totalUploadSize = " +totalUploadSize)
     }
 
-    function uploadFile(index,totalUploadSize){
+    function callBackUploadFile(index,totalUploadSize){
+        rect_root.index = index
+        rect_root.totalSize = totalUploadSize
+        var fileAbsPath = selectList[index].filePath
+        faroManager.startConvertFlsToZipPly(fileAbsPath)
+    }
+
+    function uploadFile(index,totalUploadSize,fileAbsPath){
         function onReply(reply) {
-            console.log("upload reply :" + reply)
-            var response = JSON.parse(reply)
-            performCalculation(JSON.stringify(response.data),selectList[index].filePath,totalUploadSize,JSON.stringify(selectList[index]),index)
             http.qtreplySucSignal.disconnect(onReply)
             http.qtreplyFailSignal.disconnect(onFail)
+            console.log("upload reply :" + reply)
+            var response = JSON.parse(reply)
+            if(response.code !== 0){
+                 rect_root.failedCount += 1
+                if (index + 1 < selectList.length) {
+                   callBackUploadFile(index + 1)
+                }else{
+                    upload_pop.close()
+                    tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
+                    tipsPop_upload_finish.open()
+                    //结束清除所有当前选中
+                    listItemSelectAll(false)
+                }
+                console.log("successCounr = " + rect_root.successCount + "faildCount = " + rect_root.failedCount)
+                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
+            }else{
+                performCalculation(JSON.stringify(response.data),selectList[index].filePath,totalUploadSize,JSON.stringify(selectList[index]),index)
+            }
         }
 
         function onFail(reply, code) {
@@ -387,7 +431,7 @@ Rectangle{
             http.qtreplyFailSignal.disconnect(onFail)
             rect_root.failedCount += 1
             if (index + 1 < selectList.length) {
-                uploadFile(index + 1);
+                callBackUploadFile(index + 1)
             }else{
                 upload_pop.close()
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
@@ -395,12 +439,11 @@ Rectangle{
                 //结束清除所有当前选中
                 listItemSelectAll(false)
             }
-            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount + 1).replace("%2d",totalUploadSize))
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         }
 
         http.qtreplySucSignal.connect(onReply)
         http.qtreplyFailSignal.connect(onFail)
-        var fileAbsPath = selectList[index].filePath
         http.upload(Api.admin_sys_file_upload, fileAbsPath);
         console.log("upload file abspath = " + fileAbsPath)
     }
@@ -416,9 +459,28 @@ Rectangle{
             }else{
                 rect_root.successCount += 1
                 fileManager.removePath(selectList[index].filePath)
+                fileManager.removePath(selectList[index].filePath.replace(".fls",".zip"))
+                var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+                if (filejson) {
+                    var datas = JSON.parse(filejson)
+                    if (Array.isArray(datas)){
+                        datas = datas.map((item)=>{
+                                              var itemObj = JSON.parse(item)
+                                              var filePath = itemObj.filePath;
+                                              if(selectList[index].stageType === itemObj.stageType &&
+                                                 selectList[index].stationId === itemObj.stationId &&
+                                                 selectList[index].roomId === itemObj.roomId
+                                                 ){
+                                                  itemObj.filePath = ""
+                                              }
+                                              return JSON.stringify(itemObj)
+                                          });
+                        settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
+                    }
+                }
             }
             if (index + 1 < selectList.length) {
-                uploadFile(index + 1);
+               callBackUploadFile(index + 1)
             }else{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
@@ -427,7 +489,7 @@ Rectangle{
                 listItemSelectAll(false)
             }
 
-            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount + 1).replace("%2d",totalUploadSize))
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         }
 
         function onFail(reply,code){
@@ -436,13 +498,13 @@ Rectangle{
             console.log("calculation faild reply :" + reply,code)
             rect_root.failedCount += 1
             if (index + 1 < selectList.length) {
-                uploadFile(index + 1);
+              callBackUploadFile(index + 1)
             }else{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
                 upload_pop.close()
             }
-            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount + 1).replace("%2d",totalUploadSize))
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         }
 
         faroManager.performCalculationSucResult.connect(onReply)

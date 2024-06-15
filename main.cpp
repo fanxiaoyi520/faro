@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     engine.load(url);
 
     //测试代码
-    FaroScannerController::instance()->convertFlsToPly("D:/SDK_File_020.fls","D:/ghhhx.ply");
+//    FaroScannerController::instance()->convertFlsToPly("D:/SDK_File_020.fls","D:/ghhhx.ply");
 
     return app.exec();
 }

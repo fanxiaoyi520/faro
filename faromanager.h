@@ -35,6 +35,7 @@ public slots:
     void uploadFileHandle();
     void performCalculation(const QString &response,const QString &filePath);
     void performCalculation(const QString &response,const QString &filePath,const QString &calParams);
+    void startConvertFlsToZipPly(const QString &filePath);
     void zipFileHandle();
 signals:
     void scanComplete(const QString& filePath);
@@ -44,6 +45,7 @@ signals:
     void uploadFileFailResult(const QString &error, int errorCode);
     void performCalculationSucResult(const QString &response);
     void performCalculationFailResult(const QString &error, int errorCode);
+    void convertFlsToZipPlyResult(QString filePath);
 private:
     FaroScannerController *faroScannerController;
     Http *http;
@@ -51,6 +53,10 @@ private:
     QJsonObject inputModel;
     QString *defaultFlsPath;
     NetworkHelper networkHelper;
+
+    std::thread m_thread;
+    bool m_running = false;
+    void convertFlsToZipPly(const QString &filePath);
 };
 
 #endif // FAROMANAGER_H

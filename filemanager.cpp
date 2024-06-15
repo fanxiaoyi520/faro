@@ -194,16 +194,17 @@ bool FileManager::decompression_zip_file(const QString &selectZipFilePath, const
 QString FileManager::compression_zip_by_filepath(const QString &filePath)
 {
     QString resultPath = "";
-    QString originPath = filePath;
-    originPath.replace(0,7,Util::getDriveLetter());
-    qDebug() << "new usbPath = " << originPath;
-    QDir originDir = QDir(originPath);
+//    QString originPath = filePath;
+//    originPath.replace(0,7,Util::getDriveLetter());
+    qDebug() << "new usbPath = " << filePath;
+    QDir originDir = QDir(filePath);
+    originDir.cdUp();
     originDir.cdUp();
     QString parentPath = originDir.absolutePath();
-    bool ret = FileManager::compression_zip_file(originPath,parentPath);
+    bool ret = FileManager::compression_zip_file(filePath,parentPath);
     if(ret){
-        QString zipRootFolder = filePath.mid(filePath.lastIndexOf("/") + 1);
-        resultPath = parentPath + "/" + zipRootFolder + ".zip";
+        QString fileName = QFileInfo(filePath).baseName();
+        resultPath = parentPath + "/" + fileName + ".zip";
         qDebug() << "new zipPath = " << resultPath;
     }
     return resultPath;
@@ -227,13 +228,15 @@ QString FileManager::getFlsPath()
 
 bool FileManager::removePath(const QString &path)
 {
-//    return true;
-    qDebug() << "Trying to remove path:" << path;
-    QFileInfo fileInfo(path);
+    QString resultPath = "";
+    QString originPath = path;
+    originPath.replace(0,7,Util::getDriveLetter());
+    qDebug() << "Trying to remove path:" << originPath;
+    QFileInfo fileInfo(originPath);
     if (fileInfo.exists()) {
         if (fileInfo.isDir()) {
             // 删除目录及其内容
-            QDir dir(path);
+            QDir dir(originPath);
             bool success = dir.removeRecursively();
             if (!success) {
                 qDebug() << "Failed to remove directory";
@@ -241,7 +244,7 @@ bool FileManager::removePath(const QString &path)
             return success;
         } else {
             // 删除文件
-            QFile file(path);
+            QFile file(originPath);
             bool success = file.remove();
             if (!success) {
                 qDebug() << "Failed to remove file:" << file.errorString();
