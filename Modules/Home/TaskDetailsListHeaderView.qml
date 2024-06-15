@@ -21,7 +21,7 @@ Rectangle{
 
     property var logoImage: Image {
         id: logoImageId
-        source: "../../images/ic_station_markinglarger.png"
+        source: "../../images/ic_location_green.svg"
         visible: false
         onStatusChanged: {
             if (status == Image.Ready) {
@@ -51,6 +51,7 @@ Rectangle{
         x: (parent.width - imageBackWidth)/2
         Canvas {
             id: canvas
+
             width: imageBackWidth
             height: imageBackWidth
             onPaint: canvasPaint(getContext("2d"))
@@ -123,6 +124,7 @@ Rectangle{
         if (!model) return
 
         var ctx = context;
+        ctx.clearRect(0, 0, width, height);
         var imgWidth = image.width;
         var imgHeight = image.height;
         var canvasWidth = canvas.width;
@@ -179,7 +181,7 @@ Rectangle{
                     ctx.save();
                     ctx.translate(drawX + station.x * scale - oldlogoWidth / 2, drawY + station.y * scale - oldlogoWidth / 2);
                     ctx.rotate(radians);
-                    ctx.drawImage(arrowImage, 0, -oldlogoWidth / 2, oldlogoWidth, oldlogoWidth);
+                    ctx.drawImage(arrowImage, 0, -oldlogoWidth+oldlogoWidth/6, oldlogoWidth, oldlogoWidth);
                     ctx.restore();
                 }
             }
@@ -187,20 +189,20 @@ Rectangle{
             var logoWidth = drawWidth / 12
             var logoHeight = logoWidth * 46 / 38
             ctx.globalAlpha = 0.8;
+            logoImageId.source = getColor(type)
             ctx.drawImage(logoImage, drawX+station.x*scale-logoWidth/2, drawY+station.y*scale-logoHeight, logoWidth, logoHeight);
-            //imageProcessor.changeImageColor("qrc:/images/ic_station_markinglarger.png", "#FF0000");
             ctx.globalAlpha = 1.0;
             ctx.font = logoWidth/2+"px Arial";
             ctx.fillStyle = "#0000FF";
-            ctx.fillText(station.stationNo, drawX+station.x*scale-logoWidth/2+(logoWidth-logoWidth/3)/2, drawY+station.y*scale-logoHeight+logoHeight/2);
+            ctx.fillText(station.stationNo, drawX+station.x*scale-logoWidth/2+(logoWidth-logoWidth/3)/2, drawY+station.y*scale-logoHeight+logoHeight/2+logoHeight/8);
         });
     }
 
     function getColor(type){
-        if(type === 0) return "orange"
-        if(type === 1) return "green"
-        if(type === 2) return "red"
-        if(type === 3) return "gray"
+        if(type === 0) return "../../images/ic_location_orange.svg"
+        if(type === 1) return "../../images/ic_location_green.svg"
+        if(type === 2) return "../../images/ic_location_red.svg"
+        if(type === 3) return "../../images/ic_location_gray.svg"
     }
 }
 

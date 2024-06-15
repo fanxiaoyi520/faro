@@ -143,5 +143,9 @@
         <file>images/ic_station_marking@2x.png</file>
         <file>images/ic_station_markinglarger.png</file>
         <file>images/svglarge.svg</file>
+        <file>images/ic_location_green.svg</file>
+        <file>images/ic_location_orange.svg</file>
+        <file>images/ic_location_red.svg</file>
+        <file>images/ic_location_gray.svg</file>
     </qresource>
 </RCC>

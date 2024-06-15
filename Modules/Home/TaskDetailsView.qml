@@ -234,6 +234,7 @@ Item{
     function enlargeImageAction(inputImageUrl){
         console.log("need enlarge image: "+ inputImageUrl)
         enlargeImagePopUp.imgUrl = imageUrl
+        enlargeImagePopUp.model = roomTaskVoModel
         enlargeImagePopUp.open()
     }
 
