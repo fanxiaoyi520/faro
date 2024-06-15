@@ -318,6 +318,7 @@ void FaroScannerController::FaroScannerController::convertFlsToPly(const QString
     std::ofstream outfile(outPlyFilePath.toStdString());
     syncPlyApi.SavePly(outfile,syncPlyApi.myXYZData);
     syncPlyApi.myXYZData.clear();
+    iQLibIfPtrDisconnect();
 }
 
 void FaroScannerController::checkScannerStatus()

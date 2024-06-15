@@ -407,7 +407,6 @@ Item{
             */
 
             faroManager.stopScan()
-            faroManager.zipFileHandle()
             faroManager.disconnect()
 
             function wifiDisConnect(result){

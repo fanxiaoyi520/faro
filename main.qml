@@ -6,6 +6,8 @@ import Modules 1.0
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Dialog 1.0
+import WifiHlper 1.0
+import "./Util/GlobalFunc.js" as GlobalFunc
 
 Window {
     id: rootWindow
@@ -15,10 +17,24 @@ Window {
     //visibility: "Maximized"
     title: qsTr("Measure")
     property var currentView: login
+    WifiHelper{id: wifiHelper}
 
     Component.onCompleted: {
+        preprocessing()
         initData()
         initView()
+    }
+
+    function preprocessing(){
+        var wifi = settingsManager.getValue(settingsManager.currentDevice)
+        if(GlobalFunc.isJson(wifi)) {
+            console.log("wifi info =" + wifi)
+            var contentName = JSON.parse(wifi).wifiName
+            var currentWifiName = wifiHelper.queryInterfaceName()
+            if (currentWifiName === contentName){
+                wifiHelper.disConnectWifi()
+            }
+        }
     }
 
     //initialize default select measure data
