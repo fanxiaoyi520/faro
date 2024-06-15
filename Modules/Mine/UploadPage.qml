@@ -58,11 +58,6 @@ Rectangle{
     Http{ id:http }
     FaroManager {
         id: faroManager
-        Component.onCompleted: {
-            if(faroManager.init()) {
-                console.log("--------------初始化成功--------------")
-            }
-        }
     }
     Rectangle{
         id:rect_top

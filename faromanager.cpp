@@ -20,6 +20,7 @@ bool FaroManager::init()
 
 int FaroManager::connect()
 {
+    qDebug() << "enter connect";
     return faroScannerController->connect();
 }
 

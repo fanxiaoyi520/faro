@@ -137,7 +137,6 @@ Popup {
     }
 
     function setDefaultData(){
-        console.log("每次都响应吗")
         var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
         if (selectedMeasureData){
             masonry_mode = selectedMeasureData.masonry_mode

@@ -16,7 +16,7 @@ Popup{
 
     property var imageType: 0
     property var image: Image {
-        source: imgUrl
+        source: imgUrl ? imgUrl : ""
         visible: false
         onStatusChanged: {
             if (status == Image.Ready) {

@@ -25,6 +25,9 @@ Window {
         initView()
     }
 
+    /**
+     * 启动程序，如果连接的是硬件WiFi，先断开连接
+     */
     function preprocessing(){
         var wifi = settingsManager.getValue(settingsManager.currentDevice)
         if(GlobalFunc.isJson(wifi)) {
