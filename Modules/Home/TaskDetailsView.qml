@@ -602,7 +602,7 @@ Item{
             roomsList = response.data
             room_id = roomsList[selectHeaderIndex].id
             console.log("select header index: "+selectHeaderIndex)
-            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[selectHeaderIndex-1])
+            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[selectHeaderIndex])
         }
 
         function onFail(reply,code){

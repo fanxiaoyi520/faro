@@ -236,6 +236,7 @@ ScrollView{
     function jumpToTaskDetails(index,modelData){
         console.log("incoming data index: ("+index+") and model: "+JSON.stringify(modelData))
         selectTaskDetailsView.source = "TaskDetailsView.qml"
+        selectTaskDetailsView.item.selectHeaderIndex = 0
         selectTaskDetailsView.item.inputModelData = modelData
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectTaskDetailsView.item.currentRow = selectedStageType.index === undefined ? 0 : selectedStageType.index
