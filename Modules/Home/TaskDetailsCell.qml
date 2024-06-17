@@ -212,8 +212,6 @@ Rectangle {
         } else if (model.status === 0) {
             return Settings.station_waiting_upload_file
         } else if (model.status === 1) {
-            return Settings.station_waiting_upload_file
-        } else if (model.status === 1) {
             return Settings.station_waiting_calculated
         } else if (model.status === 2) {
             return model.operationTime

@@ -82,7 +82,7 @@ Rectangle {
                         // 值有效，不需要做任何事
                     } else {
                         if (isNaN(intValue) || intValue < 1) {
-                            this.text = "1";
+                            //this.text = "1";
                         } else if (intValue > 50) {
                             this.text = "50";
                         }

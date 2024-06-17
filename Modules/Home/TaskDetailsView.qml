@@ -124,6 +124,7 @@ Item{
                 anchors.fill: parent
                 onClicked: {
                     dialog.list = SettingString.stageType
+                    dialog.currentIndex = currentRow
                     dialog.open()
                 }
             }
@@ -219,6 +220,7 @@ Item{
         console.log("task details input model data: "+JSON.stringify(inputModelData))
         var selectedItem = JSON.parse(settingsManager.getValue(settingsManager.selectedItem))
         projectName = selectedItem.projectName
+        headerListView.currentIndex = selectHeaderIndex
         hub.open()
         getBuildingRoomListByFloorId()
     }
@@ -618,8 +620,8 @@ Item{
     }
 
     function getBuildingRoomTaskAndGetRoomTaskInfo(roomModel){
-        function onReply(reply){
-            http.onReplySucSignal.disconnect(onReply)
+        function onBuildingReply(reply){
+            http.onReplySucSignal.disconnect(onBuildingReply)
             console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
             roomTaskVoModel = response.data
@@ -634,14 +636,14 @@ Item{
             admin_sys_file_listFileByFileIds([urlStr])
         }
 
-        function onFail(reply,code){
+        function onBuildingFail(reply,code){
             console.log(reply,code)
-            http.replyFailSignal.disconnect(onFail)
+            http.replyFailSignal.disconnect(onBuildingFail)
             hub.close()
         }
 
-        http.onReplySucSignal.connect(onReply)
-        http.replyFailSignal.connect(onFail)
+        http.onReplySucSignal.connect(onBuildingReply)
+        http.replyFailSignal.connect(onBuildingFail)
         http.get(Api.building_roomTask_getRoomTaskInfo,
                  {"roomId":roomModel.id,"stageType":currentRow+1})
     }

@@ -67,6 +67,7 @@ ScrollView{
                 anchors.fill: parent
                 onClicked: {
                     dialog.list = SettingString.stageType
+                    dialog.currentIndex = currentRow
                     dialog.open()
                 }
             }

@@ -186,9 +186,9 @@ Popup {
         console.log("input: "+index)
         console.log("text: "+text)
         if(index === 1) {
-            xy_crop_dist = text
+            xy_crop_dist = !text || text === "" ? 1 : text
         } else {
-            z_crop_dist = text
+            z_crop_dist = !text || text === "" ? 1 : text
         }
     }
 
