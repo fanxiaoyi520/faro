@@ -126,21 +126,22 @@ Popup{
                     type = 0
                 }
             }
-
+            var drawX = (canvasWidth - drawWidth) / 2;
+            var drawY = (canvasHeight - drawHeight) / 2;
             var oldlogoWidth = drawWidth / 20
             if (station.vectorCoordinateX !== 0 || station.vectorCoordinateY !== 0) {
                 if (station.ifNeedMark){
-                    var degrees = Math.atan2(station.cadMapCenterY-station.northCenterY, station.cadMapCenterX-station.northCenterX);
-                    var radians = degrees * (Math.PI / 180);
-                    if (radians < 0) radians += 360;
+                    var degrees = Math.atan2((station.cadMapCenterY-station.northCenterY), (station.cadMapCenterX-station.northCenterX)) * 180.0 / Math.PI;
+                    if (degrees < 0) degrees += 360;
+                    var arrowX = drawX + station.x * scale;
+                    var arrowY = drawY + station.y * scale - oldlogoWidth+oldlogoWidth / 2;
                     ctx.save();
-                    ctx.translate(drawX + station.x * scale - oldlogoWidth / 2, drawY + station.y * scale - oldlogoWidth / 2);
-                    ctx.rotate(radians);
-                    ctx.drawImage(arrowImage, 0, -oldlogoWidth+oldlogoWidth/6, oldlogoWidth, oldlogoWidth);
+                    ctx.translate(arrowX, arrowY);
+                    ctx.rotate((degrees-90)*(Math.PI / 180.0));
+                    ctx.drawImage(arrowImage,-oldlogoWidth / 2, -oldlogoWidth, oldlogoWidth, oldlogoWidth);
                     ctx.restore();
                 }
             }
-
             var logoWidth = drawWidth / 12
             var logoHeight = logoWidth * 46 / 38
             ctx.globalAlpha = 0.8;
