@@ -375,7 +375,7 @@ QNetworkRequest HttpClientPrivate::createRequest(HttpClientPrivate *d, HttpClien
     bool get      = method == HttpClientRequestMethod::GET;
     bool upload   = method == HttpClientRequestMethod::UPLOAD;
     bool withForm = !get && !upload && !d->useJson; // PUT、POST 或者 DELETE 请求，且 useJson 为 false
-    bool withJson = !get && !upload &&  d->useJson; // PUT、POST 或者 DELETE 请求，且 useJson 为 true
+    bool withJson = true; // PUT、POST 或者 DELETE 请求，且 useJson 为 true
 
     // [1] 如果是 GET 请求，并且参数不为空，则编码请求的参数，放到 URL 后面
     if (get && !d->params.isEmpty()) {
@@ -422,6 +422,7 @@ QNetworkRequest HttpClientPrivate::createRequest(HttpClientPrivate *d, HttpClien
     QNetworkRequest request(QUrl(d->url));
     for (auto i = d->headers.cbegin(); i != d->headers.cend(); ++i) {
         request.setRawHeader(i.key().toUtf8(), i.value().toUtf8());
+        qDebug() << "i key = " << i.key().toUtf8() << "     i.value" << i.value().toUtf8();
     }
 
     return request;

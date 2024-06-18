@@ -60,7 +60,7 @@ Column{
             anchors.rightMargin: 32
             id: username
             color: "#999999"
-            text: qsTr((userinfo === null) ? "" : userinfo.name)
+            text: qsTr((userinfo === null) ? "" : ((userinfo.name === null) ? "" : userinfo.name))
         }
         Rectangle{
             width: parent.width
@@ -90,7 +90,7 @@ Column{
             anchors.rightMargin: 32
             id: phone
             color: "#999999"
-            text: qsTr((userinfo === null) ? "" : userinfo.phone)
+            text: qsTr((userinfo === null) ? "" : ((userinfo.phone === null) ? "" : userinfo.phone))
         }
         Rectangle{
             width: parent.width
@@ -121,7 +121,7 @@ Column{
             anchors.rightMargin: 32
             id: email
             color: "#999999"
-            text: qsTr((userinfo === null) ? "" : userinfo.email)
+            text: qsTr((userinfo === null) ? "" : ((userinfo.email === null) ? "" : userinfo.email))
         }
         Rectangle{
             width: parent.width
@@ -183,7 +183,7 @@ Column{
             http.onReplySucSignal.disconnect(onReply)
             http.replyFailSignal.disconnect(onFail)
             hub.close()
-//            console.log("userinfo reply: "+reply)
+            console.log("userinfo reply: "+reply)
             var response = JSON.parse(reply)
             root.userinfo = response.data
         }
