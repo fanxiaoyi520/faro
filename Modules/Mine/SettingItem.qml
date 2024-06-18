@@ -112,6 +112,7 @@ Rectangle {
                 }
                 if(index == 1){
                     userInfoLoader.source = "UploadPage.qml"
+                    userInfoLoader.item.pushStackSource = "mine"
                     mineStack.push(userInfoLoader)
                 }
             }

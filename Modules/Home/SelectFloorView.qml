@@ -15,8 +15,11 @@ ScrollView{
     property var unitList:[]
     property var list:[]
     property int currentRow: 0
-    property string selectedStageName: "主体阶段（一阶段）"
-
+    property string selectedStageName: SettingString.main_stage_one
+    signal buildCallbackOrSyncEventHandling()
+    onBuildCallbackOrSyncEventHandling: {
+        kbuildCallbackOrSyncEventHandling()
+    }
     id: selectFloorView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -64,13 +67,14 @@ ScrollView{
                 anchors.fill: parent
                 onClicked: {
                     dialog.list = SettingString.stageType
+                    dialog.currentIndex = currentRow
                     dialog.open()
                 }
             }
         }
         onBackAction: {
             rootStackView.pop()
-            callbackOrSyncEventHandling()
+            buildCallbackOrSyncEventHandling()
         }
     }
 
@@ -221,7 +225,8 @@ ScrollView{
         accordingToUnitIdSearchFloor(index)
     }
 
-    function callbackOrSyncEventHandling(){
+    function floorCallbackOrSyncEventHandling(){
+        console.log("signal common ....")
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectFloorView.currentRow = selectedStageType.index
         selectFloorView.selectedStageName = selectedStageType.name
@@ -232,6 +237,7 @@ ScrollView{
     function jumpToTaskDetails(index,modelData){
         console.log("incoming data index: ("+index+") and model: "+JSON.stringify(modelData))
         selectTaskDetailsView.source = "TaskDetailsView.qml"
+        selectTaskDetailsView.item.selectHeaderIndex = 0
         selectTaskDetailsView.item.inputModelData = modelData
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectTaskDetailsView.item.currentRow = selectedStageType.index === undefined ? 0 : selectedStageType.index

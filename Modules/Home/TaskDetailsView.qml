@@ -26,14 +26,19 @@ Item{
     property var inputCellModel
     property string room_id
     property int selectHeaderIndex: 0
+    signal callbackOrSyncEventHandling()
     id: selectTaskDetailsView
     Layout.fillWidth: true
     Layout.fillHeight: true
     anchors.fill: parent
     clip: true
+    onCallbackOrSyncEventHandling: {
+        floorCallbackOrSyncEventHandling()
+    }
     Toast {id: toastPopup}
     Http {id: http}
     WifiHelper{id: wifiHelper}
+    Loader{ id : userInfoLoader}
     Dialog{
         id: dialog
         titleStr: qsTr(SettingString.selection_stage)
@@ -119,6 +124,7 @@ Item{
                 anchors.fill: parent
                 onClicked: {
                     dialog.list = SettingString.stageType
+                    dialog.currentIndex = currentRow
                     dialog.open()
                 }
             }
@@ -214,6 +220,7 @@ Item{
         console.log("task details input model data: "+JSON.stringify(inputModelData))
         var selectedItem = JSON.parse(settingsManager.getValue(settingsManager.selectedItem))
         projectName = selectedItem.projectName
+        headerListView.currentIndex = selectHeaderIndex
         hub.open()
         getBuildingRoomListByFloorId()
     }
@@ -223,12 +230,14 @@ Item{
         console.log("selected header index and model data: "+index,JSON.stringify(model))
         selectHeaderIndex = index
         room_id = model.id
+        hub.open()
         getBuildingRoomTaskAndGetRoomTaskInfo(model)
     }
 
     function enlargeImageAction(inputImageUrl){
         console.log("need enlarge image: "+ inputImageUrl)
         enlargeImagePopUp.imgUrl = imageUrl
+        enlargeImagePopUp.model = roomTaskVoModel
         enlargeImagePopUp.open()
     }
 
@@ -279,6 +288,7 @@ Item{
         }
         if (model.index === 1) {
             console.log("jump upload file")
+            jumpToUserInfo()
             return
         }
         if (model.index === 2) {
@@ -287,6 +297,12 @@ Item{
             selectMeasureModePopUp.open()
             return
         }
+    }
+
+    function jumpToUserInfo(){
+        userInfoLoader.source = "../Mine/UploadPage.qml"
+        userInfoLoader.item.pushStackSource = "home"
+        rootStackView.push(userInfoLoader)
     }
 
     ///重新计算
@@ -389,7 +405,6 @@ Item{
             faroManager.onScanComplete.disconnect(scanComplete)
             faroManager.onScanProgress.disconnect(scanProgress)
             scanCompleteDataHandle(scanParams,filePath)
-            getBuildingRoomListByFloorId()
             scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
             scanningFaroPop.close()
             /**
@@ -403,9 +418,8 @@ Item{
             */
 
             faroManager.stopScan()
-//            faroManager.zipFileHandle()
             faroManager.disconnect()
-
+            taskDetialViewMonitorNetworkChanges()
             function wifiDisConnect(result){
 
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
@@ -455,6 +469,16 @@ Item{
             scanningFaroPop.open()
             faroManager.startScan(JSON.stringify(scanParams))
         }
+    }
+
+    function taskDetialViewMonitorNetworkChanges(){
+        faroManager.monitorNetworkChanges()
+        function networkChangesComplete(isOnline){
+            console.log("network changes result: "+isOnline)
+            faroManager.onMonitorNetworkChangesComplete.disconnect(networkChangesComplete)
+            getBuildingRoomListByFloorId()
+        }
+        faroManager.onMonitorNetworkChangesComplete.connect(networkChangesComplete)
     }
 
     function scanCompleteDataHandle(scanParams,filePath){
@@ -534,9 +558,9 @@ Item{
             var datas = JSON.parse(filejson)
             if (Array.isArray(datas)){
                 var uniqueArray = datas.filter((value, index, self) => {
-                      console.log("file path value: "+JSON.parse(value).filePath)
-                      return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
-                 });
+                                                   console.log("file path value: "+JSON.parse(value).filePath)
+                                                   return JSON.parse(value).filePath !== filePath || !JSON.parse(value).filePath;
+                                               });
                 console.log("new: "+JSON.stringify(uniqueArray))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(uniqueArray))
             } else {
@@ -570,13 +594,17 @@ Item{
     function getBuildingRoomListByFloorId(floorId){
         function onReply(reply){
             http.onReplySucSignal.disconnect(onReply)
-            hub.close()
             var response = JSON.parse(reply)
             console.log("complete building room listByFloorId data: "+reply)
-            if (response.data.length <=0) return;
+            if (response.data.length <=0) {
+                hub.close()
+                return;
+            }
+            if (response.data.length <= selectHeaderIndex) selectHeaderIndex = 0
             roomsList = response.data
             room_id = roomsList[selectHeaderIndex].id
-            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
+            console.log("select header index: "+selectHeaderIndex)
+            getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[selectHeaderIndex])
         }
 
         function onFail(reply,code){
@@ -592,49 +620,51 @@ Item{
     }
 
     function getBuildingRoomTaskAndGetRoomTaskInfo(roomModel){
-        function onReply(reply){
-            http.onReplySucSignal.disconnect(onReply)
+        function onBuildingReply(reply){
+            http.onReplySucSignal.disconnect(onBuildingReply)
             console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
             roomTaskVoModel = response.data
             if (!response.data || response.data.stations.length <=0) {
                 list = []
                 imageUrl = ""
+                hub.close()
                 return;
             }
             list = response.data.stations
-            var urlStr = response.data.vectorgraph !== null ? mdoel.vectorgraph : response.data.houseTypeDrawing
+            var urlStr = response.data.vectorgraph !== null ? response.data.vectorgraph : response.data.houseTypeDrawing
             admin_sys_file_listFileByFileIds([urlStr])
         }
 
-        function onFail(reply,code){
+        function onBuildingFail(reply,code){
             console.log(reply,code)
-            http.replyFailSignal.disconnect(onFail)
+            http.replyFailSignal.disconnect(onBuildingFail)
             hub.close()
         }
 
-        http.onReplySucSignal.connect(onReply)
-        http.replyFailSignal.connect(onFail)
+        http.onReplySucSignal.connect(onBuildingReply)
+        http.replyFailSignal.connect(onBuildingFail)
         http.get(Api.building_roomTask_getRoomTaskInfo,
                  {"roomId":roomModel.id,"stageType":currentRow+1})
     }
 
     function admin_sys_file_listFileByFileIds(urlStrs){
-        function onReply(reply){
-            http.onReplySucSignal.disconnect(onReply)
+        function onFileReply(reply){
+            hub.close()
+            http.onReplySucSignal.disconnect(onFileReply)
             console.log("complete admin sys file listFileByFileIds: "+reply)
             var response = JSON.parse(reply)
             imageUrl = "http://"+response.data[0].bucketName+"."+response.data[0].fileUri+"/"+response.data[0].fileName
             console.log("imageUrl: "+imageUrl)
         }
 
-        function onFail(reply,code){
+        function onFileFail(reply,code){
             console.log(reply,code)
-            http.replyFailSignal.disconnect(onFail)
+            http.replyFailSignal.disconnect(onFileFail)
             hub.close()
         }
-        http.onReplySucSignal.connect(onReply)
-        http.replyFailSignal.connect(onFail)
+        http.onReplySucSignal.connect(onFileReply)
+        http.replyFailSignal.connect(onFileFail)
         http.post(Api.admin_sys_file_listFileByFileIds,
                   {"integers":urlStrs})
     }

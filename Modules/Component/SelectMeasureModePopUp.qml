@@ -137,7 +137,6 @@ Popup {
     }
 
     function setDefaultData(){
-        console.log("每次都响应吗")
         var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
         if (selectedMeasureData){
             masonry_mode = selectedMeasureData.masonry_mode
@@ -187,9 +186,9 @@ Popup {
         console.log("input: "+index)
         console.log("text: "+text)
         if(index === 1) {
-            xy_crop_dist = text
+            xy_crop_dist = !text || text === "" ? 1 : text
         } else {
-            z_crop_dist = text
+            z_crop_dist = !text || text === "" ? 1 : text
         }
     }
 
@@ -210,6 +209,7 @@ Popup {
             "scanningIndex": scanningIndex,
             "activeColoring": "0",
         }
+        console.log("selected measure data: "+JSON.stringify(selectedMeasureData))
         settingsManager.setValue(settingsManager.selectedMeasureData,JSON.stringify(selectedMeasureData))
     }
 }

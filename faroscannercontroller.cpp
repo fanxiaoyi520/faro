@@ -130,9 +130,11 @@ bool FaroScannerController::initIiQLibInternal()
 
 bool FaroScannerController::connect() {
     const QString default_ip = "192.168.43.1";
+    /**
     const QString defaultRemoteScanStoragePath = FileManager::getFlsPath();
     flsPath = defaultRemoteScanStoragePath;
-    return connect(default_ip,defaultRemoteScanStoragePath);
+    */
+    return connect(default_ip,""/*defaultRemoteScanStoragePath*/);
 }
 
 bool FaroScannerController::connect(const QString &scannerIP, const QString &remoteScanStoragePath)
@@ -145,14 +147,18 @@ bool FaroScannerController::connect(const QString &scannerIP, const QString &rem
 
 bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, const CComBSTR &remoteScanStoragePath)
 {
+    qDebug() << "enter connect to scanner internal";
     Q_UNUSED(remoteScanStoragePath);
     if (!scanCtrlSDKPtr) {
+        qDebug() << "init faro internal";
         initFaroInternal();
     }
 
     scanCtrlSDKPtr->ScannerIP = scannerIP;
     scanCtrlSDKPtr->clearExceptions();
     scanCtrlSDKPtr->PutScanMode(StationaryGrey);
+
+    qDebug() << "start connect";
     scanCtrlSDKPtr->connect();
     /**
     HRESULT hr = scanCtrlSDKPtr->put_RemoteScanStoragePath(remoteScanStoragePath);
@@ -226,19 +232,24 @@ void FaroScannerController::stopScan()
     if (scanCtrlSDKPtr) {
         if (timer) timer->stop();
         scanCtrlSDKPtr->stopScan();
+        qDebug() << "stop scanCtrlSDKPtr stopScan completed";
     }
 }
 
 void FaroScannerController::disconnect() {
+    qDebug() << "input disconnect";
     if (scanCtrlSDKPtr) {
+        qDebug() << "input disconnect completed";
         if (timer) {
             timer->stop();
             delete timer;
             timer = nullptr;
+            qDebug() << "destruction timer completed";
         }
         stopScan();
         scanCtrlSDKPtr = nullptr;
         scanOpInterfPtr = nullptr;
+        qDebug() << "destruction scanCtrlSDKPtr and scanOpInterfPtr completed";
     }
 }
 
@@ -318,6 +329,7 @@ void FaroScannerController::FaroScannerController::convertFlsToPly(const QString
     std::ofstream outfile(outPlyFilePath.toStdString());
     syncPlyApi.SavePly(outfile,syncPlyApi.myXYZData);
     syncPlyApi.myXYZData.clear();
+    iQLibIfPtrDisconnect();
 }
 
 void FaroScannerController::checkScannerStatus()
@@ -340,8 +352,10 @@ void FaroScannerController::checkScannerStatus()
         */
         qDebug() << "scan complete path: " << path;
         if (path.isEmpty()) {
+            qDebug() << "scan complete path isEmpty";
             this->scanAbnormalHandler(scanStatus);
         } else {
+            qDebug() << "scan complete path no isEmpty";
             this->completeHandler(path/*flsPath*/);
         }
     } else if (scanStatus == 1) {

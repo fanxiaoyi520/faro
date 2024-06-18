@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include<fstream>
 
-#define VOXEL_SIZE 0.04
+#define VOXEL_SIZE 0.004
 struct CartesianPoint
 {
     double x, y, z, intensity;

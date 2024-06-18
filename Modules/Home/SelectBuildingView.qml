@@ -64,6 +64,7 @@ ScrollView{
                 anchors.fill: parent
                 onClicked: {
                     dialog.list = SettingString.stageType
+                    dialog.currentIndex = currentRow
                     dialog.open()
                 }
             }
@@ -207,7 +208,7 @@ ScrollView{
     }
 
     //MARK: logic
-    function callbackOrSyncEventHandling(){
+    function kbuildCallbackOrSyncEventHandling(){
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         selectBuildingView.currentRow = selectedStageType.index
         selectBuildingView.selectedStageName = selectedStageType.name

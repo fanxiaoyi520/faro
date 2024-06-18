@@ -20,6 +20,7 @@ bool FaroManager::init()
 
 int FaroManager::connect()
 {
+    qDebug() << "enter connect";
     return faroScannerController->connect();
 }
 
@@ -95,6 +96,17 @@ void FaroManager::zipFileHandle()
     qDebug() << "needUploadZipPath: " << needUploadZipPath;
 }
 
+void FaroManager::monitorNetworkChanges()
+{
+    networkHelper.setNetworkStatusCallback([this](bool isOnline) {
+        qDebug() << "Network status changed:" << (isOnline ? "Online" : "Offline");
+        if (isOnline){
+            networkHelper.stopMonitoring();
+            emit monitorNetworkChangesComplete(isOnline);
+        }
+    });
+}
+
 void FaroManager::onReplySucSignal(const QString &response)
 {
     qDebug() << "response: "<< response;
@@ -162,13 +174,18 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     http->post(Api::instance()->building_roomTaskExecute_calculateStationTask(),paramsMap);
 }
 
+void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &outPlyFilePath)
+{
+    faroScannerController->convertFlsToPly(inFlsFilePath,outPlyFilePath);
+}
+
+void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &outPlyFilePath, int xyCropDist, int zCropDist)
+{
+    faroScannerController->convertFlsToPly(inFlsFilePath,outPlyFilePath,xyCropDist,zCropDist);
+}
 void FaroManager::performCalculation(const QString &response,const QString &filePath,const QString &calParams){
 
     qDebug() << "default fls path : " << filePath;
-
-    //    faroScannerController->disconnect();
-    //    faroScannerController->iQLibIfPtrDisconnect();
-
     QJsonObject fileModel = Util::parseJsonStringToObject(response);
     QJsonObject myCalParams = Util::parseJsonStringToObject(calParams);
     QMap<QString, QVariant> paramsMap;
@@ -177,7 +194,7 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     paramsMap.insert("stageType",myCalParams.value("stageType"));
     paramsMap.insert("fileId",fileModel.value("fileId"));
     paramsMap.insert("equipmentModel","Faro-Focus-X");
-    paramsMap.insert("scanningMode","1/20"/*inputModel.value("scanningMode")*/);
+    paramsMap.insert("scanningMode",/*"1/20"*/inputModel.value("scanningMode"));
     //    paramsMap.insert("scanningDataFormat","xyzi");
     paramsMap.insert("fileType","ply");
     QMap<QString, QVariant> modeTable;

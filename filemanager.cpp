@@ -158,7 +158,7 @@ bool FileManager::decompression_zip_file(const QString &selectZipFilePath, const
                 qDebug() << "Failed to create directory:" << currDir2File;
                 return false;
             }
-            qDebug() << "Directory created:" << currDir2File;
+            qDebug() << "Directory created 123:" << currDir2File;
         }
         if (zipFileInfo.isFile)
         {
@@ -220,7 +220,7 @@ QString FileManager::getFlsPath()
         if (!dir.mkpath (flsDirectory)) {
             qDebug() << "Failed to create directory:" << flsDirectory;
         } else {
-            qDebug() << "Directory created:" << flsDirectory;
+            qDebug() << "Directory created 123:" << flsDirectory;
         }
     }
     return flsDirectory;
@@ -318,7 +318,7 @@ bool FileManager::createEmptyFile(const QString &fileName) {
         if (!dir.mkpath (PLYDirectory)) {
             qDebug() << "Failed to create directory:" << PLYDirectory;
         } else {
-            qDebug() << "Directory created:" << PLYDirectory;
+            qDebug() << "Directory created 123:" << PLYDirectory;
         }
     }
 

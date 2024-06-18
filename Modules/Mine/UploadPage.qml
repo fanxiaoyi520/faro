@@ -15,6 +15,7 @@ Rectangle{
     property var listItems: []
     property var successCount: 0
     property var failedCount: 0
+    property var pushStackSource: "mine"// mine and home
     property var index: 0
     property var totalSize: 0
 
@@ -61,6 +62,7 @@ Rectangle{
     }
 
     Http{ id:http }
+    /***bug fixing: 不能在这再次调用faroManager.init()*/
     FaroManager {
         id: faroManager
         onConvertFlsToZipPlyResult: {
@@ -100,7 +102,11 @@ Rectangle{
                 anchors.fill: parent
                 onClicked: {
                     console.log("click quit")
-                    mineStack.pop()
+                    if (pushStackSource === "mine") {
+                        mineStack.pop()
+                    } else {
+                        rootStackView.pop()
+                    }
                 }
             }
         }
