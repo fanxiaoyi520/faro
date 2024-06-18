@@ -7,7 +7,7 @@ void UploadNetThread::run()
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
-        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("Tenant-id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
     } else {

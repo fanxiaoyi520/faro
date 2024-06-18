@@ -37,7 +37,7 @@ void Http::get(QString url, const QMap<QString, QVariant> &ps)
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
-        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("Tenant-id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
     } else {
@@ -73,7 +73,7 @@ void Http::post(QString url, const QMap<QString, QVariant> &ps)
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
-        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("Tenant-id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
     } else {
@@ -115,7 +115,7 @@ void Http::postForm(QString url)
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
-        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("Tenant-id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
     } else {
@@ -147,7 +147,7 @@ void Http::put(QString url, const QMap<QString, QVariant> &ps)
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
-        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("Tenant-id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
     } else {
@@ -249,7 +249,7 @@ void Http::uploadExcuseThread(QString url,QString path)
     QMap<QString, QString>headersMap;
     if(!user.isEmpty()) {
         qDebug()<<"selected tenant id: "+user.value("tenant_id").toString();
-        headersMap.insert("Tenant_id",user.value("tenant_id").toString());
+        headersMap.insert("Tenant-id",user.value("tenant_id").toString());
         headersMap.insert("lang","zh_CN");
         headersMap.insert("Authorization","Bearer " + user.value("access_token").toString());
 
