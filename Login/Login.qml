@@ -141,11 +141,10 @@ Rectangle{
 
     Timer {
         id:timer_logintoken
-        property var user_id
         interval: 200
         onTriggered: {
             hub.close()
-            getUserDetail(user_id)
+            getUserDetail()
         }
     }
 
@@ -202,15 +201,23 @@ Rectangle{
     function getLoginToken(tenantId){
         function onLoginTokenReply(reply){
             console.log("LoginTokenReply: "+reply)
+            console.log("reply length: "+reply.length)
+            var paseLongToString = substringToComma(reply , reply.indexOf("user_id"))
+            var newPaseLongToString = paseLongToString.replace(paseLongToString.substring(9,paseLongToString.length),"\"" + paseLongToString.substring(9,paseLongToString.length) + "\"")
+            reply = reply.replace(paseLongToString,newPaseLongToString)
+            console.log("paseLongToString" + paseLongToString)
+            console.log("LoginTokenReply: "+ reply)
             http.replyFailSignal.disconnect(onFail)
             http.onReplySucSignal.disconnect(onLoginTokenReply)
-            var user = JSON.parse(reply)
-            user.account = accountfield.inputfield.text
-            user.loginMode = 0
-            user.tenant_id = tenant_id
-            settingsManager.setValue(settingsManager.user,JSON.stringify(user))
-            timer_logintoken.user_id = user.user_id
-            timer_logintoken.start()
+            var user1 = JSON.parse(reply)
+            user1.account = accountfield.inputfield.text
+            user1.loginMode = 0
+            user1.tenant_id = tenant_id.toString()
+            console.log("user_id = " + user1.user_id)
+            console.log("loginToken setUser = " + JSON.stringify(user1))
+            settingsManager.setValue(settingsManager.user,JSON.stringify(user1))
+            completeLogin()
+//            timer_logintoken.start()
         }
 
         function onFail(reply,code){
@@ -221,6 +228,17 @@ Rectangle{
             toastPopup.text = "手机号或密码错误"
         }
 
+        function substringToComma(str, index) {
+            if (index < 0 || index >= str.length) {
+                throw new Error("Index out of bounds");
+            }
+            let endIndex = str.indexOf(",", index);
+            if (endIndex === -1) {
+                endIndex = str.length;
+            }
+            return str.substring(index, endIndex);
+        }
+
         tenant_id = tenantId
         http.onReplySucSignal.connect(onLoginTokenReply)
         http.replyFailSignal.connect(onFail)
@@ -228,7 +246,7 @@ Rectangle{
                        {"Tenant-id":tenant_id})
     }
 
-    function getUserDetail(user_id){
+    function getUserDetail(){
         function onUserReply(reply){
             console.log("getUserDetail: "+reply)
             http.replyFailSignal.disconnect(onFail)
@@ -247,11 +265,11 @@ Rectangle{
              http.onReplySucSignal.disconnect(onUserReply)
         }
 
-//        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
-        console.log("userid: " + user_id)
+        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
+        console.log("userid: " + user.user_id)
         http.onReplySucSignal.connect(onUserReply)
         http.replyFailSignal.connect(onFail)
-        http.get(Api.admin_user_details+"/"+user_id)
+        http.get(Api.admin_user_details+"/"+user.user_id)
     }
 
     function getById(tenant_id){
@@ -280,3 +298,4 @@ Rectangle{
         http.get(Api.admin_tenant_details+"/"+tenant_id)
     }
 }
+

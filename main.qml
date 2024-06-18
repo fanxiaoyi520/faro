@@ -16,10 +16,10 @@ Window {
     title: qsTr("Measure")
     property var currentView: mainview
 
-//    Component.onCompleted: {
-//        initData()
-//        initView()
-//    }
+    Component.onCompleted: {
+        initData()
+        initView()
+    }
 
     //initialize default select measure data
     function initData(){

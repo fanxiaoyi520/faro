@@ -321,6 +321,7 @@ Item{
         console.log("start scan ...")
         var timer = new Date()
         console.log("timer = " + timer.toLocaleString())
+        console.log("selectedMeasureData" + settingsManager.getValue(settingsManager.selectedMeasureData))
         var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
         var scanParams = {
             "activeColoring": selectedMeasureData ? selectedMeasureData.activeColoring : "0",
@@ -406,7 +407,7 @@ Item{
             faroManager.disconnect()
 
             function wifiDisConnect(result){
-                wifiHelper.onDisConnectWifiResult.disconnect(wifiDisConnect)
+
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
                 nonerworkPopUp.open()
                 /**
