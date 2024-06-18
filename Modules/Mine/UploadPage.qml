@@ -67,7 +67,13 @@ Rectangle{
         id: faroManager
         onConvertFlsToZipPlyResult: {
             console.log("enter ply zip result = " + filePath)
-            uploadFile(rect_root.index,rect_root.totalUploadSize,filePath)
+            if(filePath){
+                uploadFile(rect_root.index,rect_root.totalUploadSize,filePath)
+            }else{
+                tipsPop_tips.tipsContentStr = qsTr(String.upload_filepath_empty)
+                tipsPop_tips.open()
+                upload_pop.close()
+            }
         }
     }
     Rectangle{

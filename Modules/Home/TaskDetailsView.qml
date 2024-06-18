@@ -379,7 +379,6 @@ Item{
             settingsManager.setValue(settingsManager.currentDevice,JSON.stringify(myWifiObject))
             console.log("wifi info =" + wifi)
             return
-
         }
         console.log("wifi info =" + wifi)
 

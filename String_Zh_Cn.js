@@ -101,6 +101,7 @@ var all_selected = "全选"
 var upload_up = "上传"
 var upload_del = "删除"
 var upload_station = "测站%d"
+var upload_filepath_empty = "未找到扫描模型文件"
 
 var is_start_scan = "是否开始扫描?"
 var is_restart_scan = "是否重新开始扫描"
