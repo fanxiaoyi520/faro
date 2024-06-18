@@ -194,7 +194,7 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     paramsMap.insert("stageType",myCalParams.value("stageType"));
     paramsMap.insert("fileId",fileModel.value("fileId"));
     paramsMap.insert("equipmentModel","Faro-Focus-X");
-    paramsMap.insert("scanningMode","1/20"/*inputModel.value("scanningMode")*/);
+    paramsMap.insert("scanningMode",/*"1/20"*/inputModel.value("scanningMode"));
     //    paramsMap.insert("scanningDataFormat","xyzi");
     paramsMap.insert("fileType","ply");
     QMap<QString, QVariant> modeTable;

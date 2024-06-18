@@ -209,6 +209,7 @@ Popup {
             "scanningIndex": scanningIndex,
             "activeColoring": "0",
         }
+        console.log("selected measure data: "+JSON.stringify(selectedMeasureData))
         settingsManager.setValue(settingsManager.selectedMeasureData,JSON.stringify(selectedMeasureData))
     }
 }
