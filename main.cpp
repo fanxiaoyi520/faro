@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
     qDebug() << "OpenSSL支持情况:" << QSslSocket::supportsSsl();
     qDebug()<<"QSslSocket="<<QSslSocket::sslLibraryBuildVersionString();
 
-
     //解决乱码问题
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QTextCodec *codec = QTextCodec::codecForName("UTF-8"); //GBK gbk

@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.12
 import "../../String_Zh_Cn.js" as SettingString
 
 Popup {
-    property var list: SettingString.moreType
+    property var list
     property int currentIndex: 0
     property var titleStr: SettingString.more
     signal confirmOptionsAction(var model)
@@ -94,6 +94,11 @@ Popup {
                     anchors.left: parent.left
                     anchors.leftMargin: 34
                     anchors.verticalCenter: parent.verticalCenter
+                    ColorOverlay{
+                        anchors.fill: parent
+                        color: JSON.parse(modelData).status === 0 && JSON.parse(modelData).index !== 2 ? "#C5C5C5" : "#3C3C3C"
+                        source: parent
+                    }
                 }
                 Image {
                     id: arrowimg
@@ -112,9 +117,8 @@ Popup {
                     anchors.rightMargin: 5
                     Text {
                         text: JSON.parse(modelData).name
-                        color: "#3C3C3C"
+                        color: JSON.parse(modelData).status === 0 && JSON.parse(modelData).index !== 2 ? "#C5C5C5" : "#3C3C3C"
                         elide: Qt.ElideRight
-
                         anchors.left: parent.left
                         anchors.leftMargin: 5
                         anchors.verticalCenter: parent.verticalCenter
@@ -133,7 +137,10 @@ Popup {
                     anchors.fill: parent
                     onClicked: {
                         currentIndex = index;
-                        confirmOptionsAction(JSON.parse(list[currentIndex]))
+                        if (JSON.parse(modelData).status === 0 && JSON.parse(modelData).index !== 2){
+                        } else {
+                            confirmOptionsAction(JSON.parse(list[currentIndex]))
+                        }
                     }
                 }
             }

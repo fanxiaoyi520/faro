@@ -265,6 +265,14 @@ Item{
     }
 
     function moreAction(scanModel){
+        console.log("scan model: "+JSON.stringify(scanModel))
+        var parsedMoreType = SettingString.moreType.map(function(itemString) {
+            var itemObject = JSON.parse(itemString);
+            itemObject.status = scanModel.status;
+            return JSON.stringify(itemObject);
+        });
+        console.log("parsed more type: "+parsedMoreType)
+        morePopUp.list = parsedMoreType
         morePopUp.open()
         inputCellModel = scanModel
     }
