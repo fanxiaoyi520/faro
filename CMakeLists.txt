@@ -27,6 +27,13 @@ file(GLOB H_EasyQtSql "${H_EasyQtSql}/*.h")
 file(GLOB H_SRC_EasyQtSql "${H_SRC_EasyQtSql}/*.h")
 ]]
 
+# 查找 Qt 包
+find_package(Qt5 REQUIRED COMPONENTS Core Concurrent)
+
+# 包含头文件路径
+include_directories(${Qt5Core_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
+
+
 # 将源文件和头文件添加到项目中
 foreach(SRC_FILE ${SRC_FILES})
     set_property(SOURCE ${SRC_FILE} PROPERTY LANGUAGE CXX)
@@ -67,7 +74,7 @@ endif()
 target_compile_definitions(Measure
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(Measure
-  PRIVATE Qt5::Core Qt5::Quick Qt5::Sql)
+  PRIVATE Qt5::Core Qt5::Quick Qt5::Sql Qt5::Concurrent)
 target_link_libraries(Measure PRIVATE Qt5::Network)
 #target_link_libraries(Measure PRIVATE cpr::cpr)
 
