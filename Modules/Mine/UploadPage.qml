@@ -17,6 +17,7 @@ Rectangle{
     property var failedCount: 0
     property var pushStackSource: "mine"// mine and home
     property var index: 0
+    property var totalUploadSize: 0
     property var totalSize: 0
 
     width:parent.width
@@ -67,13 +68,13 @@ Rectangle{
         id: faroManager
         onConvertFlsToZipPlyResult: {
             console.log("enter ply zip result = " + filePath)
-            if(filePath){
+//            if(filePath){
                 uploadFile(rect_root.index,rect_root.totalUploadSize,filePath)
-            }else{
-                tipsPop_tips.tipsContentStr = qsTr(String.upload_filepath_empty)
-                tipsPop_tips.open()
-                upload_pop.close()
-            }
+//            }else{
+//                tipsPop_tips.tipsContentStr = qsTr(String.upload_filepath_empty)
+//                tipsPop_tips.open()
+//                upload_pop.close()
+//            }
         }
     }
     Rectangle{
@@ -199,8 +200,10 @@ Rectangle{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    img_select_all.isSelect = !img_select_all.isSelect
-                    listItemSelectAll(img_select_all.isSelect)
+                    var selected = !img_select_all.isSelect
+                    listItemSelectAll(selected)
+                    img_select_all.isSelect = selected
+                    console.log("select data = " + JSON.stringify(selectList))
                 }
             }
         }
@@ -214,8 +217,9 @@ Rectangle{
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    img_select_all.isSelect = !img_select_all.isSelect
-                    listItemSelectAll(img_select_all.isSelect)
+                    var selected = !img_select_all.isSelect
+                    listItemSelectAll(selected)
+                    img_select_all.isSelect = selected
                 }
             }
         }
@@ -347,7 +351,7 @@ Rectangle{
 
     function refreshFileInfo(){
         var filejson = settingsManager.getValue(settingsManager.fileInfoData)
-        console.log("fileInfoData = " + filejson)
+//        console.log("fileInfoData = " + filejson)
         var totalFileInfo = []
         if (!filejson) {
             totalFileInfo = []
@@ -371,7 +375,7 @@ Rectangle{
             }
         }
         text_count.text = "("+ totalFileInfo.length +")"
-
+        rect_root.totalSize = totalFileInfo.length
         if(totalFileInfo.length > 0){
             var resultArray = totalFileInfo.reduce(function(acc, curr) {
                 var foundItem = acc.find(function(item) {
@@ -408,7 +412,7 @@ Rectangle{
 
     function callBackUploadFile(index,totalUploadSize){
         rect_root.index = index
-        rect_root.totalSize = totalUploadSize
+        rect_root.totalUploadSize = totalUploadSize
         var fileAbsPath = selectList[index].filePath
         faroManager.startConvertFlsToZipPly(fileAbsPath)
     }
@@ -450,6 +454,7 @@ Rectangle{
                 tipsPop_upload_finish.open()
                 //结束清除所有当前选中
                 listItemSelectAll(false)
+                selectList = []
             }
             upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         }
@@ -499,6 +504,7 @@ Rectangle{
                 upload_pop.close()
                 //结束清除所有当前选中
                 listItemSelectAll(false)
+                selectList = []
             }
 
             upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))

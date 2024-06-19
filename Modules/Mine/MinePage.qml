@@ -33,6 +33,27 @@ StackView{
                 id:mineTipsPop
                 isVisibleCancel:false
             }
+            Hub{
+                id:hub_loading
+            }
+
+            TipsPopUp{
+                id:clearCachePop
+                onConfirmAction: {
+                    timer_clear_cache.start()
+                    hub_loading.open()
+                }
+            }
+            Timer{
+                id:timer_clear_cache
+                interval: 400
+                onTriggered: {
+                    hub_loading.close()
+                    mineTipsPop.tipsContentStr = qsTr(SettingString.setting_cache_ret)
+                    mineTipsPop.open()
+                }
+            }
+
             Http{id:http}
             Dialog{
                 id:wifiResultPop
@@ -89,7 +110,7 @@ StackView{
                         border.color: "#999999"
                         border.width: 0.5
                         radius: 10
-                         property var loaded: false
+                        property var loaded: false
                         Text{
                             anchors.centerIn: parent
                             text: qsTr(SettingString.setting_logout)
@@ -116,7 +137,7 @@ StackView{
                 var user = JSON.parse(settingsManager.getValue(settingsManager.user))
                 function onReply(reply){
                     http.onReplySucSignal.disconnect(onReply)
-                     http.replyFailSignal.disconnect(onFail)
+                    http.replyFailSignal.disconnect(onFail)
                     console.log("device response: "+reply)
                     var response = JSON.parse(reply)
                     if (response.data) {
@@ -128,7 +149,7 @@ StackView{
                         mineTipsPop.tipsContentStr = qsTr(SettingString.wifiscan_result_success_tips)
                         root.settingItems[3].refreshContentName = !(root.settingItems[3].refreshContentName)
                     } else {
-                         mineTipsPop.tipsContentStr = qsTr(SettingString.wifiscan_result_faild_tips)
+                        mineTipsPop.tipsContentStr = qsTr(SettingString.wifiscan_result_faild_tips)
                     }
                     mineTipsPop.open()
                 }
@@ -136,7 +157,7 @@ StackView{
                 function onFail(reply,code){
                     console.log(reply,code)
                     http.onReplySucSignal.disconnect(onReply)
-                     http.replyFailSignal.disconnect(onFail)
+                    http.replyFailSignal.disconnect(onFail)
                     hub.close()
                 }
 

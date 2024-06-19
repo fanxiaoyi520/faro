@@ -10,6 +10,8 @@ var setting_lists = [
         ];
 var setting_logout = "退出登录";
 var setting_logout_tips = "确认是否退出登录?";
+var setting_cache_tips = "是否清除缓存?";
+var setting_cache_ret = "清除缓存成功";
 
 var userinfo_title = "个人信息";
 var userinfo_username = "姓名";
