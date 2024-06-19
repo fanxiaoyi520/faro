@@ -47,9 +47,9 @@ Popup{
     }
 
     background: Rectangle{
+        id: backimage
         anchors.fill: parent
         color: "#000000"
-
         Canvas {
             id: canvas
             anchors.fill: parent
@@ -70,6 +70,12 @@ Popup{
                 contentItem.scale += 0.1;
                 console.log("Double clicked!")
             }
+        }
+
+        PinchArea {
+            anchors.fill: parent
+            enabled: true
+            pinch.target: backimage
         }
     }
     padding: 0
