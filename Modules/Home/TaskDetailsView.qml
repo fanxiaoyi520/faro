@@ -229,7 +229,7 @@ Item{
     //MARK: logic
     function refresh(){
         hub.open()
-        getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
+        getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[selectHeaderIndex])
     }
 
     function stationInfo(model){
