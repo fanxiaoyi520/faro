@@ -37,25 +37,7 @@ Item {
             verticalCenter: parent.verticalCenter
         }
     }
-    Rectangle{
-        id: progress
-        height: 5
-        width: parent.width-11*2-titleWidth-6*2-footertitleWidth
-        color: "#F5F5F5"
-        radius: 2.5
-        anchors {
-            verticalCenter: parent.verticalCenter
-            left: title.right
-            leftMargin: 6
-        }
-        Rectangle{
-            id: currentprogress
-            height: 5
-            width: parent.width * (finishRoomCount / totalRoomCount)
-            color: progresscolor
-            radius: 2.5
-        }
-    }
+
 
     TextEdit {
         id: footertitle
@@ -64,11 +46,33 @@ Item {
         wrapMode: Text.NoWrap
         font: font
         anchors {
-            left: progress.right
+            //left: progress.right
             leftMargin: 6
             right: parent.right
             rightMargin: 11
             verticalCenter: parent.verticalCenter
+        }
+    }
+
+    Rectangle{
+        id: progress
+        height: 5
+        //width: parent.width-11*2-titleWidth-6*2-footertitleWidth
+        color: "#F5F5F5"
+        radius: 2.5
+        anchors {
+            verticalCenter: parent.verticalCenter
+            left: title.right
+            right: footertitle.left
+            rightMargin: 6
+            leftMargin: 6
+        }
+        Rectangle{
+            id: currentprogress
+            height: 5
+            width: parent.width * (finishRoomCount / totalRoomCount)
+            color: progresscolor
+            radius: 2.5
         }
     }
 }

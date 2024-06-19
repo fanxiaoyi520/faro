@@ -121,6 +121,18 @@ function roundToTwoDecimalPlaces(num) {
     return +(Math.round(num + "e+2")  + "e-2");
 }
 
+function getStationType(stationType){
+   if (stationType === 1) return "客厅";
+   if (stationType === 2) return "卧室";
+   if (stationType === 3) return "厨房";
+   if (stationType === 4) return "卫生间";
+   if (stationType === 5) return "阳台";
+   if (stationType === 6) return "玄关";
+   if (stationType === 7) return "过道";
+
+   return "其它"
+}
+
 function isJson(str) {
     try {
         JSON.parse(str);

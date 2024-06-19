@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.12
 import "../../String_Zh_Cn.js" as SettingString
 
 Popup {
-    property var list: SettingString.moreType
+    property var list
     property int currentIndex: 0
     property var titleStr: SettingString.more
     signal confirmOptionsAction(var model)
@@ -94,6 +94,11 @@ Popup {
                     anchors.left: parent.left
                     anchors.leftMargin: 34
                     anchors.verticalCenter: parent.verticalCenter
+                    ColorOverlay{
+                        anchors.fill: parent
+                        color: getColor(modelData)
+                        source: parent
+                    }
                 }
                 Image {
                     id: arrowimg
@@ -112,9 +117,8 @@ Popup {
                     anchors.rightMargin: 5
                     Text {
                         text: JSON.parse(modelData).name
-                        color: "#3C3C3C"
+                        color: getColor(modelData)
                         elide: Qt.ElideRight
-
                         anchors.left: parent.left
                         anchors.leftMargin: 5
                         anchors.verticalCenter: parent.verticalCenter
@@ -133,10 +137,29 @@ Popup {
                     anchors.fill: parent
                     onClicked: {
                         currentIndex = index;
-                        confirmOptionsAction(JSON.parse(list[currentIndex]))
+                        if (getColor(modelData) === "#3C3C3C"){
+                            confirmOptionsAction(JSON.parse(list[currentIndex]))
+                        }
                     }
                 }
             }
+        }
+    }
+
+    function getColor(modelData){
+        console.log("status: "+ JSON.parse(modelData).status)
+        console.log("index: "+ JSON.parse(modelData).index)
+        console.log("filteringStatus: "+ JSON.parse(modelData).filteringStatus)
+        if (JSON.parse(modelData).status === 0
+                && JSON.parse(modelData).index !== 2) {
+            if (JSON.parse(modelData).index === 1
+                    && JSON.parse(modelData).filteringStatus === true) {
+                return "#3C3C3C"
+            } else {
+                return "#C5C5C5"
+            }
+        } else {
+            return "#3C3C3C"
         }
     }
 

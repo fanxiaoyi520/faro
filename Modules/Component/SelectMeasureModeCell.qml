@@ -17,6 +17,7 @@ Rectangle {
      * @scanningMode    扫描密度
      */
 
+    property string sub_stageType
     property int sub_masonry_mode: 0
     property int sub_xy_crop_dist: 6
     property int sub_z_crop_dist: 3
@@ -45,6 +46,7 @@ Rectangle {
                 anchors.rightMargin: 24
                 width: 32
                 height: 22
+                checked: sub_stageType === "2" ? true : false
                 onCheckedChanged: switchAction(checked)
             }
         }

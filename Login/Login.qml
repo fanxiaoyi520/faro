@@ -240,6 +240,7 @@ Rectangle{
         }
 
         tenant_id = tenantId
+        console.log("tenant_id: "+tenant_id)
         http.onReplySucSignal.connect(onLoginTokenReply)
         http.replyFailSignal.connect(onFail)
         http.loginPost(Api.auth_oauth_token,{"username":accountfield.inputfield.text,"password":passwordfield.inputfield.text},

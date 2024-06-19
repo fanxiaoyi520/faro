@@ -74,6 +74,7 @@ Item{
         isVisibleCancel: false
         onConfirmAction: {}
     }
+
     ScanningFaroPop{
         id: scanningFaroPop
         lottieType: 0
@@ -226,6 +227,28 @@ Item{
     }
 
     //MARK: logic
+    function refresh(){
+        hub.open()
+        getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[selectHeaderIndex])
+    }
+
+    function stationInfo(model){
+
+        console.log("station info: "+JSON.stringify(model))
+        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+        nonerworkPopUp.titleStr = SettingString.station_number
+        nonerworkPopUp.tipsContentStr = SettingString.station_info+model.stationNo+"\n"
+                +SettingString.station_type+getStationType(model.stationType)+"\n"
+                +SettingString.station_stageType+(selectedStageType.index+1)+"\n"
+                +SettingString.station_stationTaskNo+model.stationTaskNo
+        nonerworkPopUp.open()
+    }
+
+    function getStationType(stationType){
+       if (stationType === 1) return SettingString.other
+       return SettingString.other
+    }
+
     function headerClickSwitchAction(index,model){
         console.log("selected header index and model data: "+index,JSON.stringify(model))
         selectHeaderIndex = index
@@ -264,7 +287,16 @@ Item{
         tipsPopUp.open()
     }
 
-    function moreAction(scanModel){
+    function moreAction(scanModel,filteringStatus){
+        console.log("scan model: "+JSON.stringify(scanModel))
+        var parsedMoreType = SettingString.moreType.map(function(itemString) {
+            var itemObject = JSON.parse(itemString);
+            itemObject.status = scanModel.status;
+            itemObject.filteringStatus = filteringStatus;
+            return JSON.stringify(itemObject);
+        });
+        console.log("parsed more type: "+parsedMoreType)
+        morePopUp.list = parsedMoreType
         morePopUp.open()
         inputCellModel = scanModel
     }
@@ -292,7 +324,8 @@ Item{
             return
         }
         if (model.index === 2) {
-            selectMeasureModePopUp.stageType = roomTaskVoModel.stageType
+            var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+            selectMeasureModePopUp.stageType = selectedStageType.index+1
             selectMeasureModePopUp.stationType = inputCellModel.stationType
             selectMeasureModePopUp.open()
             return
