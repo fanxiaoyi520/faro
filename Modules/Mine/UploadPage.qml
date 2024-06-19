@@ -351,7 +351,7 @@ Rectangle{
 
     function refreshFileInfo(){
         var filejson = settingsManager.getValue(settingsManager.fileInfoData)
-//        console.log("fileInfoData = " + filejson)
+        console.log("fileInfoData = " + filejson)
         var totalFileInfo = []
         if (!filejson) {
             totalFileInfo = []

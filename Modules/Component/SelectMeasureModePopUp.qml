@@ -97,6 +97,7 @@ Popup {
                 sub_scanningIndex: scanningIndex
                 sub_xy_crop_dist: xy_crop_dist
                 sub_z_crop_dist: z_crop_dist
+                sub_stageType: stageType
             }
         }
         Item {

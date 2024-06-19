@@ -96,7 +96,7 @@ Popup {
                     anchors.verticalCenter: parent.verticalCenter
                     ColorOverlay{
                         anchors.fill: parent
-                        color: JSON.parse(modelData).status === 0 && JSON.parse(modelData).index !== 2 ? "#C5C5C5" : "#3C3C3C"
+                        color: getColor(modelData)
                         source: parent
                     }
                 }
@@ -117,7 +117,7 @@ Popup {
                     anchors.rightMargin: 5
                     Text {
                         text: JSON.parse(modelData).name
-                        color: JSON.parse(modelData).status === 0 && JSON.parse(modelData).index !== 2 ? "#C5C5C5" : "#3C3C3C"
+                        color: getColor(modelData)
                         elide: Qt.ElideRight
                         anchors.left: parent.left
                         anchors.leftMargin: 5
@@ -137,13 +137,29 @@ Popup {
                     anchors.fill: parent
                     onClicked: {
                         currentIndex = index;
-                        if (JSON.parse(modelData).status === 0 && JSON.parse(modelData).index !== 2){
-                        } else {
+                        if (getColor(modelData) === "#3C3C3C"){
                             confirmOptionsAction(JSON.parse(list[currentIndex]))
                         }
                     }
                 }
             }
+        }
+    }
+
+    function getColor(modelData){
+        console.log("status: "+ JSON.parse(modelData).status)
+        console.log("index: "+ JSON.parse(modelData).index)
+        console.log("filteringStatus: "+ JSON.parse(modelData).filteringStatus)
+        if (JSON.parse(modelData).status === 0
+                && JSON.parse(modelData).index !== 2) {
+            if (JSON.parse(modelData).index === 1
+                    && JSON.parse(modelData).filteringStatus === true) {
+                return "#3C3C3C"
+            } else {
+                return "#C5C5C5"
+            }
+        } else {
+            return "#3C3C3C"
         }
     }
 

@@ -233,13 +233,14 @@ Item{
     }
 
     function stationInfo(model){
+
         console.log("station info: "+JSON.stringify(model))
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        nonerworkPopUp.titleStr = SettingString.station_info
-        nonerworkPopUp.tipsContentStr = "测站号: "+model.stationNo+"\n"
-                +"测站类型: "+getStationType(model.stationType)+"\n"
-                +"测站阶段: "+(selectedStageType.index+1)+"\n"
-                +"任务号: "+model.stationTaskNo
+        nonerworkPopUp.titleStr = SettingString.station_number
+        nonerworkPopUp.tipsContentStr = SettingString.station_info+model.stationNo+"\n"
+                +SettingString.station_type+getStationType(model.stationType)+"\n"
+                +SettingString.station_stageType+(selectedStageType.index+1)+"\n"
+                +SettingString.station_stationTaskNo+model.stationTaskNo
         nonerworkPopUp.open()
     }
 
@@ -286,11 +287,12 @@ Item{
         tipsPopUp.open()
     }
 
-    function moreAction(scanModel){
+    function moreAction(scanModel,filteringStatus){
         console.log("scan model: "+JSON.stringify(scanModel))
         var parsedMoreType = SettingString.moreType.map(function(itemString) {
             var itemObject = JSON.parse(itemString);
             itemObject.status = scanModel.status;
+            itemObject.filteringStatus = filteringStatus;
             return JSON.stringify(itemObject);
         });
         console.log("parsed more type: "+parsedMoreType)
@@ -322,7 +324,8 @@ Item{
             return
         }
         if (model.index === 2) {
-            selectMeasureModePopUp.stageType = roomTaskVoModel.stageType
+            var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+            selectMeasureModePopUp.stageType = selectedStageType.index+1
             selectMeasureModePopUp.stationType = inputCellModel.stationType
             selectMeasureModePopUp.open()
             return

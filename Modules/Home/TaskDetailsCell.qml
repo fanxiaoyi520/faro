@@ -194,7 +194,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("more clicked")
-                    moreAction(model)
+                    moreAction(model,model.status === 0 && filtering(model) !== undefined)
                 }
             }
         }
