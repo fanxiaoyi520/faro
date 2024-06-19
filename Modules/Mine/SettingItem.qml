@@ -115,6 +115,10 @@ Rectangle {
                     userInfoLoader.item.pushStackSource = "mine"
                     mineStack.push(userInfoLoader)
                 }
+                if(index == 4 && visible){
+                    clearCachePop.tipsContentStr = qsTr(String.setting_cache_tips)
+                    clearCachePop.open()
+                }
             }
         }
     }

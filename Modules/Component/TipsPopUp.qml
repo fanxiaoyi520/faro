@@ -25,8 +25,8 @@ Popup {
     }
     Rectangle{
         id:rect_root
-        width: 300
-        height: 240
+        width: (parent.width / 3 < 300) ? 300 : parent.width / 3
+        height: (parent.height / 2 < 240) ? 240 : parent.height / 2
         radius: 25
         color: "#FFFFFF"
         anchors.centerIn: parent

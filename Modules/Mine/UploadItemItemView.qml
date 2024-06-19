@@ -76,5 +76,9 @@ Rectangle{
         if(!isSelected){
             rect_root.selectList.pop(fileInfo)
         }
+        if(rect_root.selectList.length !== rect_root.totalSize && img_select_all.isSelect){
+            img_select_all.isSelect = false
+        }
+        console.log("select data = " + JSON.stringify(rect_root.selectList))
     }
 }
