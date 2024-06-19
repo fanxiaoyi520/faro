@@ -147,5 +147,6 @@
         <file>images/ic_location_orange.svg</file>
         <file>images/ic_location_red.svg</file>
         <file>images/ic_location_gray.svg</file>
+        <file>images/refresh_click.png</file>
     </qresource>
 </RCC>

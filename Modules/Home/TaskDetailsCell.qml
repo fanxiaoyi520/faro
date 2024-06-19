@@ -54,6 +54,14 @@ Rectangle {
             anchors.leftMargin: 23.5
             anchors.top: parent.top
             anchors.topMargin: 20.5
+            MouseArea{
+                width: parent.width
+                height: parent.height
+                onClicked: {
+                    console.log("station info")
+                    stationInfo(model)
+                }
+            }
         }
         Text {
             id: title
@@ -223,18 +231,23 @@ Rectangle {
 
     function filtering(model) {
         var filejson = settingsManager.getValue(settingsManager.fileInfoData);
+        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
         console.log("filejson: "+filejson)
         var uniqueModel
         if (GlobalFunc.isJson(filejson)){
             var fileModel = JSON.parse(filejson)
             if (Array.isArray(fileModel)){
                 uniqueModel = fileModel.find((value, index, self) => {
-                                                       console.log("JSON.parse(value).stationId: "+JSON.parse(value).stationId)
-                                                       console.log("model.stationId: "+model.stationId)
-                                                       console.log("JSON.parse(value).roomId: "+model.roomId)
-                                                       console.log("cellroom_id: "+model.roomId)
-                                                       return JSON.parse(value).stationId === model.stationId && JSON.parse(value).roomId === model.roomId
-                                                   });
+                                                 console.log("JSON.parse(value).stationId: "+JSON.parse(value).stationId)
+                                                 console.log("model.stationId: "+model.stationId)
+                                                 console.log("JSON.parse(value).roomId: "+model.roomId)
+                                                 console.log("cellroom_id: "+model.roomId)
+                                                 console.log("stageType: "+model.stageType)
+
+                                                 return JSON.parse(value).stationId === model.stationId
+                                                 && JSON.parse(value).roomId === model.roomId
+                                                 && JSON.parse(value).stageType === selectedStageType.index+1
+                                             });
             }
         }
         console.log("unique model: " + JSON.stringify(uniqueModel))

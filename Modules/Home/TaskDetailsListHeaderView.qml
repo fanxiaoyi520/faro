@@ -97,6 +97,7 @@ Rectangle{
             color: "#000000"
             font.pixelSize: 18
         }
+        /**
         Rectangle{
             id: rotundity
             anchors.verticalCenter: parent.verticalCenter
@@ -115,6 +116,19 @@ Rectangle{
             font.weight: Font.Normal
             color: "#999999"
             font.pixelSize: 12
+        }
+        */
+
+        Image {
+            id: refreshImage
+            source: "../../images/refresh_click.png"
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+            MouseArea{
+                anchors.fill: parent
+                onClicked: refresh()
+            }
         }
     }
 

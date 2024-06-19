@@ -74,6 +74,7 @@ Item{
         isVisibleCancel: false
         onConfirmAction: {}
     }
+
     ScanningFaroPop{
         id: scanningFaroPop
         lottieType: 0
@@ -226,6 +227,27 @@ Item{
     }
 
     //MARK: logic
+    function refresh(){
+        hub.open()
+        getBuildingRoomTaskAndGetRoomTaskInfo(roomsList[0])
+    }
+
+    function stationInfo(model){
+        console.log("station info: "+JSON.stringify(model))
+        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+        nonerworkPopUp.titleStr = SettingString.station_info
+        nonerworkPopUp.tipsContentStr = "测站号: "+model.stationNo+"\n"
+                +"测站类型: "+getStationType(model.stationType)+"\n"
+                +"测站阶段: "+(selectedStageType.index+1)+"\n"
+                +"任务号: "+model.stationTaskNo
+        nonerworkPopUp.open()
+    }
+
+    function getStationType(stationType){
+       if (stationType === 1) return SettingString.other
+       return SettingString.other
+    }
+
     function headerClickSwitchAction(index,model){
         console.log("selected header index and model data: "+index,JSON.stringify(model))
         selectHeaderIndex = index
