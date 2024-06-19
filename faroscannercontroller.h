@@ -15,6 +15,8 @@
 #include "syncplyapi.h"
 #include <cmath>
 #include <QThread>
+#include <QtConcurrent>
+#include <QFuture>
 #ifdef _WIN64
 // Yes - type is 'win32' even on WIN64!
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.0.0' processorArchitecture='amd64' publicKeyToken='1d23f5635ba800ab'\"")

@@ -277,12 +277,11 @@ void FaroScannerController::convertFlsToPly(const QString& inFlsFilePath,const Q
     convertFlsToPly(inFlsFilePath,outPlyFilePath,6,3);
 }
 
-void FaroScannerController::FaroScannerController::convertFlsToPly(const QString &inFlsFilePath,
-                                                                   const QString &outPlyFilePath,
-                                                                   int xyCropDist,
-                                                                   int zCropDist)
+void FaroScannerController::convertFlsToPly(const QString &inFlsFilePath,
+                                            const QString &outPlyFilePath,
+                                            int xyCropDist,
+                                            int zCropDist)
 {
-
     initIiQLibInternal();
     HRESULT result;
     std::string stdStr = inFlsFilePath.toStdString();
@@ -300,34 +299,58 @@ void FaroScannerController::FaroScannerController::convertFlsToPly(const QString
 
     QString m_ScanNo = "0";
     int scanNo = m_ScanNo.toInt();
-    double Rx,Ry,Rz,angle;
-    iQLibIfPtr->getScanOrientation(scanNo,&Rx,&Ry,&Rz,&angle);
+    double Rx, Ry, Rz, angle;
+    iQLibIfPtr->getScanOrientation(scanNo, &Rx, &Ry, &Rz, &angle);
     qDebug() << Rx << "  " << Ry << "  " << Rz << "  " << angle;
-    double x,y,z;
-    int refl;
-    for (int i = 0; i < row; ++i) {
+
+    double cosAngle = cos(angle);
+    double sinAngle = sin(angle);
+
+    QVector<CartesianPoint> allPoints(row * col);
+
+    auto processRow = [&](int i) {
+        QVector<CartesianPoint> rowPoints(col);
         for (int j = 0; j < col; ++j) {
-            CartesianPoint cartesian{};
-            iQLibIfPtr->getScanPoint(0,i,j,&x,&y,&z,&refl);
-            cartesian.x = (Rx*Rx*(1-cos(angle))+cos(angle))*x
-                    + (Ry*Rx*(1-cos(angle))-Rz*sin(angle))*y
-                    + (Rz*Rx*(1-cos(-angle))+Ry*sin(angle))*z;
+            double x, y, z;
+            int refl;
+            iQLibIfPtr->getScanPoint(scanNo, i, j, &x, &y, &z, &refl);
 
-            cartesian.y = (Rx*Ry*(1-cos(angle))+Rz*sin(angle))*x
-                    + (Ry*Ry*(1-cos(angle))+cos(angle))*y
-                    + (Rz*Ry*(1-cos(-angle))-Rx*sin(angle))*z;
+            CartesianPoint cartesian;
+            cartesian.x = (Rx * Rx * (1 - cosAngle) + cosAngle) * x
+                        + (Ry * Rx * (1 - cosAngle) - Rz * sinAngle) * y
+                        + (Rz * Rx * (1 - cosAngle) + Ry * sinAngle) * z;
 
-            cartesian.z = (Rx*Rz*(1-cos(angle))-Ry*sin(angle))*x
-                    + (Ry*Rz*(1-cos(angle))+Rx*sin(angle))*y
-                    + (Rz*Rz*(1-cos(-angle))+cos(angle))*z;
-            cartesian.intensity = refl/255.0;
-            syncPlyApi.myXYZData.push_back(cartesian);
+            cartesian.y = (Rx * Ry * (1 - cosAngle) + Rz * sinAngle) * x
+                        + (Ry * Ry * (1 - cosAngle) + cosAngle) * y
+                        + (Rz * Ry * (1 - cosAngle) - Rx * sinAngle) * z;
+
+            cartesian.z = (Rx * Rz * (1 - cosAngle) - Ry * sinAngle) * x
+                        + (Ry * Rz * (1 - cosAngle) + Rx * sinAngle) * y
+                        + (Rz * Rz * (1 - cosAngle) + cosAngle) * z;
+
+            cartesian.intensity = refl / 255.0;
+            rowPoints[j] = cartesian;
+        }
+        return rowPoints;
+    };
+
+    QVector<QFuture<QVector<CartesianPoint>>> futures;
+    for (int i = 0; i < row; ++i) {
+        futures.append(QtConcurrent::run(processRow, i));
+    }
+
+    int index = 0;
+    for (auto &future : futures) {
+        future.waitForFinished();
+        for (auto &point : future.result()) {
+            allPoints[index++] = point;
         }
     }
 
-    syncPlyApi.downSamplePoint(xyCropDist,zCropDist);
+    syncPlyApi.myXYZData = allPoints.toStdVector();
+    syncPlyApi.downSamplePoint(xyCropDist, zCropDist);
     std::ofstream outfile(outPlyFilePath.toStdString());
-    syncPlyApi.SavePly(outfile,syncPlyApi.myXYZData);
+    syncPlyApi.SavePly(outfile, syncPlyApi.myXYZData);
     syncPlyApi.myXYZData.clear();
     iQLibIfPtrDisconnect();
 }
