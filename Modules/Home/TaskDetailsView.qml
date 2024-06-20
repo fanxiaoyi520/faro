@@ -327,6 +327,17 @@ Item{
             var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
             selectMeasureModePopUp.stageType = selectedStageType.index+1
             selectMeasureModePopUp.stationType = inputCellModel.stationType
+
+            var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
+            var dataList = SettingString.selectedMeasureMode.map(function(itemString) {
+                var itemObject = JSON.parse(itemString);
+                itemObject.xy_crop_dist = selectedMeasureData.xy_crop_dist;
+                itemObject.z_crop_dist = selectedMeasureData.z_crop_dist;
+                return JSON.stringify(itemObject);
+            });
+            console.log("dataList: "+JSON.stringify(dataList))
+            selectMeasureModePopUp.list = []
+            selectMeasureModePopUp.list = dataList
             selectMeasureModePopUp.open()
             return
         }
@@ -664,6 +675,7 @@ Item{
                 hub.close()
                 return;
             }
+            list = []
             list = response.data.stations
             var urlStr = response.data.vectorgraph !== null ? response.data.vectorgraph : response.data.houseTypeDrawing
             admin_sys_file_listFileByFileIds([urlStr])

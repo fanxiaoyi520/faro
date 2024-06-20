@@ -7,7 +7,7 @@ Popup {
     property var titleStr: "选择测量模式"
     property var tipsContentStr: ""
     property bool switchvisible: false
-    property var list: SettingString.selectedMeasureMode
+    property var list/*: SettingString.selectedMeasureMode*/
     signal confirmAction()
 
     id: popup

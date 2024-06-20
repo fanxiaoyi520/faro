@@ -64,7 +64,7 @@ Rectangle {
                 anchors.rightMargin: 24
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width * 0.15
-                text: cellModel.index === 1 ? sub_xy_crop_dist : sub_z_crop_dist
+                text: cellModel.index === 1 ? cellModel.xy_crop_dist : cellModel.z_crop_dist/*cellModel.index === 1 ? sub_xy_crop_dist : sub_z_crop_dist*/
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 font.capitalization: Font.MixedCase

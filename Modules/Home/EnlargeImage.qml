@@ -61,21 +61,30 @@ Popup{
             }
         }
 
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                popup.close()
-            }
-            onDoubleClicked: {
-                contentItem.scale += 0.1;
-                console.log("Double clicked!")
+        Image {
+            id: btnimage
+            source: "../../images/login_close@2x.png"
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: 20
+            anchors.rightMargin: 20
+            width: 30;height: 30
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    popup.close()
+
+
+                }
             }
         }
 
         PinchArea {
-            anchors.fill: parent
+            anchors.margins: 50
             enabled: true
             pinch.target: backimage
+            pinch.minimumScale: 0.5
+            pinch.maximumScale: 2
         }
     }
     padding: 0
