@@ -183,7 +183,7 @@ Popup {
                 anchors.bottomMargin: 16
                 anchors.right: parent.right
                 anchors.rightMargin: 60
-                width: (parent.width-60*2-24)/2
+                width: (parent.width - 60 * 2 - 24 ) / 2
                 height: 41
                 text: qsTr("确定")
                 highlighted: true

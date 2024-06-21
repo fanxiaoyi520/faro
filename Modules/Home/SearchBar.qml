@@ -2,7 +2,9 @@
 import QtQuick.Controls 2.12
 
 Item {
+    id:root_item
     width: parent.width
+    property var seartext: ""
 
     TextField {
         id: searchField
@@ -34,17 +36,19 @@ Item {
             radius: 5
         }
         onTextChanged: {
-            console.log("搜索内容:", text)
+            //            console.log("搜索内容:", text)
+            root_item.seartext = text
         }
     }
 
-    Button {
+    Rectangle {
         id: searchButton
         anchors.right: parent.right
         anchors.rightMargin: 6
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: searchField.right
         anchors.leftMargin: 6
+        z:999
         visible: searchField.focus ? true : false
         Text{
             color: "#1FA3FF"
@@ -55,11 +59,12 @@ Item {
         }
         width: 60
         height: 30
-        background: Rectangle{
-            color: "transparent"
-        }
-        onClicked: {
-            console.log("搜索按钮被点击，搜索内容:", searchField.text)
+        color: "transparent"
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                console.log("搜索按钮被点击，搜索内容:", searchField.text)
+            }
         }
     }
     Canvas {

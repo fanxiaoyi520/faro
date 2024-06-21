@@ -69,7 +69,7 @@ Rectangle{
         onConvertFlsToZipPlyResult: {
             console.log("enter ply zip result = " + filePath)
 //            if(filePath){
-                uploadFile(rect_root.index,rect_root.totalUploadSize,filePath)
+                uploadFile(rect_root.index,filePath)
 //            }else{
 //                tipsPop_tips.tipsContentStr = qsTr(String.upload_filepath_empty)
 //                tipsPop_tips.open()
@@ -404,6 +404,7 @@ Rectangle{
         rect_root.failedCount = 0
         rect_root.successCount = 0
         var totalUploadSize = selectList.length
+        rect_root.totalUploadSize = totalUploadSize
         upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         upload_pop.open()
         callBackUploadFile(0,totalUploadSize)
@@ -412,12 +413,12 @@ Rectangle{
 
     function callBackUploadFile(index,totalUploadSize){
         rect_root.index = index
-        rect_root.totalUploadSize = totalUploadSize
+        console.log("begin totalUploadSize : " + rect_root.totalUploadSize)
         var fileAbsPath = selectList[index].filePath
         faroManager.startConvertFlsToZipPly(fileAbsPath)
     }
 
-    function uploadFile(index,totalUploadSize,fileAbsPath){
+    function uploadFile(index,fileAbsPath){
         function onReply(reply) {
             http.qtreplySucSignal.disconnect(onReply)
             http.qtreplyFailSignal.disconnect(onFail)
@@ -433,16 +434,19 @@ Rectangle{
                     tipsPop_upload_finish.open()
                     //结束清除所有当前选中
                     listItemSelectAll(false)
+                    selectList = []
                 }
                 console.log("successCounr = " + rect_root.successCount + "faildCount = " + rect_root.failedCount)
-                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
+                console.log("upload reply :" + rect_root.totalUploadSize)
+                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
             }else{
-                performCalculation(JSON.stringify(response.data),selectList[index].filePath,totalUploadSize,JSON.stringify(selectList[index]),index)
+                performCalculation(JSON.stringify(response.data),selectList[index].filePath,JSON.stringify(selectList[index]),index)
             }
         }
 
         function onFail(reply, code) {
             console.log("upload failed :" + reply, code);
+            console.log("upload failed:" + rect_root.totalUploadSize)
             http.qtreplySucSignal.disconnect(onReply)
             http.qtreplyFailSignal.disconnect(onFail)
             rect_root.failedCount += 1
@@ -456,7 +460,7 @@ Rectangle{
                 listItemSelectAll(false)
                 selectList = []
             }
-            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
         }
 
         http.qtreplySucSignal.connect(onReply)
@@ -465,11 +469,12 @@ Rectangle{
         console.log("upload file abspath = " + fileAbsPath)
     }
 
-    function performCalculation(result,filePath,totalUploadSize,params,index){
+    function performCalculation(result,filePath,params,index){
         function onReply(reply){
             faroManager.performCalculationFailResult.disconnect(onFail)
             faroManager.performCalculationSucResult.disconnect(onReply)
             console.log("calculation reply:" + reply)
+            console.log("calculation totalCount:" + rect_root.totalUploadSize)
             var replayObj = JSON.parse(reply)
             if(replayObj.code !== 0){
                 rect_root.failedCount += 1
@@ -507,13 +512,14 @@ Rectangle{
                 selectList = []
             }
 
-            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
         }
 
         function onFail(reply,code){
             faroManager.performCalculationFailResult.disconnect(onFail)
             faroManager.performCalculationSucResult.disconnect(onReply)
             console.log("calculation faild reply :" + reply,code)
+            console.log("calculation totalCount:" + rect_root.totalUploadSize)
             rect_root.failedCount += 1
             if (index + 1 < selectList.length) {
               callBackUploadFile(index + 1)
@@ -521,8 +527,10 @@ Rectangle{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
                 upload_pop.close()
+                listItemSelectAll(false)
+                selectList = []
             }
-            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
         }
 
         faroManager.performCalculationSucResult.connect(onReply)
