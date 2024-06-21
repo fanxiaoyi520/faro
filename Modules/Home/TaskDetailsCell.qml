@@ -166,7 +166,7 @@ Rectangle {
             anchors.right: moreColumnLayout.right
             anchors.top: moreColumnLayout.top
             radius: 3
-            visible: model.status === 0 && filtering(model) !== undefined
+            visible: /*model.status === 0 && */filtering(model) !== undefined
         }
 
         ColumnLayout{
@@ -194,7 +194,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("more clicked")
-                    moreAction(model,model.status === 0 && filtering(model) !== undefined)
+                    moreAction(model,/*model.status === 0 && */filtering(model) !== undefined)
                 }
             }
         }
@@ -217,7 +217,7 @@ Rectangle {
         console.log("detais cell model: "+JSON.stringify(model))
         if (model.status === 0 && uniqueModel === undefined) {
             return Settings.station_waiting_scan
-        } else if (model.status === 0) {
+        } else if (/*model.status === 0*/uniqueModel !== undefined) {
             return Settings.station_waiting_upload_file
         } else if (model.status === 1) {
             return Settings.station_waiting_calculated
@@ -268,9 +268,17 @@ Rectangle {
             case GlobalEnum.MMProjectStatus.InProgress:
                 return "../../images/measure_other/measure_ic_progress@2x.png"
             case GlobalEnum.MMProjectStatus.Completed:
-                return "../../images/measure_other/measure_complete@2x.png"
+                if (uniqueModel === undefined) {
+                    return "../../images/measure_other/measure_complete@2x.png"
+                } else {
+                    return "../../images/measure_other/measure_ic_progress@2x.png"
+                }
             case GlobalEnum.MMProjectStatus.Close:
-                return "../../images/measure_other/measure_ic_calculation_failed@2x.png"
+                if (uniqueModel === undefined) {
+                    return "../../images/measure_other/measure_ic_calculation_failed@2x.png"
+                } else {
+                    return "../../images/measure_other/measure_ic_progress@2x.png"
+                }
             default: break
             }
         } else {
