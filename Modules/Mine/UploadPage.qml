@@ -52,6 +52,7 @@ Rectangle{
     TipsPopUp{
         id:tipsPop_upload_finish
         onConfirmAction: {
+            delByPath()
             refreshFileInfo()
         }
     }
@@ -393,7 +394,7 @@ Rectangle{
                 return acc;
             }, []);
 
-
+            rect_root.groupedList = []
             rect_root.groupedList = resultArray
         }else{
             rect_root.groupedList = []
