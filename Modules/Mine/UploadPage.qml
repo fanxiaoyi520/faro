@@ -433,6 +433,7 @@ Rectangle{
                     tipsPop_upload_finish.open()
                     //结束清除所有当前选中
                     listItemSelectAll(false)
+                    selectList = []
                 }
                 console.log("successCounr = " + rect_root.successCount + "faildCount = " + rect_root.failedCount)
                 upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
@@ -521,6 +522,8 @@ Rectangle{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
                 upload_pop.close()
+                listItemSelectAll(false)
+                selectList = []
             }
             upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",totalUploadSize))
         }

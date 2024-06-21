@@ -114,8 +114,10 @@ Rectangle {
                             onClicked: {
                                 control.currentItem=itemFlag;
                                 console.log("selected",itemFlag)
-                                if(item_repeater.count)
+                                if(item_repeater.count){
                                     item_sub.visible=!item_sub.visible;
+//                                    modelData.isExpand = !modelData.isExpand
+                                }
                                 if (!modelData.children) {
                                     sureSelectedSearchResult(modelData)
                                 }
@@ -148,7 +150,7 @@ Rectangle {
                 Column {
                     id: item_sub
                     //也可以像check一样用一个expand数组保存展开状态
-                    visible: control.autoExpand
+                    visible: (modelData === undefined) ? modelData.isExpand : false
                     //上级左侧距离=小图标宽+x偏移
                     x: control.indent
                     width: parent.width-control.indent
@@ -163,6 +165,10 @@ Rectangle {
                             model: modelData.children
                             property string viewFlag: itemFlag
                         }
+                    }
+                    Component.onCompleted: {
+                        console.log("item expand = " + modelData.isExpand)
+                        console.log("item expand = " + modelData.name)
                     }
                 }
             }
