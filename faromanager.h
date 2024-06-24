@@ -10,6 +10,9 @@
 #include "networkhelper.h"
 #include "wifihelper.h"
 #include <thread>
+#include <QtConcurrent>
+#include <functional>
+
 //#include "EasyQtSql/src/EasyQtSql.h"
 //#include "EasyQtSql/filemodel.h"
 //#include "EasyQtSql/sqlmanager.h"
@@ -26,7 +29,7 @@ public slots:
     void onCalculationSucSignal(const QString &response);
     void onCalculationFailSignal(const QString &error, int errorCode);
 
-    int connect();
+    int connect(const QString &inputParams);
     void startScan(const QString &inputParams);
     bool init();
     void stopScan();
@@ -42,6 +45,7 @@ public slots:
     void zipFileHandle();
     void monitorNetworkChanges();
 signals:
+    void connectResult(bool result);
     void scanComplete(const QString& filePath);
     void scanProgress(int percent);
     void scanAbnormal(int percent);
@@ -58,6 +62,10 @@ private:
     QJsonObject inputModel;
     QString *defaultFlsPath;
     NetworkHelper networkHelper;
+    QFutureWatcher<bool> watcher;
+    QFutureWatcher<void> watcher1;
+
+    QString inputScanParams;
 
     std::thread m_thread;
     bool m_running = false;

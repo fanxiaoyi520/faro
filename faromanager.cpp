@@ -4,56 +4,90 @@ FaroManager::FaroManager(QObject *parent)
     : QObject(parent),
       faroScannerController
       (FaroScannerController::instance()),
-      http(new Http(this))
+      http(new Http(this)),
+      watcher(new QFutureWatcher<bool>(this)),
+      watcher1(new QFutureWatcher<bool>(this))
 {
 
     QObject::connect(http, &Http::qtreplySucSignal, this, &FaroManager::onReplySucSignal);
     QObject::connect(http, &Http::qtreplyFailSignal, this, &FaroManager::onReplyFailSignal);
     QObject::connect(http, &Http::replySucSignal, this, &FaroManager::onCalculationSucSignal);
     QObject::connect(http, &Http::replyFailSignal, this, &FaroManager::onCalculationFailSignal);
+
+
+    QObject::connect(&watcher, &QFutureWatcher<bool>::finished, [&]() {
+        int result = watcher.result();
+        emit connectResult(result);
+        QFuture<void> future = QtConcurrent::run([&]() {
+            startScan(inputScanParams);
+        });
+        watcher1.setFuture(future);
+    });
+
+    QObject::connect(&watcher1, &QFutureWatcher<bool>::finished, [&]() {
+        faroScannerController->pollingScannerStatus();
+        faroScannerController->scanProgress([this](int percent){
+            emit scanProgress(percent);
+        }).complete([this](QString flsPath){
+            defaultFlsPath = &flsPath;
+            emit scanComplete(flsPath);
+        }).scanAbnormal([this](int scanStatus){
+            Q_UNUSED(scanStatus);
+            emit scanAbnormal(scanStatus);
+        });
+    });
 }
 
 bool FaroManager::init()
 {
-    return faroScannerController->init();
+    //return faroScannerController->init();
+    return true;
 }
 
-int FaroManager::connect()
+int FaroManager::connect(const QString &inputParams)
 {
+    qDebug() << "enter connect: " << inputParams;
+
+    inputScanParams = inputParams;
     qDebug() << "enter connect";
-    return faroScannerController->connect();
+    //    return faroScannerController->connect();
+    QFuture<bool> future = QtConcurrent::run([&]() {
+        return faroScannerController->connect();
+    });
+    watcher.setFuture(future);
+
+    return 1;
 }
 
 void FaroManager::startScan(const QString &inputParams)
 {
     qDebug() << "scan input params: " << inputParams;
     inputModel = Util::parseJsonStringToObject(inputParams);
-    faroScannerController->startScan(inputParams)
-            .scanProgress([this](int percent){
-        emit scanProgress(percent);
-    }).complete([this](QString flsPath){
-        defaultFlsPath = &flsPath;
-        emit scanComplete(flsPath);
-    }).scanAbnormal([this](int scanStatus){
-        Q_UNUSED(scanStatus);
-        faroScannerController->disconnect();
-        emit scanAbnormal(scanStatus);
-    });
+    faroScannerController->startScan(inputParams);
 }
 
 void FaroManager::stopScan()
 {
-    faroScannerController->stopScan();
+    QtConcurrent::run([&]() {
+        faroScannerController->stopScan();
+    });
+//    faroScannerController->stopScan();
 }
 
 void FaroManager::disconnect()
 {
-    faroScannerController->disconnect();
+    QtConcurrent::run([&]() {
+        faroScannerController->disconnect();
+    });
+//    faroScannerController->disconnect();
 }
 
 void FaroManager::shutDown()
 {
-    faroScannerController->shutDown();
+    QtConcurrent::run([&]() {
+        faroScannerController->shutDown();
+    });
+//    faroScannerController->shutDown();
 }
 
 //扫描完成之后压缩文件为zip上传
@@ -230,7 +264,7 @@ void FaroManager::convertFlsToZipPly(const QString &filePath)
         QString plyZipPath = FileManager::instance()-> compression_zip_by_filepath(originPath + "/" + fileName +".ply");
         emit convertFlsToZipPlyResult(plyZipPath);
     }else{
-           emit convertFlsToZipPlyResult("");
+        emit convertFlsToZipPlyResult("");
     }
 }
 

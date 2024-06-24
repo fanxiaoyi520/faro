@@ -26,6 +26,7 @@ Item{
     property var inputCellModel
     property string room_id
     property int selectHeaderIndex: 0
+    property var inputScanParams
     signal callbackOrSyncEventHandling()
     id: selectTaskDetailsView
     Layout.fillWidth: true
@@ -101,6 +102,7 @@ Item{
                 console.log("--------------初始化成功--------------")
             }
         }
+        onConnectResult: detailConnectResult(result)
     }
     BaseNavigationBar{
         id: navigationBar
@@ -245,8 +247,8 @@ Item{
     }
 
     function getStationType(stationType){
-       if (stationType === 1) return SettingString.other
-       return SettingString.other
+        if (stationType === 1) return SettingString.other
+        return SettingString.other
     }
 
     function headerClickSwitchAction(index,model){
@@ -461,8 +463,8 @@ Item{
             }
             */
 
-            faroManager.stopScan()
-            faroManager.disconnect()
+//            faroManager.stopScan()
+//            faroManager.disconnect()
             taskDetialViewMonitorNetworkChanges()
             function wifiDisConnect(result){
 
@@ -501,18 +503,29 @@ Item{
         faroManager.onScanComplete.connect(scanComplete)
         faroManager.onScanProgress.connect(scanProgress)
         faroManager.scanAbnormal.connect(scanAbnormal)
-        var connectResult = faroManager.connect()
+        var connectResult = faroManager.connect(scanParams)
+        inputScanParams = scanParams
         console.log("connect result: "+connectResult)
-        if (connectResult !== 1) {
-            nonerworkPopUp.tipsContentStr = qsTr(SettingString.device_conncet_fail_tips)
-            nonerworkPopUp.open()
-        } else {
-            scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
-            scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
-            scanningFaroPop.lottieType = 0
-            scanningFaroPop.open()
-            faroManager.startScan(JSON.stringify(scanParams))
-        }
+        //        if (connectResult !== 1) {
+        //            nonerworkPopUp.tipsContentStr = qsTr(SettingString.device_conncet_fail_tips)
+        //            nonerworkPopUp.open()
+        //        } else {
+        //            scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
+        //            scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
+        //            scanningFaroPop.lottieType = 0
+        //            scanningFaroPop.open()
+        //            faroManager.startScan(JSON.stringify(scanParams))
+        //        }
+        scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
+        scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
+        scanningFaroPop.lottieType = 0
+        scanningFaroPop.open()
+    }
+
+    function detailConnectResult(result){
+        console.log("result: "+result)
+        scanningFaroPop.tipsconnect = SettingString.device_connect_suc
+        //faroManager.startScan(JSON.stringify(inputScanParams))
     }
 
     function taskDetialViewMonitorNetworkChanges(){

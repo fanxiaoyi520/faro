@@ -17,6 +17,10 @@
 #include <QThread>
 #include <QtConcurrent>
 #include <QFuture>
+
+#include <QtConcurrent>
+#include <functional>
+
 #ifdef _WIN64
 // Yes - type is 'win32' even on WIN64!
 #pragma comment(linker, "\"/manifestdependency:type='win32' name='FARO.LS' version='1.1.0.0' processorArchitecture='amd64' publicKeyToken='1d23f5635ba800ab'\"")
@@ -63,8 +67,13 @@ public:
     Q_INVOKABLE void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath);
     Q_INVOKABLE void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
     Q_INVOKABLE QString getScanPathName();
+    Q_INVOKABLE void pollingScannerStatus();
+    void asyncTaskHandle(QTimer *timer);
+signals:
+    void timerResultReady(QTimer *timer);
 private slots:
-    void checkScannerStatus();
+    void checkScannerStatus(QTimer *timer);
+    void handleResults(QTimer *timer);
 private:
 //    explicit FaroScannerController(QObject *parent = nullptr);
 //    ~FaroScannerController();
@@ -84,10 +93,10 @@ private:
     // 连接到扫描仪的内部实现
     bool connectToScannerInternal(const _bstr_t &scannerIP, const CComBSTR &remoteScanStoragePath);
 
-    void pollingScannerStatus();
+//    void pollingScannerStatus();
     void getScanProgress();
     int scanStatus;
-    QTimer *timer;
+//    QTimer *timer;
     QString flsPath;
     SyncPlyApi syncPlyApi;
 };
