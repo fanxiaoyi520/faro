@@ -25,7 +25,12 @@ StackView{
     ScanSelectTaskDialog{
         id: scanSelectTaskDialog
         onConfirmOptionsAction: scanConfirmOptionsAction(model)
+        onPopUpclickSelectTask: scanPopUpclickSelectTask(index)
     }
+    ScanSelectPop {
+        id: scanSelectPop
+    }
+
     Component {
         id: scanview
         Rectangle{
@@ -160,5 +165,10 @@ StackView{
 
     function scanConfirmOptionsAction(model) {
         console.log("select task sure")
+    }
+
+    function scanPopUpclickSelectTask(index) {
+        console.log("scan pop up click select task")
+        scanSelectPop.open()
     }
 }

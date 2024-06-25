@@ -9,6 +9,7 @@ Popup {
     property int currentIndex: 0
     property var titleStr: Settings.scan_select_task
     signal confirmOptionsAction(var model)
+    signal popUpclickSelectTask(int index)
     onListChanged: {
         console.log("List has changed:" + list[0], list.length)
         var objList = []
@@ -45,20 +46,37 @@ Popup {
     padding: 0
     contentItem:  ColumnLayout{
         clip: true
-        Text {
-            id: title
-            text: titleStr
-            font.pointSize: 18
-            Layout.topMargin: 17.5
-            Layout.alignment: Qt.AlignHCenter
-            width: parent.width * 0.8
-            color: "#2C2C2C"
+        Rectangle{
+            height: 35
+            Layout.topMargin: 25
+            Layout.fillWidth: true
+            Text {
+                id: title
+                text: titleStr
+                font.pointSize: 18
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width
+                color: "#2C2C2C"
+            }
+
+            Image {
+                id: closeImageBtn
+                source: "../../images/home_page_slices/home_more_close@2x.png"
+                width: 17;height: 17
+                anchors.right: parent.right
+                anchors.rightMargin: 30
+                anchors.verticalCenter: title.verticalCenter
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: closeAction()
+                }
+            }
         }
 
         Rectangle {
             id: bottomLine
             Layout.fillWidth: true
-            Layout.topMargin: 17.5
             height: 1
             color: "#80EAEAEA"
         }
@@ -113,7 +131,6 @@ Popup {
                         id: arrowImageItem
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
-                        anchors.rightMargin: 30
                         Image {
                             id: selimage
                             anchors.verticalCenter: parent.verticalCenter
@@ -154,6 +171,7 @@ Popup {
                     anchors.fill: parent
                     onClicked: {
                         currentIndex = index;
+                        popUpclickSelectTask(currentIndex)
                     }
                 }
             }
@@ -202,6 +220,10 @@ Popup {
         popup.close()
         console.log("sure clicked and currentIndex: " + currentIndex)
         confirmOptionsAction(list[currentIndex])
+    }
+
+    function closeAction(){
+        popup.close()
     }
 }
 

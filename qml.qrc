@@ -150,5 +150,6 @@
         <file>images/refresh_click.png</file>
         <file>Modules/Scan/ScanHeaderView.qml</file>
         <file>Modules/Scan/ScanSelectTaskDialog.qml</file>
+        <file>Modules/Scan/ScanSelectPop.qml</file>
     </qresource>
 </RCC>
