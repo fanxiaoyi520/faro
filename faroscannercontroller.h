@@ -68,12 +68,12 @@ public:
     Q_INVOKABLE void convertFlsToPly(const QString& inFlsFilePath,const QString& outPlyFilePath,int xyCropDist,int zCropDist);
     Q_INVOKABLE QString getScanPathName();
     Q_INVOKABLE void pollingScannerStatus();
-    void asyncTaskHandle(QTimer *timer);
+    void asyncTaskHandle(/*QTimer *timer*/);
 signals:
-    void timerResultReady(QTimer *timer);
+    void timerResultReady(/*QTimer *timer*/);
 private slots:
-    void checkScannerStatus(QTimer *timer);
-    void handleResults(QTimer *timer);
+    void checkScannerStatus(/*QTimer *timer*/);
+    void handleResults(/*QTimer *timer*/);
 private:
 //    explicit FaroScannerController(QObject *parent = nullptr);
 //    ~FaroScannerController();
@@ -96,7 +96,7 @@ private:
 //    void pollingScannerStatus();
     void getScanProgress();
     int scanStatus;
-//    QTimer *timer;
+    QTimer *timer;
     QString flsPath;
     SyncPlyApi syncPlyApi;
 };

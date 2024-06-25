@@ -47,15 +47,11 @@ bool FaroManager::init()
 int FaroManager::connect(const QString &inputParams)
 {
     qDebug() << "enter connect: " << inputParams;
-
     inputScanParams = inputParams;
-    qDebug() << "enter connect";
-    //    return faroScannerController->connect();
     QFuture<bool> future = QtConcurrent::run([&]() {
         return faroScannerController->connect();
     });
     watcher.setFuture(future);
-
     return 1;
 }
 

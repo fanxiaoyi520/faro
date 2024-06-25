@@ -9,26 +9,27 @@ FaroScannerController* FaroScannerController::instance() {
     QMutexLocker locker(&mutex);
     if (!instancePtr) {
         instancePtr = new FaroScannerController();
+        QObject::connect(instancePtr, &FaroScannerController::timerResultReady, instancePtr, &FaroScannerController::handleResults);
     }
     return instancePtr;
 }
 
 FaroScannerController &FaroScannerController::scanProgress(std::function<void (int)> scanProgressHandler)
 {
-    this->scanProgressHandler = scanProgressHandler;
-    return *this;
+    instancePtr->scanProgressHandler = scanProgressHandler;
+    return *instancePtr;
 }
 
 FaroScannerController &FaroScannerController::complete(std::function<void (const QString &)> completeHandler)
 {
-    this->completeHandler = completeHandler;
-    return *this;
+    instancePtr->completeHandler = completeHandler;
+    return *instancePtr;
 }
 
 FaroScannerController &FaroScannerController::scanAbnormal(std::function<void (int)> scanAbnormalHandler)
 {
-    this->scanAbnormalHandler = scanAbnormalHandler;
-    return *this;
+    instancePtr->scanAbnormalHandler = scanAbnormalHandler;
+    return *instancePtr;
 }
 
 FaroScannerController::FaroScannerController(QObject *parent) : QObject(parent)
@@ -36,18 +37,13 @@ FaroScannerController::FaroScannerController(QObject *parent) : QObject(parent)
     scanCtrlSDKPtr = nullptr;
     scanOpInterfPtr = nullptr;
     iQLibIfPtr = nullptr;
-    QObject::connect(this, &FaroScannerController::timerResultReady, this, &FaroScannerController::handleResults);
+    timer = new QTimer();
 }
 
 FaroScannerController::~FaroScannerController()
 {
     stopScan();
     disconnect();
-    //    if (timer) {
-    //        timer->stop();
-    ////        delete timer;
-    ////        timer = nullptr;
-    //    }
 }
 
 bool FaroScannerController::init()
@@ -131,10 +127,6 @@ bool FaroScannerController::initIiQLibInternal()
 
 bool FaroScannerController::connect() {
     const QString default_ip = "192.168.43.1";
-    /**
-    const QString defaultRemoteScanStoragePath = FileManager::getFlsPath();
-    flsPath = defaultRemoteScanStoragePath;
-    */
     return connect(default_ip,""/*defaultRemoteScanStoragePath*/);
 }
 
@@ -161,25 +153,6 @@ bool FaroScannerController::connectToScannerInternal(const _bstr_t &scannerIP, c
 
     qDebug() << "start connect";
     scanCtrlSDKPtr->connect();
-    /**
-    HRESULT hr = scanCtrlSDKPtr->put_RemoteScanStoragePath(remoteScanStoragePath);
-    if (SUCCEEDED(hr)) {
-        // Path set successfully
-        scanCtrlSDKPtr->RemoteScanAccess = RSAEnabled;
-        scanCtrlSDKPtr->PutStorageMode(SMRemote);
-        scanCtrlSDKPtr->PutScanMode(StationaryGrey);
-        //        scanCtrlSDKPtr->PutResolution(1);
-        //        int aa = scanCtrlSDKPtr->GetResolution();
-        //        qDebug() << "Get Resolution: " << aa;
-
-        //scanCtrlSDKPtr->PutMeasurementRate(1);
-        return true;
-    } else {
-        // Handle error
-        qDebug() << "Failed to set remote scan storage path";
-        return false;
-    }
-    */
     return true;
 }
 
@@ -192,7 +165,7 @@ FaroScannerController& FaroScannerController::startScan(const QString &inputPara
     const QString m_Resolution = "20";
     const QString m_ScanName = name;
     startScan(inputParams,m_Resolution,m_ScanName);
-    return *this;
+    return *instancePtr;
 }
 
 QString FaroScannerController::getScanPathName() {
@@ -223,15 +196,13 @@ FaroScannerController& FaroScannerController::startScan(const QString &inputPara
         scanCtrlSDKPtr->ScanBaseName = _bstr_t_m_ScanName;
         scanCtrlSDKPtr->syncParam();
         scanCtrlSDKPtr->startScan();
-        //pollingScannerStatus();
     }
-    return *this;
+    return *instancePtr;
 }
 
 void FaroScannerController::stopScan()
 {
     if (scanCtrlSDKPtr) {
-        //        if (timer) timer->stop();
         scanCtrlSDKPtr->stopScan();
         qDebug() << "stop scanCtrlSDKPtr stopScan completed";
     }
@@ -245,12 +216,6 @@ void FaroScannerController::disconnect() {
         scanCtrlSDKPtr = nullptr;
         scanOpInterfPtr = nullptr;
         qDebug() << "destruction scanCtrlSDKPtr and scanOpInterfPtr completed";
-        //        if (timer) {
-        //            timer->stop();
-        ////            delete timer;
-        ////            timer = nullptr;
-        //            qDebug() << "destruction timer completed";
-        //        }
     }
 }
 
@@ -264,11 +229,6 @@ void FaroScannerController::iQLibIfPtrDisconnect()
 void FaroScannerController::shutDown()
 {
     if (scanCtrlSDKPtr) {
-        //        if (timer) {
-        //            timer->stop();
-        //            delete timer;
-        //            timer = nullptr;
-        //        }
         scanCtrlSDKPtr->shutDown();
     }
 }
@@ -356,55 +316,48 @@ void FaroScannerController::convertFlsToPly(const QString &inFlsFilePath,
     iQLibIfPtrDisconnect();
 }
 
-void FaroScannerController::checkScannerStatus(QTimer *timer)
+void FaroScannerController::checkScannerStatus(/*QTimer *timer*/)
 {
     QFuture<void> future = QtConcurrent::run([&]() {
-        asyncTaskHandle(timer);
+        asyncTaskHandle();
     });
 }
 
-void FaroScannerController::handleResults(QTimer *timer)
+void FaroScannerController::handleResults(/*QTimer *timer*/)
 {
+    qDebug() << "enter timer handle";
     if (timer) {
+        qDebug() << "start stop timer";
         timer->stop();
+        qDebug() << "stoped timer";
         delete timer;
         timer = nullptr;
     }
 }
 
-void FaroScannerController::asyncTaskHandle(QTimer *timer){
+void FaroScannerController::asyncTaskHandle(/*QTimer *timer*/){
 
     qDebug() << "is connected: " << scanOpInterfPtr->isConnected();
     scanOpInterfPtr->getScannerStatus(&scanStatus);
     qDebug() << "Scanner status: " << scanStatus;
 
     if (scanStatus == 0) {
-        //QTimer *timer = qobject_cast<QTimer*>(sender());
-        //        if (timer) timer->stop();
-        //        timer->deleteLater();
         QString path = getScanPathName();
-        /**
-        int index = path.indexOf("/Scans");
-        if (index != -1) {
-            path.replace(index, QString("/Scans").length(), "G:");
-        }
-        qDebug() << "get scan path name: " << path;
-        */
         qDebug() << "scan complete path: " << path;
         disconnect();
         if (path.isEmpty()) {
             qDebug() << "scan complete path isEmpty";
-            emit timerResultReady(timer);
-            this->scanAbnormalHandler(scanStatus);
+            emit timerResultReady(/*timer*/);
+            instancePtr->scanAbnormalHandler(scanStatus);
         } else {
             qDebug() << "scan complete path no isEmpty";
-            emit timerResultReady(timer);
-            this->completeHandler(path/*flsPath*/);
+            emit timerResultReady(/*timer*/);
+            instancePtr->completeHandler(path/*flsPath*/);
         }
     } else if (scanStatus == 1) {
         disconnect();
-        emit timerResultReady(timer);
-        this->scanAbnormalHandler(scanStatus);
+        emit timerResultReady(/*timer*/);
+        instancePtr->scanAbnormalHandler(scanStatus);
     } else {
         getScanProgress();
     }
@@ -413,11 +366,10 @@ void FaroScannerController::asyncTaskHandle(QTimer *timer){
 void FaroScannerController::pollingScannerStatus(){
 
     scanStatus = -1;
-    QTimer *timer = new QTimer();
-    QObject::connect(timer, &QTimer::timeout, [this, timer](){
-        this->checkScannerStatus(timer);
+    if(!timer) timer = new QTimer();
+    QObject::connect(timer, &QTimer::timeout, [](){
+        instance()->checkScannerStatus();
     });
-    //    QObject::connect(timer, &QTimer::timeout, this, &FaroScannerController::checkScannerStatus);
     timer->start(1000);
 }
 
@@ -426,6 +378,6 @@ void FaroScannerController::getScanProgress()
     int percent = 1;
     scanOpInterfPtr->getScanProgress(&percent);
     if (percent > 0) {
-        this->scanProgressHandler(percent);
+        instancePtr->scanProgressHandler(percent);
     }
 }

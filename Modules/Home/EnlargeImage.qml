@@ -50,14 +50,28 @@ Popup{
         id: backimage
         anchors.fill: parent
         color: "#000000"
-        Canvas {
-            id: canvas
+
+        Rectangle {
             anchors.fill: parent
-            width: imageBackWidth
-            height: imageBackWidth
-            onPaint: canvasPaint(getContext("2d"))
-            Component.onCompleted: {
-                image.asynchronous = true;
+            anchors.margins: 50
+            id: scaleimage
+            Canvas {
+                id: canvas
+                anchors.fill: parent
+                width: imageBackWidth
+                height: imageBackWidth
+                onPaint: canvasPaint(getContext("2d"))
+                Component.onCompleted: {
+                    image.asynchronous = true;
+                }
+            }
+
+            PinchArea {
+                anchors.fill: parent
+                enabled: true
+                pinch.target: scaleimage
+                pinch.minimumScale: 0.5
+                pinch.maximumScale: 2
             }
         }
 
@@ -77,14 +91,6 @@ Popup{
 
                 }
             }
-        }
-
-        PinchArea {
-            anchors.margins: 50
-            enabled: true
-            pinch.target: backimage
-            pinch.minimumScale: 0.5
-            pinch.maximumScale: 2
         }
     }
     padding: 0

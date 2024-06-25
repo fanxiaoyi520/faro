@@ -419,20 +419,22 @@ Item{
     function wifiConectHandle(scanParams,checked){
         var wifi = settingsManager.getValue(settingsManager.currentDevice)
         if (!wifi) {
+            /**
             var myWifiObject = {
                 wifiName : "LLS082118788",
                 wifiPass : "0123456789"
             }
             settingsManager.setValue(settingsManager.currentDevice,JSON.stringify(myWifiObject))
             console.log("wifi info =" + wifi)
+            */
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.unable_obtain_device_WiFi)
+            nonerworkPopUp.open()
             return
         }
         console.log("wifi info =" + wifi)
 
         function connectResult(isSuc){
             wifiHelper.connectToWiFiResult.disconnect(connectResult)
-            //var currentWifiName = wifiHelper.queryInterfaceName()
-            //console.log("current Wifi Name: " + currentWifiName)
             if (isSuc/* && currentWifiName === JSON.parse(wifi).wifiName*/){
                 console.log("wifi connect suc ...")
                 enteringScanningPhase(scanParams,checked)
@@ -453,35 +455,10 @@ Item{
             scanCompleteDataHandle(scanParams,filePath)
             scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
             scanningFaroPop.close()
-            /**
-            if (!checked){
-                scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
-                scanningFaroPop.close()
-            } else {
-                scanningFaroPop.tipsconnect = qsTr(SettingString.uploading_pointcloud_file)
-                scanningFaroPop.lottieType = 1
-            }
-            */
-
-//            faroManager.stopScan()
-//            faroManager.disconnect()
             taskDetialViewMonitorNetworkChanges()
             function wifiDisConnect(result){
-
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
                 nonerworkPopUp.open()
-                /**
-                if (!checked){
-                    nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
-                    nonerworkPopUp.open()
-                }
-                if (result){
-                    console.log("wifi disconnect success")
-                    if (checked) uploadFile(filePath)
-                } else {
-                    console.log("wifi disconnect fail")
-                }
-                */
             }
             wifiHelper.onDisConnectWifiResult.connect(wifiDisConnect)
             wifiHelper.disConnectWifi()
@@ -506,16 +483,7 @@ Item{
         var connectResult = faroManager.connect(scanParams)
         inputScanParams = scanParams
         console.log("connect result: "+connectResult)
-        //        if (connectResult !== 1) {
-        //            nonerworkPopUp.tipsContentStr = qsTr(SettingString.device_conncet_fail_tips)
-        //            nonerworkPopUp.open()
-        //        } else {
-        //            scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
-        //            scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
-        //            scanningFaroPop.lottieType = 0
-        //            scanningFaroPop.open()
-        //            faroManager.startScan(JSON.stringify(scanParams))
-        //        }
+
         scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
         scanningFaroPop.title = SettingString.scan_station_id+inputCellModel.stationNo
         scanningFaroPop.lottieType = 0
@@ -524,8 +492,15 @@ Item{
 
     function detailConnectResult(result){
         console.log("result: "+result)
-        scanningFaroPop.tipsconnect = SettingString.device_connect_suc
-        //faroManager.startScan(JSON.stringify(inputScanParams))
+        var wifi = settingsManager.getValue(settingsManager.currentDevice)
+        if(GlobalFunc.isJson(wifi)) {
+            console.log("start scan wifi info =" + wifi)
+            var contentName = JSON.parse(wifi).wifiName
+            var currentWifiName = wifiHelper.queryInterfaceName()
+            if (currentWifiName === contentName){
+                scanningFaroPop.tipsconnect = SettingString.device_connect_suc
+            }
+        }
     }
 
     function taskDetialViewMonitorNetworkChanges(){
