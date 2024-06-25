@@ -141,3 +141,7 @@ function isJson(str) {
         return false;
     }
 }
+
+function isEmpty(variable) {
+    return variable === null || variable === undefined || variable === '';
+}

@@ -4,6 +4,10 @@ import "../../String_Zh_Cn.js" as Settings
 
 Rectangle {
     color: "#FFFFFF"
+    property var setupModel
+    signal setupMeasureData()
+    signal clickSelectTask()
+    signal clickSelectStationNo()
     Rectangle{
         id: leftSelectTaskRec
         anchors.left: parent.left
@@ -30,6 +34,11 @@ Rectangle {
             anchors.rightMargin: 20
             anchors.verticalCenter: parent.verticalCenter
         }
+
+        MouseArea{
+            anchors.fill: parent
+            onClicked: clickSelectTask()
+        }
     }
 
     Rectangle{
@@ -50,8 +59,13 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: clickSelectStationNo()
+        }
     }
 
+    /**
     Text {
         id: autoUploadText
         text: qsTr(Settings.scan_auto_upload)
@@ -70,15 +84,18 @@ Rectangle {
         height: 32
         anchors.right: parent.right
         anchors.rightMargin: 16
-//        onCheckedChanged: switchAction(checked)
+        //onCheckedChanged: switchAction(checked)
     }
+    */
 
     Canvas {
         id: lineview
         width: parent.width
         height: 1
-        anchors.top: autoUploadText.bottom
-        anchors.topMargin: 15.5
+        //anchors.top: autoUploadText.bottom
+        //anchors.topMargin: 15.5
+        anchors.top: leftSelectTaskRec.bottom
+        anchors.topMargin: 34.5
         property color lineColor: "#80EAEAEA"
         property int lineWidth: 1
 
@@ -117,6 +134,7 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 console.log("enter setup")
+                setupMeasureData()
             }
         }
     }

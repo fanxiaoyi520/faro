@@ -535,10 +535,15 @@ Item{
                                                 && JSON.parse(value).stageType === scanParams.stageType
                                                 return iscon
                                             });
+                console.log("cover index: "+index)
                 if (index !== -1) {
-                    datas[index] = JSON.stringify(scanParams);
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas[index] = JSON.stringify(scanParams);
+                    }
                 } else {
-                    datas.push(JSON.stringify(scanParams))
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas.push(JSON.stringify(scanParams))
+                    }
                 }
                 console.log("scan params and datas: "+JSON.stringify(datas))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))

@@ -87,8 +87,6 @@ Popup{
                 anchors.fill: parent
                 onClicked: {
                     popup.close()
-
-
                 }
             }
         }

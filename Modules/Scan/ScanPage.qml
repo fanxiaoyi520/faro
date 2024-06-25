@@ -19,7 +19,13 @@ StackView{
     Dialog{id: dialog}
     Hub{id: hub}
     Loader {id: searchview}
-
+    SelectMeasureModePopUp{
+        id: selectMeasureModePopUp
+    }
+    ScanSelectTaskDialog{
+        id: scanSelectTaskDialog
+        onConfirmOptionsAction: scanConfirmOptionsAction(model)
+    }
     Component {
         id: scanview
         Rectangle{
@@ -71,7 +77,10 @@ StackView{
                     ScanHeaderView{
                         id: scanHeaderView
                         Layout.fillWidth: true
-                        height: 170
+                        height: 119.5
+                        onSetupMeasureData: scanSetupMeasureData()
+                        onClickSelectTask: scanClickSelectTask()
+                        onClickSelectStationNo: scanClickSelectStationNo()
                     }
 
                     Rectangle{
@@ -84,7 +93,7 @@ StackView{
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: parent.width * 0.4
                             height: 53
-                            text: qsTr("开始扫描")
+                            text: qsTr(SettingString.start_scan)
                             font.capitalization: Font.MixedCase
                             font.pixelSize: 18
                             highlighted: true
@@ -115,5 +124,41 @@ StackView{
         //使用的时候再加载
         searchview.source = "../Home/SearchView.qml"
         scanstack.push(searchview)
+    }
+
+    function scanSetupMeasureData() {
+        var params = settingsManager.getValue(settingsManager.selectedStageType)
+        if (!params) {
+            settingsManager.setValue(settingsManager.selectedStageType,SettingString.stageType[0])
+        }
+        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+        selectMeasureModePopUp.stageType = selectedStageType.index+1
+        selectMeasureModePopUp.stationType = 2
+
+        var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
+        var dataList = SettingString.selectedMeasureMode.map(function(itemString) {
+            var itemObject = JSON.parse(itemString);
+            itemObject.xy_crop_dist = selectedMeasureData.xy_crop_dist;
+            itemObject.z_crop_dist = selectedMeasureData.z_crop_dist;
+            return JSON.stringify(itemObject);
+        });
+        console.log("dataList: "+JSON.stringify(dataList))
+        selectMeasureModePopUp.list = []
+        selectMeasureModePopUp.list = dataList
+        selectMeasureModePopUp.open()
+    }
+
+    function scanClickSelectTask() {
+        console.log("click select task")
+        scanSelectTaskDialog.list = SettingString.selectTask
+        scanSelectTaskDialog.open()
+    }
+
+    function scanClickSelectStationNo() {
+        console.log("click select stationNo")
+    }
+
+    function scanConfirmOptionsAction(model) {
+        console.log("select task sure")
     }
 }

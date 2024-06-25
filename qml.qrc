@@ -149,5 +149,6 @@
         <file>images/ic_location_gray.svg</file>
         <file>images/refresh_click.png</file>
         <file>Modules/Scan/ScanHeaderView.qml</file>
+        <file>Modules/Scan/ScanSelectTaskDialog.qml</file>
     </qresource>
 </RCC>
