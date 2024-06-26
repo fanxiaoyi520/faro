@@ -114,4 +114,9 @@ QString Api::building_roomTaskExecute_rerun() const
     return QString("/building/roomTaskExecute/rerun");
 }
 
+QString Api::building_roomTask_searchFastScanRoomTask() const
+{
+    return QString("/building/roomTask/searchFastScanRoomTask");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

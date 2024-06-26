@@ -8,8 +8,10 @@ Popup {
     property var list: []
     property int currentIndex: 0
     property var titleStr: Settings.scan_select_task
+    property bool isChangeColor: false
     signal confirmOptionsAction(var model)
     signal popUpclickSelectTask(int index)
+
     onListChanged: {
         console.log("List has changed:" + list[0], list.length)
         var objList = []
@@ -95,7 +97,7 @@ Popup {
             }
 
             onContentHeightChanged: {
-                my_listview.height = my_listview.contentHeight + 54 * 2;
+                my_listview.height = my_listview.contentHeight + 54 * 3;
                 console.log("list height =" + my_listview.contentHeight)
             }
         }
@@ -147,7 +149,7 @@ Popup {
                         anchors.rightMargin: 5
                         Text {
                             text: modelData.content
-                            color: "#C5C5C5"
+                            color: modelData.content.includes(Settings.please_select) ? "#C5C5C5" : "#3C3C3C"
                             elide: Qt.ElideRight
                             anchors.right: parent.right
                             anchors.rightMargin: 5
@@ -197,7 +199,7 @@ Popup {
                 font.bold: true
                 background: Rectangle{
                     id: surebtnrect
-                    color: "#1890FF"
+                    color:  isChangeColor ? "#1890FF" : "#E5E5E5"
                     radius: 20.5
                 }
                 contentItem: Text {
@@ -211,6 +213,7 @@ Popup {
                     font.pixelSize: 16
                     font.bold: true
                 }
+                enabled: isChangeColor ? true : false
                 onClicked: sureAction()
             }
         }

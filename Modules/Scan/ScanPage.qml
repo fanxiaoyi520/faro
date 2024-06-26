@@ -14,6 +14,18 @@ StackView{
     property string navigationBarTitle: SettingString.quick_scan
     //公布stackView，让其在所有子控件可以访问到homestack
     property var rootStackView: scanstack
+    property var scanSelectTaskData: SettingString.selectTask
+    property var roomTaskVoModel
+    property var imageUrl
+
+    property double imageBackHeight : scanstack.width * 0.6
+    property double imageBackWidth : scanstack.width * 0.6
+    property var selectPorjectData
+    property var selectBuildingData
+    property var selectUnitData
+    property var selectFloorData
+    property var selectRoomData
+
     Toast {id: toastPopup}
     Http {id: http}
     Dialog{id: dialog}
@@ -27,8 +39,32 @@ StackView{
         onConfirmOptionsAction: scanConfirmOptionsAction(model)
         onPopUpclickSelectTask: scanPopUpclickSelectTask(index)
     }
-    ScanSelectPop {
-        id: scanSelectPop
+    ScanSelectProjectPop {
+        id: scanSelectProjectPop
+        onCellClickHandle: scanSellClickHandle(modelData,index)
+    }
+    ScanSelectBuildingPop {
+        id: scanSelectBuildingPop
+        onCellClickHandle: scanSellClickHandle(modelData,index)
+    }
+    ScanSelectUnitPop {
+        id: scanSelectUnitPop
+        onCellClickHandle: scanSellClickHandle(modelData,index)
+    }
+    ScanSelectFloorPop {
+        id: scanSelectFloorPop
+        onCellClickHandle: scanSellClickHandle(modelData,index)
+    }
+    ScanSelectRoomPop {
+        id: scanSelectRoomPop
+        onCellClickHandle: scanSellClickHandle(modelData,index)
+    }
+    ScanSearchResultDialog{
+        id: scanSearchResultDialog
+        onSelectSearchResult: scanSelectSearchResult(model)
+    }
+    ScanSelectStationNoDialog {
+        id: scanSelectStationNoDialog
     }
 
     Component {
@@ -37,6 +73,7 @@ StackView{
             id: rect
             Layout.fillHeight: true
             Layout.fillWidth: true
+
             BaseNavigationBar{
                 id: navigationBar
                 title: navigationBarTitle
@@ -79,6 +116,15 @@ StackView{
                 ColumnLayout{
                     id: column
                     anchors.fill: parent
+                    ScanImageHeaderView {
+                        id: scanImageHeaderView
+                        visible: GlobalFunc.isEmpty(roomTaskVoModel) ? false : true
+                        imgUrl: imageUrl
+                        model: roomTaskVoModel
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: imageBackHeight+90-64
+                    }
+
                     ScanHeaderView{
                         id: scanHeaderView
                         Layout.fillWidth: true
@@ -115,12 +161,17 @@ StackView{
                                 radius: 50
                                 color: "#1A1890FF"
                             }
-                            onClicked: login()
+                            onClicked: startScan()
                         }
                     }
                 }
             }
         }
+    }
+
+    //MARK: Scan
+    function startScan() {
+        console.log("start scan")
     }
 
     //MARK: jump
@@ -153,22 +204,170 @@ StackView{
         selectMeasureModePopUp.open()
     }
 
+    //MARK: Func Logic
+    function scanSellClickHandle(modelData,index) {
+        console.log("func index: "+index)
+        console.log("scan select model data: "+ JSON.stringify(modelData))
+        if (index === 0) {
+            selectPorjectData = modelData
+        } else if (index === 1) {
+            selectBuildingData = modelData
+        } else if (index === 2) {
+            selectUnitData = modelData
+        } else if (index === 3) {
+            selectFloorData = modelData
+        } else {
+            selectRoomData = modelData
+        }
+
+        scanSelectTaskData = scanSelectTaskData.map(function(itemString) {
+            var itemObject = JSON.parse(itemString);
+            if (itemObject.index === index) {
+                itemObject.content = accoringIndexGetContent(index,modelData)
+                return JSON.stringify(itemObject);
+            }
+            return itemString;
+        });
+        console.log("modified data: "+scanSelectTaskData)
+        scanSelectTaskDialog.isChangeColor = GlobalFunc.isEmpty(selectPorjectData) ? false : true
+        scanSelectTaskDialog.list = scanSelectTaskData
+    }
+
+    function accoringIndexGetContent(index,modelData) {
+        if (index === 0) return modelData.projectName
+        if (index === 1) return modelData.blockName
+        if (index === 2) return modelData.unitName
+        if (index === 3) return modelData.floorName
+        if (index === 4) return modelData.roomName
+    }
+
     function scanClickSelectTask() {
         console.log("click select task")
+        scanSelectTaskDialog.isChangeColor = false
         scanSelectTaskDialog.list = SettingString.selectTask
         scanSelectTaskDialog.open()
     }
 
     function scanClickSelectStationNo() {
         console.log("click select stationNo")
+        if (GlobalFunc.isEmpty(roomTaskVoModel)) {
+            toastPopup.text = SettingString.station_info_null
+            return
+        }
+        if (GlobalFunc.isEmpty(roomTaskVoModel.stations) && roomTaskVoModel.stations.length === 0) {
+            toastPopup.text = SettingString.station_info_null
+            return
+        } else {
+            console.log("stations: "+JSON.stringify(roomTaskVoModel.stations))
+            scanSelectStationNoDialog.list = roomTaskVoModel.stations
+            scanSelectStationNoDialog.open()
+        }
     }
 
     function scanConfirmOptionsAction(model) {
         console.log("select task sure")
+        scanSearchResultDialog.selectPorjectData = selectPorjectData
+        scanSearchResultDialog.selectBuildingData = selectBuildingData
+        scanSearchResultDialog.selectFloorData = selectFloorData
+        scanSearchResultDialog.selectRoomData = selectRoomData
+        scanSearchResultDialog.selectUnitData = selectUnitData
+        scanSearchResultDialog.open()
     }
 
     function scanPopUpclickSelectTask(index) {
         console.log("scan pop up click select task")
-        scanSelectPop.open()
+        if (index === 0) {
+            scanSelectProjectPop.index = index
+            scanSelectProjectPop.open()
+        } else if (index === 1) {
+
+            if (GlobalFunc.isEmpty(selectPorjectData)) {
+                toastPopup.text = SettingString.please_select_project
+            } else {
+                scanSelectBuildingPop.index = index
+                scanSelectBuildingPop.inputModelData = selectPorjectData
+                scanSelectBuildingPop.open()
+            }
+        } else if (index === 2) {
+            if (GlobalFunc.isEmpty(selectBuildingData)) {
+                toastPopup.text = SettingString.please_select_building
+            } else {
+                scanSelectUnitPop.index = index
+                scanSelectUnitPop.inputModelData = selectBuildingData
+                scanSelectUnitPop.open()
+            }
+        } else if (index === 3) {
+            if (GlobalFunc.isEmpty(selectUnitData)) {
+                toastPopup.text = SettingString.please_select_unit
+            } else {
+                scanSelectFloorPop.index = index
+                scanSelectFloorPop.inputModelData = selectBuildingData
+                scanSelectFloorPop.unitInputModelData = selectUnitData
+                scanSelectFloorPop.open()
+            }
+        } else {
+            if (GlobalFunc.isEmpty(selectFloorData)) {
+                toastPopup.text = SettingString.please_select_floor
+            } else {
+                scanSelectRoomPop.index = index
+                scanSelectRoomPop.inputModelData = selectFloorData
+                scanSelectRoomPop.open()
+            }
+        }
+    }
+
+    function scanSelectSearchResult(modelData) {
+        console.log("selected search result data: " + JSON.stringify(modelData))
+        getBuildingRoomTaskAndGetRoomTaskInfo(modelData)
+    }
+
+    //MARK: Network
+    function getBuildingRoomTaskAndGetRoomTaskInfo(roomModel){
+        function onBuildingReply(reply){
+            http.onReplySucSignal.disconnect(onBuildingReply)
+            console.log("complete building room task and get roomTaskInfo: "+reply)
+            var response = JSON.parse(reply)
+            roomTaskVoModel = response.data
+            if (!response.data || response.data.stations.length <=0) {
+                imageUrl = ""
+                hub.close()
+                return;
+            }
+
+            var urlStr = response.data.vectorgraph !== null ? response.data.vectorgraph : response.data.houseTypeDrawing
+            admin_sys_file_listFileByFileIds([urlStr])
+        }
+
+        function onBuildingFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onBuildingFail)
+            hub.close()
+        }
+
+        http.onReplySucSignal.connect(onBuildingReply)
+        http.replyFailSignal.connect(onBuildingFail)
+        http.get(Api.building_roomTask_getRoomTaskInfo,
+                 {"roomId":roomModel.roomId,"stageType":roomModel.stageType})
+    }
+
+    function admin_sys_file_listFileByFileIds(urlStrs){
+        function onFileReply(reply){
+            hub.close()
+            http.onReplySucSignal.disconnect(onFileReply)
+            console.log("complete admin sys file listFileByFileIds: "+reply)
+            var response = JSON.parse(reply)
+            imageUrl = "http://"+response.data[0].bucketName+"."+response.data[0].fileUri+"/"+response.data[0].fileName
+            console.log("imageUrl: "+imageUrl)
+        }
+
+        function onFileFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFileFail)
+            hub.close()
+        }
+        http.onReplySucSignal.connect(onFileReply)
+        http.replyFailSignal.connect(onFileFail)
+        http.post(Api.admin_sys_file_listFileByFileIds,
+                  {"integers":urlStrs})
     }
 }
