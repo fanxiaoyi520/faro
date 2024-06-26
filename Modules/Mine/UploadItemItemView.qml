@@ -6,7 +6,6 @@ Rectangle{
     width: parent.width
     height: 48
     property var fileInfo
-    property var selectAll: false
 
     Rectangle{
         anchors.fill: parent
@@ -62,10 +61,10 @@ Rectangle{
 
     }
 
-    onSelectAllChanged: {
-        console.log("fileInfo = " + JSON.stringify(fileInfo))
-         fileInfo.isSelected = selectAll
-         isSelectChange(fileInfo.isSelected)
+    Component.onCompleted: {
+        if(fileInfo.isSelected){
+             img_status.source = "../../images/mine/ic_selected.png"
+        }
     }
 
     function isSelectChange(isSelected){
@@ -79,6 +78,8 @@ Rectangle{
         if(rect_root.selectList.length !== rect_root.totalSize && img_select_all.isSelect){
             img_select_all.isSelect = false
         }
-        console.log("select data = " + JSON.stringify(rect_root.selectList))
+        column_itemview.datas[index] = JSON.stringify(fileInfo)
+
+//        console.log("select data = " + JSON.stringify(rect_root.selectList))
     }
 }

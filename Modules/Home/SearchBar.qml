@@ -41,32 +41,6 @@ Item {
         }
     }
 
-    Rectangle {
-        id: searchButton
-        anchors.right: parent.right
-        anchors.rightMargin: 6
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: searchField.right
-        anchors.leftMargin: 6
-        z:999
-        visible: searchField.focus ? true : false
-        Text{
-            color: "#1FA3FF"
-            text: qsTr("取消")
-            font.pixelSize: 16
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-        width: 60
-        height: 30
-        color: "transparent"
-        MouseArea{
-            anchors.fill: parent
-            onClicked: {
-                console.log("搜索按钮被点击，搜索内容:", searchField.text)
-            }
-        }
-    }
     Canvas {
         id: lineview
         width: parent.width
