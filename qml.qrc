@@ -158,5 +158,6 @@
         <file>Modules/Scan/ScanHeaderView.qml</file>
         <file>Modules/Scan/ScanImageHeaderView.qml</file>
         <file>Modules/Scan/ScanSelectStationNoDialog.qml</file>
+        <file>Login/LoginModeSelectionDialog.qml</file>
     </qresource>
 </RCC>
