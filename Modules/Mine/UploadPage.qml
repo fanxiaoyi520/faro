@@ -109,6 +109,8 @@ Rectangle{
                     } else {
                         rootStackView.pop()
                     }
+                    selectList = []
+                    img_select_all.isSelect = false
                 }
             }
         }
@@ -134,6 +136,7 @@ Rectangle{
 
     Rectangle{
         id:rect_content
+        clip: true
         width: parent.width;
         height: rect_root.height - rect_bottom.height - rect_top.height
         anchors.top: rect_top.bottom
@@ -142,6 +145,7 @@ Rectangle{
         Component{
             id:component_data
             ListView {
+                id:list_uploadpgae
                 width: parent.width;
                 height: rect_content.height
                 model: groupedList
@@ -202,9 +206,15 @@ Rectangle{
                 anchors.fill: parent
                 onClicked: {
                     var selected = !img_select_all.isSelect
-                    listItemSelectAll(selected)
+                    console.log("selected = " + selected)
                     img_select_all.isSelect = selected
-                    console.log("select data = " + JSON.stringify(selectList))
+                    if(selected){
+                        selectList = parseAllGroup(groupedList)
+                    }else{
+                        selectAllGroup(false)
+                        selectList = []
+                    }
+//                    console.log("select data = " + JSON.stringify(selectList))
                 }
             }
         }
@@ -219,7 +229,13 @@ Rectangle{
                 anchors.fill: parent
                 onClicked: {
                     var selected = !img_select_all.isSelect
-                    listItemSelectAll(selected)
+
+                    if(selected){
+                        selectList = parseAllGroup(groupedList)
+                    }else{
+                        selectAllGroup(false)
+                        selectList = []
+                    }
                     img_select_all.isSelect = selected
                 }
             }
@@ -311,12 +327,6 @@ Rectangle{
     onVisibleChanged: {
         if(visible){
             refreshFileInfo()
-        }
-    }
-
-    function listItemSelectAll(select){
-        for(var i = 0 ;i< listItems.length;i++){
-            listItems[i].selectAll = select
         }
     }
 
@@ -537,6 +547,32 @@ Rectangle{
         faroManager.performCalculationSucResult.connect(onReply)
         faroManager.performCalculationFailResult.connect(onFail)
         faroManager.performCalculation(result,filePath,params)
+    }
+
+    function parseAllGroup(){
+        selectAllGroup(true)
+        var totalArray = []
+        groupedList.forEach((item,index)=>{
+          var subArray = item
+          if(subArray && subArray.length > 0){
+              subArray.forEach((subItem,subIndex)=>{
+                 totalArray.push(JSON.parse(subItem))
+              })
+          }
+        })
+        return totalArray
+    }
+
+    function selectAllGroup(isSelected){
+        var newGroupedList = groupedList.map(function(item){
+                    return item.map(function(subItem){
+                        var subObjItem = JSON.parse(subItem)
+                        subObjItem.isSelected = isSelected
+                        return JSON.stringify(subObjItem)
+                    })
+                })
+        groupedList = []
+        groupedList = newGroupedList
     }
 }
 
