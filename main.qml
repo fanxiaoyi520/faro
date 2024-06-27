@@ -18,7 +18,10 @@ Window {
     title: qsTr("Measure")
     property var currentView: login
     WifiHelper{id: wifiHelper}
-
+    property string navigationBarTitle
+    property var modellist: []
+    property var sourcelist: []
+    property int headerSelectedIndex: 0
     Component.onCompleted: {
         preprocessing()
         initData()

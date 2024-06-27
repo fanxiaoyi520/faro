@@ -14,7 +14,7 @@ import "../../Util/GlobalFunc.js" as GlobalFunc
 StackView{
     id: scanstack
     initialItem: scanview
-    property string navigationBarTitle: SettingString.quick_scan
+    //property string navigationBarTitle: SettingString.quick_scan
     //公布stackView，让其在所有子控件可以访问到homestack
     property var rootStackView: scanstack
     property var scanSelectTaskData: SettingString.selectTask
@@ -30,7 +30,9 @@ StackView{
     property var selectUnitData
     property var selectFloorData
     property var selectRoomData
-
+    onVisibleChanged: {
+        if (visible) clearAll()
+    }
     Toast {id: toastPopup}
     Http {id: http}
     Dialog{id: dialog}
@@ -104,7 +106,7 @@ StackView{
 
             BaseNavigationBar{
                 id: navigationBar
-                title: navigationBarTitle
+                title: GlobalFunc.isEmpty(navigationBarTitle) ? SettingString.quick_scan : navigationBarTitle
                 isVisibleBackBtn: false
 
                 Image{
@@ -428,6 +430,7 @@ StackView{
     function scanSellClickHandle(modelData,index) {
         console.log("func index: "+index)
         console.log("scan select model data: "+ JSON.stringify(modelData))
+        if (GlobalFunc.isEmpty(scanSelectTaskData)) scanSelectTaskData = SettingString.selectTask
         if (index === 0) {
             if (!GlobalFunc.isEmpty(selectPorjectData)
                     && modelData.id !== selectPorjectData.id) {
@@ -480,7 +483,6 @@ StackView{
         } else {
             selectRoomData = modelData
         }
-
         scanSelectTaskData = scanSelectTaskData.map(function(itemString) {
             var itemObject = JSON.parse(itemString);
             if (itemObject.index === index) {
@@ -511,7 +513,7 @@ StackView{
     }
 
     function scanClickSelectTask() {
-        console.log("click select task")
+        console.log("click select task"+JSON.stringify(selectPorjectData))
         scanSelectTaskDialog.isChangeColor = GlobalFunc.isEmpty(selectPorjectData) ? false : true
         scanSelectTaskDialog.list = !GlobalFunc.isEmpty(scanSelectTaskData) ? scanSelectTaskData : SettingString.selectTask
         scanSelectTaskDialog.open()
@@ -686,6 +688,90 @@ StackView{
 
     function clearAll() {
         scanSelectTaskData = undefined
+        selectPorjectData = undefined
+        selectBuildingData = undefined
+        selectFloorData = undefined
+        selectUnitData = undefined
+        selectRoomData = undefined
         clearSelectedData()
+    }
+
+    function sureSelectedSearchResult(modelData){
+        searchview.parent.pop()
+        headerSelectedIndex = 0
+        clearAll()
+        console.log("search selected project data: "+JSON.stringify(modelData))
+        settingsManager.setValue(settingsManager.selectedProjectSource,JSON.stringify(modelData))
+        assemblySelectedProjectData(modelData)
+    }
+
+    function assemblySelectedProjectData(modelData){
+        navigationBarTitle = qsTr(modelData.name)
+
+        function onReply(reply){
+            http.onReplySucSignal.disconnect(onReply)
+            hub.close()
+            console.log("complete project page data: "+reply)
+            var response = JSON.parse(reply)
+            reduceData(response.data)
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFail)
+            hub.close()
+        }
+
+        http.onReplySucSignal.connect(onReply)
+
+        http.replyFailSignal.connect(onFail)
+        http.post(Api.building_project_page,
+                  {"current":1,"size":10,"deptId":modelData.id})
+    }
+
+    function reduceData(model){
+        if (model && Array.isArray(model.records)) {
+            var ids = model.records.map(item => item.id)
+            console.log("ids: "+ ids)
+            if(ids.length <= 0) {
+                //更新数据UI
+                return
+            }
+            buildingRoomProjectRoomCount(ids,model)
+        } else {
+            console.error("model 或 model.records 是 undefined 或不是数组");
+        }
+    }
+
+    function buildingRoomProjectRoomCount(ids,model){
+        function onReply(reply){
+            http.onReplySucSignal.disconnect(onReply)
+            hub.close()
+            console.log("complete building room projectRoomCount data: "+reply)
+            var response = JSON.parse(reply)
+            response.data.map(obj =>{
+                                  var dataItems = model.records.map(item => {
+                                                                        if(obj.projectId === item.id){
+                                                                            item.reduceItem = obj
+                                                                        }
+                                                                        return item
+                                                                    })
+                                  console.log("Combined data: " + JSON.stringify(dataItems))
+                                  settingsManager.setValue(settingsManager.selectedProject,JSON.stringify(dataItems))
+                                  sourcelist = dataItems
+                                  modellist = dataItems
+                              })
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFail)
+            hub.close()
+        }
+
+        http.onReplySucSignal.connect(onReply)
+        http.replyFailSignal.connect(onFail)
+        http.post(Api.building_room_projectRoomCount,
+                  {"integers":ids})
     }
 }
