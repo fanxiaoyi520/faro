@@ -181,7 +181,9 @@ var layer = "层"
 var building = "栋"
 var room_task = "房间任务"
 var station_info_null = "测站信息为空"
-
+var please_first_select_task = "请选择任务"
+var please_select_station = "请选择测站"
+var in_progress_unable_to_scan = "当前任务正在进行中,无法扫描"
 
 
 

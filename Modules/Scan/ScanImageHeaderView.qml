@@ -44,7 +44,6 @@ Rectangle{
         id: imageBackView
         width: imageBackWidth
         height: imageBackHeight
-        y: 20
         x: (parent.width - imageBackWidth)/2
         Canvas {
             id: canvas

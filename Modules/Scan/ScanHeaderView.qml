@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
 import "../../String_Zh_Cn.js" as Settings
+import "../../Util/GlobalFunc.js" as GlobalFunc
 
 Rectangle {
     color: "#FFFFFF"
@@ -8,6 +9,9 @@ Rectangle {
     signal setupMeasureData()
     signal clickSelectTask()
     signal clickSelectStationNo()
+    property var selectProjectData
+    property var selectStationData
+    
     Rectangle{
         id: leftSelectTaskRec
         anchors.left: parent.left
@@ -19,9 +23,9 @@ Rectangle {
         width: parent.width * 0.6
         Text {
             id: leftSelectTaskRecText
-            text: qsTr(Settings.click_select_task)
+            text: qsTr(!GlobalFunc.isEmpty(selectProjectData) ? selectProjectData.projectName : Settings.click_select_task)
             font.pointSize: 16
-            color: "#999999"
+            color: !GlobalFunc.isEmpty(selectProjectData) ? "#333333" : "#999999"
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 20
@@ -53,9 +57,9 @@ Rectangle {
         border.width: 1
         Text {
             id: rightStationNoRecText
-            text: qsTr(Settings.station_no)
+            text: qsTr(!GlobalFunc.isEmpty(selectStationData) ? (Settings.stationname+selectStationData.stationNo): Settings.station_no)
             font.pointSize: 16
-            color: "#999999"
+            color: !GlobalFunc.isEmpty(selectStationData) ? "#333333" : "#999999"
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }

@@ -6,8 +6,11 @@ import Http 1.0
 import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
+import FaroManager 1.0
+
 import "../../String_Zh_Cn.js" as SettingString
 import "../../Util/GlobalFunc.js" as GlobalFunc
+
 StackView{
     id: scanstack
     initialItem: scanview
@@ -17,9 +20,11 @@ StackView{
     property var scanSelectTaskData: SettingString.selectTask
     property var roomTaskVoModel
     property var imageUrl
+    property var scanSelectProjectData
+    property var scanSelectStationData
 
-    property double imageBackHeight : scanstack.width * 0.6
-    property double imageBackWidth : scanstack.width * 0.6
+    property double imageBackHeight : scanstack.width * 0.8
+    property double imageBackWidth : scanstack.width * 0.8
     property var selectPorjectData
     property var selectBuildingData
     property var selectUnitData
@@ -31,6 +36,28 @@ StackView{
     Dialog{id: dialog}
     Hub{id: hub}
     Loader {id: searchview}
+    EnlargeImage{
+        id: enlargeImagePopUp
+    }
+    FaroManager {
+        id: faroManager
+        Component.onCompleted: {
+            if(faroManager.init()) {
+                console.log("--------------初始化成功--------------")
+            }
+        }
+        onConnectResult: detailConnectResult(result)
+    }
+    TipsPopUp{
+        id: nonerworkPopUp
+        tipsContentStr: qsTr(SettingString.unable_obtain_device_WiFi)
+        isVisibleCancel: false
+        onConfirmAction: {}
+    }
+    ScanningFaroPop{
+        id: scanningFaroPop
+        lottieType: 0
+    }
     SelectMeasureModePopUp{
         id: selectMeasureModePopUp
     }
@@ -65,6 +92,7 @@ StackView{
     }
     ScanSelectStationNoDialog {
         id: scanSelectStationNoDialog
+        onSelectStationNo: scanFuncSelectStationNo(model)
     }
 
     Component {
@@ -128,15 +156,18 @@ StackView{
                     ScanHeaderView{
                         id: scanHeaderView
                         Layout.fillWidth: true
+                        Layout.topMargin: 20
                         height: 119.5
                         onSetupMeasureData: scanSetupMeasureData()
                         onClickSelectTask: scanClickSelectTask()
                         onClickSelectStationNo: scanClickSelectStationNo()
+                        selectProjectData: scanSelectProjectData
+                        selectStationData: scanSelectStationData
                     }
 
                     Rectangle{
                         Layout.fillWidth: true
-                        height: 200
+                        height: 120
                         Button{
                             id: startScanBtn
                             anchors.bottom: parent.bottom
@@ -171,7 +202,189 @@ StackView{
 
     //MARK: Scan
     function startScan() {
-        console.log("start scan")
+        if (!checkPreScan()) return
+
+        console.log("start scan ...")
+        var timer = new Date()
+        console.log("timer = " + timer.toLocaleString())
+        console.log("selectedMeasureData" + settingsManager.getValue(settingsManager.selectedMeasureData))
+        var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
+        var scanParams = {
+            "activeColoring": selectedMeasureData ? selectedMeasureData.activeColoring : "0",
+            "map_mode": selectedMeasureData ? selectedMeasureData.map_mode : "4",
+            "scanningMode": selectedMeasureData ? selectedMeasureData.scanningMode : "1/20",
+            "masonry_mode": selectedMeasureData ? selectedMeasureData.masonry_mode : 0,
+            "xy_crop_dist": selectedMeasureData ? selectedMeasureData.xy_crop_dist : 6,
+            "z_crop_dist": selectedMeasureData ? selectedMeasureData.z_crop_dist : 3,
+
+            "stationId":scanSelectStationData.stationId,
+            "taskNo":scanSelectStationData.stationNo,
+            "stationType":scanSelectStationData.stationType,
+            "isAutoUpload":false,
+            "projectName":roomTaskVoModel.projectName,
+            "blockName":roomTaskVoModel.blockName,
+            "unitName":roomTaskVoModel.unitName,
+            "floorName":roomTaskVoModel.floorName,
+            "roomName":roomTaskVoModel.roomName,
+            "stageType":roomTaskVoModel.stageType,
+            "roomId":scanSelectStationData.roomId,
+            "stationTaskNo": scanSelectStationData.stationTaskNo,
+            "update_time": timer.toLocaleString()
+        }
+
+        console.log("input scanning parameters: "+JSON.stringify(scanParams))
+        console.log("~scanSelectStationData: "+JSON.stringify(scanSelectStationData))
+        console.log("~selectedMeasureData: "+JSON.stringify(selectedMeasureData))
+        console.log("~roomTaskVoModel: "+JSON.stringify(roomTaskVoModel))
+        wifiConectHandle(scanParams)
+    }
+
+    function checkPreScan(){
+        if (GlobalFunc.isEmpty(roomTaskVoModel)
+                || roomTaskVoModel.ifReadyForTask === 0
+                || GlobalFunc.isEmpty(scanSelectProjectData)) {
+            toastPopup.text = SettingString.please_first_select_task
+            return false
+        }
+
+        if (GlobalFunc.isEmpty(scanSelectStationData)) {
+            toastPopup.text = SettingString.please_select_station
+            return false
+        }
+        return true
+    }
+
+    function wifiConectHandle(scanParams){
+        var wifi = settingsManager.getValue(settingsManager.currentDevice)
+        if (!wifi) {
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.unable_obtain_device_WiFi)
+            nonerworkPopUp.open()
+            return
+        }
+        console.log("wifi info =" + wifi)
+
+        function connectResult(isSuc){
+            wifiHelper.connectToWiFiResult.disconnect(connectResult)
+            if (isSuc){
+                console.log("wifi connect suc ...")
+                enteringScanningPhase(scanParams,false)
+            } else {
+                console.log("wifi connect fail ...")
+                nonerworkPopUp.open()
+            }
+        }
+        wifiHelper.onConnectToWiFiResult.connect(connectResult)
+        wifiHelper.connectToWiFi(JSON.parse(wifi).wifiName,JSON.parse(wifi).wifiPass)
+    }
+
+    function enteringScanningPhase(scanParams,checked){
+        ///扫描完成回调
+        function scanComplete(filePath){
+            faroManager.onScanComplete.disconnect(scanComplete)
+            faroManager.onScanProgress.disconnect(scanProgress)
+            scanCompleteDataHandle(scanParams,filePath)
+            scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
+            scanningFaroPop.close()
+            //clearAll()
+            taskDetialViewMonitorNetworkChanges()
+            function wifiDisConnect(result){
+                nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
+                nonerworkPopUp.open()
+            }
+            wifiHelper.onDisConnectWifiResult.connect(wifiDisConnect)
+            wifiHelper.disConnectWifi()
+        }
+
+        ///扫描进度
+        function scanProgress(percent){
+            console.log("scan progress percent: "+percent)
+            scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + percent + "%)"
+        }
+
+        ///扫描异常
+        function scanAbnormal(scanStatus){
+            scanningFaroPop.close()
+            nonerworkPopUp.tipsContentStr = qsTr(SettingString.device_conncet_fail_tips)
+            nonerworkPopUp.open()
+        }
+
+        faroManager.onScanComplete.connect(scanComplete)
+        faroManager.onScanProgress.connect(scanProgress)
+        faroManager.scanAbnormal.connect(scanAbnormal)
+        var connectResult = faroManager.connect(scanParams)
+        console.log("connect result: "+connectResult)
+
+        scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
+        scanningFaroPop.title = SettingString.scan_station_id+scanSelectStationData.stationNo
+        scanningFaroPop.lottieType = 0
+        scanningFaroPop.open()
+    }
+
+    function detailConnectResult(result){
+        console.log("result: "+result)
+        var wifi = settingsManager.getValue(settingsManager.currentDevice)
+        if(GlobalFunc.isJson(wifi)) {
+            console.log("start scan wifi info =" + wifi)
+            var contentName = JSON.parse(wifi).wifiName
+            var currentWifiName = wifiHelper.queryInterfaceName()
+            if (currentWifiName === contentName){
+                scanningFaroPop.tipsconnect = SettingString.device_connect_suc
+            }
+        }
+    }
+
+    function taskDetialViewMonitorNetworkChanges(){
+        faroManager.monitorNetworkChanges()
+        function networkChangesComplete(isOnline){
+            console.log("network changes result: "+isOnline)
+            faroManager.onMonitorNetworkChangesComplete.disconnect(networkChangesComplete)
+            getBuildingRoomListByFloorId()
+        }
+        faroManager.onMonitorNetworkChangesComplete.connect(networkChangesComplete)
+    }
+
+    function scanCompleteDataHandle(scanParams,filePath){
+        console.log("scan params: "+scanParams+" file path: "+filePath)
+        scanParams.filePath = filePath
+        var newscanParams = scanParams
+        console.log("new scan params: "+JSON.stringify(scanParams))
+        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("get file json data: "+filejson)
+        if (!filejson || filejson.length === 0) {
+            var filedatas = []
+            filedatas.push(JSON.stringify(scanParams))
+            console.log("new data: "+filejson)
+            console.log("new data: "+JSON.stringify(scanParams))
+            settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(filedatas))
+        } else {
+            var datas = JSON.parse(filejson)
+            if (Array.isArray(datas)){
+                let index = datas.findIndex(value => {
+                                                var iscon = JSON.parse(value).stationId === scanParams.stationId
+                                                && JSON.parse(value).roomId === scanParams.roomId
+                                                && JSON.parse(value).stageType === scanParams.stageType
+                                                return iscon
+                                            });
+                console.log("cover index: "+index)
+                if (index !== -1) {
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas[index] = JSON.stringify(scanParams);
+                    }
+                } else {
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas.push(JSON.stringify(scanParams))
+                    }
+                }
+                console.log("scan params and datas: "+JSON.stringify(datas))
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
+            } else {
+                var nulldatas = []
+                nulldatas.push(JSON.stringify(scanParams))
+                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(nulldatas))
+            }
+        }
+        var newfilejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("new data: "+newfilejson)
     }
 
     //MARK: jump
@@ -180,6 +393,13 @@ StackView{
         //使用的时候再加载
         searchview.source = "../Home/SearchView.qml"
         scanstack.push(searchview)
+    }
+
+    function enlargeImageAction(inputImageUrl){
+        console.log("need enlarge image: "+ inputImageUrl)
+        enlargeImagePopUp.imgUrl = imageUrl
+        enlargeImagePopUp.model = roomTaskVoModel
+        enlargeImagePopUp.open()
     }
 
     function scanSetupMeasureData() {
@@ -209,12 +429,53 @@ StackView{
         console.log("func index: "+index)
         console.log("scan select model data: "+ JSON.stringify(modelData))
         if (index === 0) {
+            if (!GlobalFunc.isEmpty(selectPorjectData)
+                    && modelData.id !== selectPorjectData.id) {
+                selectBuildingData = undefined
+                selectUnitData = undefined
+                selectFloorData = undefined
+                selectRoomData = undefined
+                scanSelectTaskData = SettingString.selectTask
+            }
             selectPorjectData = modelData
         } else if (index === 1) {
+            if (!GlobalFunc.isEmpty(selectBuildingData)
+                    && modelData.id !== selectBuildingData.id) {
+                selectUnitData = undefined
+                selectFloorData = undefined
+                selectRoomData = undefined
+                scanSelectTaskData = scanSelectTaskData.map(function(itemString) {
+                    var itemObject = JSON.parse(itemString);
+                    if (itemObject.index === 2) itemObject.content = SettingString.please_select_unit
+                    if (itemObject.index === 3) itemObject.content = SettingString.please_select_floor
+                    if (itemObject.index === 4) itemObject.content = SettingString.please_select_roomno
+                    return JSON.stringify(itemObject);
+                });
+            }
             selectBuildingData = modelData
         } else if (index === 2) {
+            if (!GlobalFunc.isEmpty(selectUnitData)
+                    && modelData.id !== selectUnitData.id) {
+                selectFloorData = undefined
+                selectRoomData = undefined
+                scanSelectTaskData = scanSelectTaskData.map(function(itemString) {
+                    var itemObject = JSON.parse(itemString);
+                    if (itemObject.index === 3) itemObject.content = SettingString.please_select_floor
+                    if (itemObject.index === 4) itemObject.content = SettingString.please_select_roomno
+                    return JSON.stringify(itemObject);
+                });
+            }
             selectUnitData = modelData
         } else if (index === 3) {
+            if (!GlobalFunc.isEmpty(selectFloorData)
+                    && modelData.id !== selectFloorData.id) {
+                selectRoomData = undefined
+                scanSelectTaskData = scanSelectTaskData.map(function(itemString) {
+                    var itemObject = JSON.parse(itemString);
+                    if (itemObject.index === 4) itemObject.content = SettingString.please_select_roomno
+                    return JSON.stringify(itemObject);
+                });
+            }
             selectFloorData = modelData
         } else {
             selectRoomData = modelData
@@ -241,10 +502,18 @@ StackView{
         if (index === 4) return modelData.roomName
     }
 
+    function accoringIndexReductionContent(index,modelData) {
+        if (index === 0) return modelData.projectName
+        if (index === 1) return modelData.blockName
+        if (index === 2) return modelData.unitName
+        if (index === 3) return modelData.floorName
+        if (index === 4) return modelData.roomName
+    }
+
     function scanClickSelectTask() {
         console.log("click select task")
-        scanSelectTaskDialog.isChangeColor = false
-        scanSelectTaskDialog.list = SettingString.selectTask
+        scanSelectTaskDialog.isChangeColor = GlobalFunc.isEmpty(selectPorjectData) ? false : true
+        scanSelectTaskDialog.list = !GlobalFunc.isEmpty(scanSelectTaskData) ? scanSelectTaskData : SettingString.selectTask
         scanSelectTaskDialog.open()
     }
 
@@ -261,6 +530,15 @@ StackView{
             console.log("stations: "+JSON.stringify(roomTaskVoModel.stations))
             scanSelectStationNoDialog.list = roomTaskVoModel.stations
             scanSelectStationNoDialog.open()
+        }
+    }
+
+    function scanFuncSelectStationNo(modelData) {
+        console.log("selected station no: "+JSON.stringify(modelData))
+        if (GlobalFunc.isEmpty(modelData.stationTaskNo)) {
+            createRoomStationTask(modelData)
+        } else {
+            scanSelectStationData = modelData
         }
     }
 
@@ -318,6 +596,9 @@ StackView{
 
     function scanSelectSearchResult(modelData) {
         console.log("selected search result data: " + JSON.stringify(modelData))
+        clearSelectedData()
+        scanSelectProjectData = modelData
+        hub.open()
         getBuildingRoomTaskAndGetRoomTaskInfo(modelData)
     }
 
@@ -369,5 +650,42 @@ StackView{
         http.replyFailSignal.connect(onFileFail)
         http.post(Api.admin_sys_file_listFileByFileIds,
                   {"integers":urlStrs})
+    }
+
+    function clearSelectedData(){
+        scanSelectProjectData = undefined
+        scanSelectStationData = undefined
+        roomTaskVoModel = undefined
+        imageUrl = undefined
+    }
+
+    function createRoomStationTask(modelData) {
+        function onReply(reply){
+            http.onReplySucSignal.disconnect(onReply)
+            console.log("complete building roomStation task create "+reply)
+            var response = JSON.parse(reply)
+            if (!response.data) {
+                hub.close()
+                return;
+            }
+            modelData.stationTaskNo = response.data
+            scanSelectStationData = modelData
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFail)
+            hub.close()
+        }
+
+        http.onReplySucSignal.connect(onReply)
+        http.replyFailSignal.connect(onFail)
+        http.post(Api.building_roomStationTask_create,
+                  {"roomTaskNo":modelData.roomTaskNo,"stationId":modelData.stationId})
+    }
+
+    function clearAll() {
+        scanSelectTaskData = undefined
+        clearSelectedData()
     }
 }

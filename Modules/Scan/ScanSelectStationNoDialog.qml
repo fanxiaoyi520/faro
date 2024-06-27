@@ -10,7 +10,7 @@ import "../../Util/GlobalFunc.js" as GlobalFunc
 Popup {
     property var list: []
     property int currentIndex: 0
-    property var titleStr: Settings.search_result
+    property var titleStr: Settings.station_no
 
     property var page: 0
     property var selectPorjectData
@@ -19,7 +19,7 @@ Popup {
     property var selectFloorData
     property var selectRoomData
 
-    signal selectSearchResult(var model)
+    signal selectStationNo(var model)
     id: popup
     y: parent.height - popup.height
     width: parent.width
@@ -124,7 +124,7 @@ Popup {
                     onClicked: {
                         currentIndex = index;
                         popup.close()
-                        selectSearchResult(modelData)
+                        selectStationNo(modelData)
                     }
                 }
             }

@@ -26,7 +26,6 @@ Item{
     property var inputCellModel
     property string room_id
     property int selectHeaderIndex: 0
-    property var inputScanParams
     signal callbackOrSyncEventHandling()
     id: selectTaskDetailsView
     Layout.fillWidth: true
@@ -481,7 +480,6 @@ Item{
         faroManager.onScanProgress.connect(scanProgress)
         faroManager.scanAbnormal.connect(scanAbnormal)
         var connectResult = faroManager.connect(scanParams)
-        inputScanParams = scanParams
         console.log("connect result: "+connectResult)
 
         scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine

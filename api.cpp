@@ -119,4 +119,9 @@ QString Api::building_roomTask_searchFastScanRoomTask() const
     return QString("/building/roomTask/searchFastScanRoomTask");
 }
 
+QString Api::building_roomStationTask_create() const
+{
+    return QString("/building/roomStationTask/create");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}
