@@ -4,6 +4,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.12
 import Http 1.0
 import Api 1.0
+import Modules 1.0
 import "../../String_Zh_Cn.js" as Settings
 import "../../Util/GlobalFunc.js" as GlobalFunc
 
@@ -86,6 +87,19 @@ Popup {
             clip: true
             model: list
             delegate:itemDelegate
+            ScrollView {
+                anchors.fill: parent
+                background: NoDataView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    y: 0
+                    width: parent.width
+                    height: parent.height
+                    id: noDataView
+                    textStr: qsTr(Settings.no_datas)
+                }
+                visible: list && list.length > 0 ? false : true
+            }
         }
         Component{
             id: itemDelegate

@@ -408,9 +408,9 @@ StackView{
             settingsManager.setValue(settingsManager.selectedStageType,SettingString.stageType[0])
         }
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        selectMeasureModePopUp.stageType = selectedStageType.index+1
-        selectMeasureModePopUp.stationType = 2
-
+        selectMeasureModePopUp.stageType = GlobalFunc.isEmpty(scanSelectProjectData) ? selectedStageType.index+1 : scanSelectProjectData.stageType
+        selectMeasureModePopUp.stationType = GlobalFunc.isEmpty(scanSelectStationData) ? 2 : scanSelectStationData. stationType
+        console.log("stageType: "+selectMeasureModePopUp.stageType)
         var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
         var dataList = SettingString.selectedMeasureMode.map(function(itemString) {
             var itemObject = JSON.parse(itemString);
