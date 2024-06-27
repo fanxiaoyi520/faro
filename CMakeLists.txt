@@ -71,6 +71,10 @@ else()
     )
 endif()
 
+set_target_properties(Measure PROPERTIES
+ WIN32_EXECUTABLE TRUE
+)
+
 target_compile_definitions(Measure
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(Measure
