@@ -159,5 +159,8 @@
         <file>Modules/Scan/ScanImageHeaderView.qml</file>
         <file>Modules/Scan/ScanSelectStationNoDialog.qml</file>
         <file>Login/LoginModeSelectionDialog.qml</file>
+        <file>Modules/Base/BaseMajorTabBar.qml</file>
+        <file>Modules/Base/MainView.qml</file>
+        <file>Modules/Base/MajorMainView.qml</file>
     </qresource>
 </RCC>

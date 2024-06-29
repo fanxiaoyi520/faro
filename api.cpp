@@ -124,4 +124,9 @@ QString Api::building_roomStationTask_create() const
     return QString("/building/roomStationTask/create");
 }
 
+QString Api::building_block_queryBlockOfflineData() const
+{
+    return QString("/building/block/queryBlockOfflineData");
+}
+
 Api::Api(QObject *parent) : QObject(parent) {}

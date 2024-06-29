@@ -1,5 +1,6 @@
 ﻿module Modules
 
+BaseMajorTabBar 1.0 ./Base/BaseMajorTabBar.qml
 BaseTabBar 1.0 ./Base/BaseTabBar.qml
 BaseNavigationBar 1.0 ./Base/BaseNavigationBar.qml
 HomePage 1.0 ./Home/HomePage.qml

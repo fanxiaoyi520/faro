@@ -6,6 +6,7 @@ import Http 1.0
 import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
+import QtEnumClass 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as SettingString
 ScrollView{
@@ -15,7 +16,9 @@ ScrollView{
     property var list:[]
     property int currentRow: 0
     property string selectedStageName: "主体阶段（一阶段）"
-
+    property int inputIndex
+    property var transferModelData
+    property var blockOffilneData
     id: selectBuildingView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -23,6 +26,23 @@ ScrollView{
     clip: true
     Toast {id: toastPopup}
     Http {id: http}
+    TipsPopUp{
+        id: tipsPopUp
+        onConfirmAction: preEnterMeasureMode()
+    }
+//    Timer {
+//        id: downloadTimer
+//        interval: 500
+//        repeat: true
+//        onTriggered: downloadTimerTaskHandle ()
+//    }
+    ScanningFaroPop{
+        id: scanningFaroPop
+        title: SettingString.faro_measure_task
+        isVisibleCancle: true
+        lottieType: 1
+        onCancleBlock: buildingCancleBlock()
+    }
     Dialog{
         id: dialog
         titleStr: qsTr("选择阶段")
@@ -192,10 +212,45 @@ ScrollView{
                     anchors.rightMargin: 20
                 }
             }
-            MouseArea{
+
+            Timer {
+                id: longPressTimer
+                interval: 500
+                repeat: false
+                onTriggered: {
+                    if (mouseArea.pressed) {
+                        console.log("Long press detected!");
+                        // 在这里添加你的长按响应代码
+                        longPressDetected()
+                    }
+                }
+            }
+
+            MouseArea {
+                id: mouseArea
                 anchors.fill: parent
                 onClicked: {
-                    jumpToSelectFloor(index,modelData)
+                    var loginMode = settingsManager.getValue(settingsManager.LoginMode)
+                    inputIndex = index
+                    transferModelData = modelData
+                    if (Number(loginMode) === QtEnumClass.Ordinary) {
+                        jumpToSelectFloor(index,modelData)
+                    } else {
+                        console.log("this is a major mode")
+                    }
+                }
+                onPressed: {
+                    longPressTimer.start();
+                }
+
+                onReleased: {
+                    longPressTimer.stop();
+                }
+
+                onPositionChanged: {
+                    if (mouseArea.pressed) {
+                        longPressTimer.stop();
+                    }
                 }
             }
         }
@@ -216,6 +271,34 @@ ScrollView{
 
     //MARK: jump
     //跳转到选择楼层
+    function longPressDetected(){
+        tipsPopUp.tipsContentStr = SettingString.enter_measure_mode
+        tipsPopUp.open()
+    }
+
+    function preEnterMeasureMode() {
+        if (tipsPopUp.tipsContentStr === SettingString.enter_measure_mode) {
+            console.log("inputIndex: "+inputIndex)
+            console.log("transferModelData: "+JSON.stringify(transferModelData))
+            tipsPopUp.close()
+            scanningFaroPop.tipsconnect = SettingString.measure_resource_download_progress+"0%"
+            scanningFaroPop.open()
+            queryBlockOffilneData()
+        }
+
+        if (tipsPopUp.tipsContentStr === SettingString.sure_cancle_tasks) {
+            console.log("sure cancle task ...")
+            //downloadTimer.stop()
+            scanningFaroPop.close()
+            tipsPopUp.close()
+        }
+    }
+
+    function buildingCancleBlock() {
+        tipsPopUp.tipsContentStr = SettingString.sure_cancle_tasks
+        tipsPopUp.open()
+    }
+
     function jumpToSelectFloor(index,modelData){
         console.log("incoming data index: ("+index+") and model: "+JSON.stringify(modelData))
         selectFloorView.source = "SelectFloorView.qml"
@@ -289,5 +372,54 @@ ScrollView{
         http.replyFailSignal.connect(onFail)
         http.post(Api.building_room_blockRoomCount,
                   {"blockIds":blockIds,"stageType":currentRow+1})
+    }
+
+    function queryBlockOffilneData(){
+        function onReply(reply){
+            http.onReplySucSignal.disconnect(onReply)
+            var response = JSON.parse(reply)
+            console.log("complete query block offilne data: "+reply)
+            if (!response.data) {
+                hub.close()
+                return;
+            }
+            blockOffilneData = response.data
+            //downloadTimer.start()
+            scanningFaroPop.tipsconnect = SettingString.measure_resource_download_progress+"1%"
+            downloadTaskHandle()
+        }
+
+        function onFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFail)
+            hub.close()
+        }
+
+        http.onReplySucSignal.connect(onReply)
+        http.replyFailSignal.connect(onFail)
+        http.get(Api.building_block_queryBlockOfflineData,{"stageType":currentRow+1,"blockId":transferModelData.id})
+    }
+
+    function downloadTaskHandle(){
+        function onFileReply(reply){
+            hub.close()
+            http.onReplySucSignal.disconnect(onFileReply)
+            console.log("complete admin sys file listFileByFileIds: "+reply)
+        }
+
+        function onFileFail(reply,code){
+            console.log(reply,code)
+            http.replyFailSignal.disconnect(onFileFail)
+            hub.close()
+        }
+        console.log("blockOffilneData.pics: "+blockOffilneData.pics)
+        http.onReplySucSignal.connect(onFileReply)
+        http.replyFailSignal.connect(onFileFail)
+        blockOffilneData.pics.map(item=>{
+                                      console.log("urlStr: "+item)
+                                      http.download(Api.admin_sys_file_listFileByFileIds,
+                                                {"integers":item})
+                                      return item
+                                  })
     }
 }

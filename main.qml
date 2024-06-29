@@ -7,7 +7,9 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 import Dialog 1.0
 import WifiHlper 1.0
+import QtEnumClass 1.0
 import "./Util/GlobalFunc.js" as GlobalFunc
+import "String_Zh_Cn.js" as Settings
 
 Window {
     id: rootWindow
@@ -22,6 +24,8 @@ Window {
     property var modellist: []
     property var sourcelist: []
     property int headerSelectedIndex: 0
+    property var loginMode
+    property var loginName
     Component.onCompleted: {
         preprocessing()
         initData()
@@ -74,21 +78,31 @@ Window {
             }
         }
 
+        loginMode = settingsManager.getValue(settingsManager.LoginMode)
+        loginName = Number(loginMode) === QtEnumClass.Ordinary ? Settings.normal_mode : Settings.major_mode
         if (user && user.access_token !== "") {
             console.log("enter mainview")
-            currentView = mainview;
+            currentView = loginMode === QtEnumClass.Ordinary ? mainview : majormainview;
+            viewLoader.sourceComponent = Number(loginMode) === QtEnumClass.Ordinary ? mainview : majormainview
         } else {
             console.log("enter loginview")
             currentView = login;
+            viewLoader.sourceComponent = login
         }
     }
 
+    function inputMainView() {
+        console.log("enter !!!")
+        loginMode = settingsManager.getValue(settingsManager.LoginMode)
+        loginName = Number(loginMode) === QtEnumClass.Ordinary ? Settings.normal_mode : Settings.major_mode
+        viewLoader.sourceComponent = Number(loginMode) === QtEnumClass.Ordinary ? mainview : majormainview
+    }
+
     function toggleView() {
-        if(currentView === login){
-            currentView = mainview
-        }else{
-            currentView = login
-        }
+        viewLoader.sourceComponent = login
+        ///***切换模式重启程序，目前发现登录完成多次切换sourceComponent，存在crash问题***
+        ///***备用解决方案***
+        applicationController.restartApplication()
     }
 
     Hub{id:hub}
@@ -103,7 +117,7 @@ Window {
             anchors.fill: parent
             Login {
                 anchors.centerIn: parent
-                onCompleteLogin: toggleView()
+                onCompleteLogin: inputMainView()
                 anchors.fill: parent
             }
         }
@@ -155,9 +169,67 @@ Window {
         }
     }
 
+    Component {
+        id: majormainview
+        Rectangle{
+            anchors.fill: parent
+            StackLayout {
+                anchors.fill: parent
+                currentIndex: tabbar.currentIndex
+                HomePage{
+                    id: homeTab
+                    onDepthChanged: {
+                        console.log("home page current depth:"+depth)
+                        tabbar.visible = depth === 1
+                    }
+                }
+
+                ResultPage{
+                    id: resultTab
+                    onDepthChanged: {
+                        console.log("result page current depth:"+depth)
+                        tabbar.visible = depth === 1
+                    }
+                }
+
+                StackView{
+                    id: uploadstack
+                    initialItem: uploadview
+                    Component {
+                        id: uploadview
+                        UploadPage {
+                            id: uploadTab
+                            isTabbarRootComponent: true
+                        }
+                    }
+                    onDepthChanged: {
+                        console.log("result page current depth:"+depth)
+                        tabbar.visible = depth === 1
+                    }
+                }
+
+                MinePage{
+                    id: mineTab
+                    onDepthChanged: {
+                        console.log("mine page current depth:"+depth)
+                        tabbar.visible = depth === 1
+                    }
+                }
+            }
+
+            BaseMajorTabBar {
+                id: tabbar
+                onTabBarAction: {
+                    console.log("switch selected tabbar: "+currentIndex)
+                }
+            }
+        }
+    }
+
     Loader {
         id: viewLoader
         anchors.fill: parent
-        sourceComponent: currentView
+        //asynchronous: true
+//        Component.onCompleted: viewLoader.sourceComponent = login
     }
 }

@@ -339,7 +339,8 @@ Item {
         }
 
         function destroyAndRecreate() {
-            console.log(d.log, "destroy and recreate");
+            //TODO: 注释
+            //console.log(d.log, "destroy and recreate");
             if (animationItem) {
                 d.pendingRawFrame = animationItem.currentRawFrame;
             }

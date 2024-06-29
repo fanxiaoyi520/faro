@@ -19,6 +19,7 @@ Rectangle{
     property var index: 0
     property var totalUploadSize: 0
     property var totalSize: 0
+    property bool isTabbarRootComponent: false
 
     width:parent.width
     height: parent.width
@@ -100,6 +101,7 @@ Rectangle{
             anchors.leftMargin: 16
             width: 16
             height: 16
+            visible: !isTabbarRootComponent
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
@@ -184,6 +186,7 @@ Rectangle{
         width: parent.width
         height: 60
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: isTabbarRootComponent ? 79 : 0
         layer.enabled: true
         layer.effect: DropShadow{
             horizontalOffset: 0

@@ -10,7 +10,6 @@ Rectangle{
     signal completeLogin()
     property alias loginbtn: loginbtn
     property var tenant_id: "1"
-    property string loginName: Settings.normal_mode
     property int currentRow: 0
 
     Toast {id: toastPopup}
@@ -30,6 +29,7 @@ Rectangle{
         id: loginModeDialog
         titleStr: qsTr(Settings.login_mode)
         list: Settings.loginMode
+        currentIndex: Number(loginMode) === QtEnumClass.Ordinary ? 0 : 1
         onConfirmOptionsAction: loginModelSelection(model)
     }
 
@@ -176,8 +176,9 @@ Rectangle{
         } else {
             settingsManager.setValue(settingsManager.LoginMode,QtEnumClass.Major)
         }
-        console.log("aaaaaaaaaa: "+        settingsManager.getValue(settingsManager.LoginMode)
-)
+        ///***切换模式重启程序，目前发现登录完成多次切换sourceComponent，存在crash问题***
+        ///***备用解决方案***
+        applicationController.restartApplication()
     }
 
     //MARK: Net
@@ -200,7 +201,7 @@ Rectangle{
 
         function onFail(reply,code){
             console.log(reply,code)
-             http.onReplySucSignal.disconnect(onReply)
+            http.onReplySucSignal.disconnect(onReply)
             http.replyFailSignal.disconnect(onFail)
         }
 
@@ -228,7 +229,7 @@ Rectangle{
             console.log("loginToken setUser = " + JSON.stringify(user1))
             settingsManager.setValue(settingsManager.user,JSON.stringify(user1))
             completeLogin()
-//            timer_logintoken.start()
+            //            timer_logintoken.start()
         }
 
         function onFail(reply,code){
@@ -262,7 +263,7 @@ Rectangle{
         function onUserReply(reply){
             console.log("getUserDetail: "+reply)
             http.replyFailSignal.disconnect(onFail)
-             http.onReplySucSignal.disconnect(onUserReply)
+            http.onReplySucSignal.disconnect(onUserReply)
             var response = JSON.parse(reply)
             var user = JSON.parse(settingsManager.getValue(settingsManager.user))
             user.userinfo = JSON.stringify(response.data)
@@ -274,7 +275,7 @@ Rectangle{
         function onFail(reply,code){
             console.log(reply,code)
             http.replyFailSignal.disconnect(onFail)
-             http.onReplySucSignal.disconnect(onUserReply)
+            http.onReplySucSignal.disconnect(onUserReply)
         }
 
         var user = JSON.parse(settingsManager.getValue(settingsManager.user))
@@ -302,8 +303,8 @@ Rectangle{
             http.onReplySucSignal.disconnect(onByIdReply)
         }
 
-//        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
-//        console.log("userid: " + user.user_id)
+        //        var user = JSON.parse(settingsManager.getValue(settingsManager.user))
+        //        console.log("userid: " + user.user_id)
         http.onReplySucSignal.connect(onByIdReply)
         http.replyFailSignal.connect(onFail)
         console.log("user.userinfo.tenantId: "+ tenant_id)

@@ -226,6 +226,22 @@ QString FileManager::getFlsPath()
     return flsDirectory;
 }
 
+QString FileManager::getMajorPicsPath()
+{
+    QString appDirPath = "C:";//QCoreApplication::applicationDirPath();
+    QString zipFilePath = appDirPath+"/"+FAROMAJORDIRECTORY;
+    QString flsDirectory = QDir(zipFilePath).filePath(QString());
+    QDir dir;
+    if (!dir.exists(flsDirectory)) {
+        if (!dir.mkpath (flsDirectory)) {
+            qDebug() << "Failed to create directory:" << flsDirectory;
+        } else {
+            qDebug() << "Directory created 123:" << flsDirectory;
+        }
+    }
+    return flsDirectory;
+}
+
 bool FileManager::removePath(const QString &path)
 {
     QString resultPath = "";

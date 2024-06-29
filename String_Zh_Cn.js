@@ -184,7 +184,7 @@ var station_info_null = "测站信息为空"
 var please_first_select_task = "请选择任务"
 var please_select_station = "请选择测站"
 var in_progress_unable_to_scan = "当前任务正在进行中,无法扫描"
-
-
-
-
+var enter_measure_mode = "是否进入测量模式"
+var faro_measure_task = "测量任务"
+var measure_resource_download_progress = "测量资源下载进度: "
+var sure_cancle_tasks = "确定取消建立测量任务吗?"

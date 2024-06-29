@@ -31,6 +31,7 @@ class Api : public QObject {
     Q_PROPERTY(QString building_roomTaskExecute_rerun READ building_roomTaskExecute_rerun CONSTANT)
     Q_PROPERTY(QString building_roomTask_searchFastScanRoomTask READ building_roomTask_searchFastScanRoomTask CONSTANT)
     Q_PROPERTY(QString building_roomStationTask_create READ building_roomStationTask_create CONSTANT)
+    Q_PROPERTY(QString building_block_queryBlockOfflineData READ building_block_queryBlockOfflineData CONSTANT)
 
 public:
     static Api* instance();
@@ -58,6 +59,8 @@ public:
     QString building_roomTaskExecute_rerun() const;
     QString building_roomTask_searchFastScanRoomTask() const;
     QString building_roomStationTask_create() const;
+    QString building_block_queryBlockOfflineData() const;
+
 private:
     Api(QObject *parent = nullptr);
     Q_DISABLE_COPY(Api)

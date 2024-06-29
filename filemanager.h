@@ -14,6 +14,8 @@
 #define FLSDIRECTORY "fls"
 #define ZIPDIRECTORY "zip"
 #define PLYDIRECTORY "ply"
+
+#define FAROMAJORDIRECTORY "faromajorpics"
 class FileManager : public QObject
 {
     Q_OBJECT
@@ -25,6 +27,7 @@ public:
 
     static FileManager *instance();
     static QString getFlsPath();
+    static QString getMajorPicsPath();
     static QStringList getFilesInDirectory(const QString &dirPath, const QStringList &filters = QStringList());
     static bool createEmptyFile(const QString &fileName);
 public slots:

@@ -9,6 +9,9 @@ Popup {
     property int lottieType: 0
     property var tipsconnect: String.starting_connection_to_machine
     property var title: String.scan_station_id
+    property bool isVisibleCancle: false
+
+    signal cancleBlock()
     modal: true
     width: parent.width
     height: parent.height
@@ -42,6 +45,25 @@ Popup {
             font.bold: true
             color: "#333333"
         }
+
+        Text {
+            id: cancelBtn
+            text: qsTr(String.cancel)
+            anchors.verticalCenter: text_title.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 16
+            font.pixelSize: 16
+            font.bold: true
+            color: "#1890FF"
+            visible: isVisibleCancle
+            MouseArea{
+                anchors.fill: parent
+                onClicked: {
+                    cancleBlock()
+                }
+            }
+        }
+
         Rectangle{
             id:rect_dive
             width: parent.width
