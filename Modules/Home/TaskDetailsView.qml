@@ -26,7 +26,6 @@ Item{
     property var inputCellModel
     property string room_id
     property int selectHeaderIndex: 0
-    property var inputScanParams
     signal callbackOrSyncEventHandling()
     id: selectTaskDetailsView
     Layout.fillWidth: true
@@ -481,7 +480,6 @@ Item{
         faroManager.onScanProgress.connect(scanProgress)
         faroManager.scanAbnormal.connect(scanAbnormal)
         var connectResult = faroManager.connect(scanParams)
-        inputScanParams = scanParams
         console.log("connect result: "+connectResult)
 
         scanningFaroPop.tipsconnect = SettingString.starting_connection_to_machine
@@ -535,10 +533,15 @@ Item{
                                                 && JSON.parse(value).stageType === scanParams.stageType
                                                 return iscon
                                             });
+                console.log("cover index: "+index)
                 if (index !== -1) {
-                    datas[index] = JSON.stringify(scanParams);
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas[index] = JSON.stringify(scanParams);
+                    }
                 } else {
-                    datas.push(JSON.stringify(scanParams))
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas.push(JSON.stringify(scanParams))
+                    }
                 }
                 console.log("scan params and datas: "+JSON.stringify(datas))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))

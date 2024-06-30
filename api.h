@@ -29,6 +29,8 @@ class Api : public QObject {
     Q_PROPERTY(QString building_tasknotify_statistics READ building_tasknotify_statistics CONSTANT)
     Q_PROPERTY(QString building_roomTaskExecute_calculateStationTask READ building_roomTaskExecute_calculateStationTask CONSTANT)
     Q_PROPERTY(QString building_roomTaskExecute_rerun READ building_roomTaskExecute_rerun CONSTANT)
+    Q_PROPERTY(QString building_roomTask_searchFastScanRoomTask READ building_roomTask_searchFastScanRoomTask CONSTANT)
+    Q_PROPERTY(QString building_roomStationTask_create READ building_roomStationTask_create CONSTANT)
 
 public:
     static Api* instance();
@@ -54,6 +56,8 @@ public:
     QString admin_sys_file_upload() const;
     QString building_roomTaskExecute_calculateStationTask() const;
     QString building_roomTaskExecute_rerun() const;
+    QString building_roomTask_searchFastScanRoomTask() const;
+    QString building_roomStationTask_create() const;
 private:
     Api(QObject *parent = nullptr);
     Q_DISABLE_COPY(Api)

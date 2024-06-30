@@ -4,6 +4,7 @@ import QtQuick.Controls 2.5
 import Dialog 1.0
 import Api 1.0
 import Http 1.0
+import QtEnumClass 1.0
 import "../String_Zh_Cn.js" as Settings
 Rectangle{
     signal completeLogin()
@@ -24,15 +25,12 @@ Rectangle{
     }
     Hub{id: hub}
 
-    /**登录模式
-    Dialog{
+    //登录模式
+    LoginModeSelectionDialog {
         id: loginModeDialog
         titleStr: qsTr(Settings.login_mode)
         list: Settings.loginMode
-        onConfirmOptionsAction: {
-            loginName = model.name
-            currentRow = model.index
-        }
+        onConfirmOptionsAction: loginModelSelection(model)
     }
 
     Rectangle{
@@ -61,7 +59,6 @@ Rectangle{
             }
         }
     }
-    */
 
     Rectangle{
         width: 640
@@ -170,6 +167,20 @@ Rectangle{
         get()
     }
 
+    //MARK: Func
+    function loginModelSelection(model) {
+        loginName = model.name
+        currentRow = model.index
+        if (model.index === 0) {
+            settingsManager.setValue(settingsManager.LoginMode,QtEnumClass.Ordinary)
+        } else {
+            settingsManager.setValue(settingsManager.LoginMode,QtEnumClass.Major)
+        }
+        console.log("aaaaaaaaaa: "+        settingsManager.getValue(settingsManager.LoginMode)
+)
+    }
+
+    //MARK: Net
     function get(){
         function onReply(reply){
             console.log(reply)

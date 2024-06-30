@@ -9,10 +9,7 @@ import "../../String_Zh_Cn.js" as SettingString
 import "../../Util/GlobalFunc.js" as GlobalFunc
 
 StackView{
-    property var modellist: []
-    property var sourcelist: []
-    property string navigationBarTitle: qsTr("房间实测")
-    property int headerSelectedIndex: 0
+
     //公布stackView，让其在所有子控件可以访问到homestack
     property var rootStackView: homestack
     id: homestack
@@ -32,7 +29,7 @@ StackView{
             Layout.fillWidth: true
             BaseNavigationBar{
                 id: navigationBar
-                title: navigationBarTitle
+                title: GlobalFunc.isEmpty(navigationBarTitle) ? SettingString.result_task_type_room : navigationBarTitle
                 isVisibleBackBtn: false
                 Image{
                     id: searchimage

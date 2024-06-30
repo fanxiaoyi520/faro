@@ -148,6 +148,16 @@
         <file>images/ic_location_red.svg</file>
         <file>images/ic_location_gray.svg</file>
         <file>images/refresh_click.png</file>
+        <file>Modules/Scan/ScanSelectTaskDialog.qml</file>
+        <file>Modules/Scan/ScanSelectProjectPop.qml</file>
+        <file>Modules/Scan/ScanSelectBuildingPop.qml</file>
+        <file>Modules/Scan/ScanSelectUnitPop.qml</file>
+        <file>Modules/Scan/ScanSelectFloorPop.qml</file>
+        <file>Modules/Scan/ScanSelectRoomPop.qml</file>
+        <file>Modules/Scan/ScanSearchResultDialog.qml</file>
         <file>Modules/Scan/ScanHeaderView.qml</file>
+        <file>Modules/Scan/ScanImageHeaderView.qml</file>
+        <file>Modules/Scan/ScanSelectStationNoDialog.qml</file>
+        <file>Login/LoginModeSelectionDialog.qml</file>
     </qresource>
 </RCC>

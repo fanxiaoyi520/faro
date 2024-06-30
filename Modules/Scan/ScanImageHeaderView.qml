@@ -1,19 +1,12 @@
-﻿import QtQuick 2.0
+import QtQuick 2.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 
-Popup{
-    id: popup
+Rectangle{
     property var model
     property var imgUrl
-    width: parent.width
-    height: parent.height
-    modal: true
-    focus: true
-    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
     property var imageType: 0
     property var image: Image {
         source: imgUrl ? imgUrl : ""
@@ -46,55 +39,38 @@ Popup{
         }
     }
 
-    background: Rectangle{
-        id: backimage
-        anchors.fill: parent
-        color: "#000000"
-
-        Rectangle {
-            anchors.fill: parent
-            anchors.margins: 50
-            id: scaleimage
-            Canvas {
-                id: canvas
-                anchors.fill: parent
-                width: imageBackWidth
-                height: imageBackWidth
-                onPaint: canvasPaint(getContext("2d"))
-                Component.onCompleted: {
-                    image.asynchronous = true;
-                }
-            }
-
-            PinchArea {
-                anchors.fill: parent
-                enabled: true
-                pinch.target: scaleimage
-                pinch.minimumScale: 0.5
-                pinch.maximumScale: 2
-            }
-        }
-
-        Image {
-            id: btnimage
-            source: "../../images/login_close@2x.png"
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.topMargin: 20
-            anchors.rightMargin: 20
-            width: 30;height: 30
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    popup.close()
-                }
+    id: headerRect
+    Rectangle{
+        id: imageBackView
+        width: imageBackWidth
+        height: imageBackHeight
+        x: (parent.width - imageBackWidth)/2
+        Canvas {
+            id: canvas
+            width: imageBackWidth
+            height: imageBackWidth
+            onPaint: canvasPaint(getContext("2d"))
+            Component.onCompleted: {
+                image.asynchronous = true;
             }
         }
     }
-    padding: 0
+
+    Image{
+        id: enlargeImage
+        source: "../../images/home_page_slices/home_enlarge@2x.png"
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 0
+        anchors.right: parent.right
+        width: 74.5;height: 74.5
+        MouseArea{
+            anchors.fill: parent
+            onClicked: enlargeImageAction(imgUrl)
+        }
+    }
 
     function canvasPaint(context){
-        console.log("canvas model large: "+JSON.stringify(model))
+        console.log("canvas model: "+JSON.stringify(model))
         if (!model) return
 
         var ctx = context;
@@ -180,3 +156,5 @@ Popup{
         if(type === 3) return "../../images/ic_location_gray.svg"
     }
 }
+
+

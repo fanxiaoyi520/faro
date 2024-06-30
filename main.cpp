@@ -11,6 +11,7 @@
 #include "filemanager.h"
 #include "crashwatcher.h"
 #include <csignal>
+#include "qtenumclass.h"
 #include "faroscannercontroller.h"
 
 QObject *apiProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
@@ -50,11 +51,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<QNetworkAccessManager>("QNetworkAccessManager", 1, 0, "QNetworkAccessManager");
     qmlRegisterType<Http>("Http", 1, 0, "Http");
     qmlRegisterType<WifiHelper>("WifiHlper",1,0,"WifiHelper");
+    qmlRegisterType<QtEnumClass>("QtEnumClass", 1, 0, "QtEnumClass");
     qmlRegisterType<FaroManager>("FaroManager", 1, 0, "FaroManager");
     qmlRegisterSingletonType<QObject>("Api", 1, 0, "Api",apiProvider);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());
-    engine.rootContext()->setContextProperty("fileManager", FileManager::instance());
+    engine.rootContext()->setContextProperty("fileManager", FileManager::instance());   
     engine.addImportPath(QStringLiteral("qrc:/"));
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

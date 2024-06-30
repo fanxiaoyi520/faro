@@ -58,6 +58,14 @@ var loginMode = [
             '{"index": 1, "name": "专业模式"}'
         ];
 
+var selectTask = [
+            '{"index": 0, "name": "项目", "content": "请选择项目"}',
+            '{"index": 1, "name": "楼栋", "content": "请选择楼栋"}',
+            '{"index": 2, "name": "单元", "content": "请选择单元"}',
+            '{"index": 3, "name": "楼层", "content": "请选择楼层"}',
+            '{"index": 4, "name": "房号", "content": "请选择房号"}',
+        ];
+
 var wifiscan_title = "扫描附近设备"
 var wifiscan_tips = "扫描中..."
 var wifiscan_result_title = "附近设备"
@@ -148,6 +156,35 @@ var quick_scan = "快速扫描"
 var scanning_tasks = "扫描任务"
 var click_select_task = "点击选择任务"
 var station_no = "测站号"
+var stationname = "测站"
 var scan_auto_upload = "扫描后是否自动上传"
 var measure_mode_tips = "测量模式"
 var scan_set_up = "设置"
+var scan_select_task = "选择任务"
+var sure = "确定"
+var search_tasks = "搜索任务"
+var scan_select_project = "选择项目"
+var scan_select_building = "选择楼栋"
+var scan_select_unit = "选择单元"
+var scan_select_floor = "选择楼层"
+var scan_select_roomno = "选择房号"
+var please_select = "请选择"
+var please_select_project = "请选择项目"
+var please_select_building = "请选择楼栋"
+var please_select_unit = "请选择单元"
+var please_select_floor = "请选择楼层"
+var please_select_roomno = "请选择房号"
+var search_result = "搜索结果"
+var building = "栋"
+var unit = "单元"
+var layer = "层"
+var building = "栋"
+var room_task = "房间任务"
+var station_info_null = "测站信息为空"
+var please_first_select_task = "请选择任务"
+var please_select_station = "请选择测站"
+var in_progress_unable_to_scan = "当前任务正在进行中,无法扫描"
+
+
+
+

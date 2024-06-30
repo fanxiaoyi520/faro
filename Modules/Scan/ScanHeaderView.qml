@@ -1,9 +1,17 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.12
 import "../../String_Zh_Cn.js" as Settings
+import "../../Util/GlobalFunc.js" as GlobalFunc
 
 Rectangle {
     color: "#FFFFFF"
+    property var setupModel
+    signal setupMeasureData()
+    signal clickSelectTask()
+    signal clickSelectStationNo()
+    property var selectProjectData
+    property var selectStationData
+    
     Rectangle{
         id: leftSelectTaskRec
         anchors.left: parent.left
@@ -15,9 +23,9 @@ Rectangle {
         width: parent.width * 0.6
         Text {
             id: leftSelectTaskRecText
-            text: qsTr(Settings.click_select_task)
+            text: qsTr(!GlobalFunc.isEmpty(selectProjectData) ? selectProjectData.projectName : Settings.click_select_task)
             font.pointSize: 16
-            color: "#999999"
+            color: !GlobalFunc.isEmpty(selectProjectData) ? "#333333" : "#999999"
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 20
@@ -29,6 +37,11 @@ Rectangle {
             anchors.right: parent.right
             anchors.rightMargin: 20
             anchors.verticalCenter: parent.verticalCenter
+        }
+
+        MouseArea{
+            anchors.fill: parent
+            onClicked: clickSelectTask()
         }
     }
 
@@ -44,14 +57,19 @@ Rectangle {
         border.width: 1
         Text {
             id: rightStationNoRecText
-            text: qsTr(Settings.station_no)
+            text: qsTr(!GlobalFunc.isEmpty(selectStationData) ? (Settings.stationname+selectStationData.stationNo): Settings.station_no)
             font.pointSize: 16
-            color: "#999999"
+            color: !GlobalFunc.isEmpty(selectStationData) ? "#333333" : "#999999"
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
         }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: clickSelectStationNo()
+        }
     }
 
+    /**
     Text {
         id: autoUploadText
         text: qsTr(Settings.scan_auto_upload)
@@ -70,15 +88,18 @@ Rectangle {
         height: 32
         anchors.right: parent.right
         anchors.rightMargin: 16
-//        onCheckedChanged: switchAction(checked)
+        //onCheckedChanged: switchAction(checked)
     }
+    */
 
     Canvas {
         id: lineview
         width: parent.width
         height: 1
-        anchors.top: autoUploadText.bottom
-        anchors.topMargin: 15.5
+        //anchors.top: autoUploadText.bottom
+        //anchors.topMargin: 15.5
+        anchors.top: leftSelectTaskRec.bottom
+        anchors.topMargin: 34.5
         property color lineColor: "#80EAEAEA"
         property int lineWidth: 1
 
@@ -117,6 +138,7 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 console.log("enter setup")
+                setupMeasureData()
             }
         }
     }
