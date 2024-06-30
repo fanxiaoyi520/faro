@@ -69,13 +69,21 @@ Rectangle{
         id: faroManager
         onConvertFlsToZipPlyResult: {
             console.log("enter ply zip result = " + filePath)
-//            if(filePath){
+            if(filePath){
                 uploadFile(rect_root.index,filePath)
-//            }else{
-//                tipsPop_tips.tipsContentStr = qsTr(String.upload_filepath_empty)
-//                tipsPop_tips.open()
-//                upload_pop.close()
-//            }
+            }else{
+                rect_root.failedCount += 1
+                if (index + 1 < selectList.length) {
+                    callBackUploadFile(index + 1)
+                }else{
+                    tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
+                    tipsPop_upload_finish.open()
+                    upload_pop.close()
+                    selectAllGroup(false)
+                    selectList = []
+                }
+                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
+            }
         }
     }
     Rectangle{
@@ -371,6 +379,7 @@ Rectangle{
             if (Array.isArray(datas)){
                 console.log("compress after datas = " + JSON.stringify(datas))
                 var fileDatas = datas.filter((value, index, self) => {
+                                                 console.log("value == " + value)
                                                  var path = JSON.parse(value).filePath
                                                  console.log("filepath = " + path)
                                                  console.log("path isEmpty = " + (path === 'undefined' || !path || !/[^\s]/.test(path)))
@@ -385,6 +394,7 @@ Rectangle{
                 totalFileInfo = []
             }
         }
+        console.log("totalFileInfo length = " + totalFileInfo.length)
         text_count.text = "("+ totalFileInfo.length +")"
         rect_root.totalSize = totalFileInfo.length
         if(totalFileInfo.length > 0){
@@ -430,6 +440,20 @@ Rectangle{
     }
 
     function uploadFile(index,fileAbsPath){
+        if(fileAbsPath === ""){
+            console.log("enter fileAbsPath empty")
+            rect_root.failedCount += 1
+            if (index + 1 < selectList.length) {
+                callBackUploadFile(index + 1)
+            }else{
+                upload_pop.close()
+                selectAllGroup(false)
+                selectList = []
+            }
+            upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
+            return
+        }
+
         function onReply(reply) {
             http.qtreplySucSignal.disconnect(onReply)
             http.qtreplyFailSignal.disconnect(onFail)
@@ -443,8 +467,7 @@ Rectangle{
                     upload_pop.close()
                     tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                     tipsPop_upload_finish.open()
-                    //结束清除所有当前选中
-                    listItemSelectAll(false)
+                    selectAllGroup(false)
                     selectList = []
                 }
                 console.log("successCounr = " + rect_root.successCount + "faildCount = " + rect_root.failedCount)
@@ -467,8 +490,7 @@ Rectangle{
                 upload_pop.close()
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
-                //结束清除所有当前选中
-                listItemSelectAll(false)
+                selectAllGroup(false)
                 selectList = []
             }
             upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
@@ -518,8 +540,7 @@ Rectangle{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
                 upload_pop.close()
-                //结束清除所有当前选中
-                listItemSelectAll(false)
+               selectAllGroup(false)
                 selectList = []
             }
 
@@ -538,7 +559,7 @@ Rectangle{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
                 upload_pop.close()
-                listItemSelectAll(false)
+                selectAllGroup(false)
                 selectList = []
             }
             upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))

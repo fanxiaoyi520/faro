@@ -221,7 +221,8 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     QMap<QString, QVariant> paramsMap;
     paramsMap.insert("roomId",myCalParams.value("roomId"));
     paramsMap.insert("stationId",myCalParams.value("stationId"));
-    paramsMap.insert("stageType",myCalParams.value("stageType"));
+    QString str = myCalParams.value("stageType").toString();
+    paramsMap.insert("stageType",(str.isEmpty()) ? "5" : str);
     paramsMap.insert("fileId",fileModel.value("fileId"));
     paramsMap.insert("equipmentModel","Faro-Focus-X");
     //inputModel.value("scanningMode")
@@ -252,13 +253,21 @@ void FaroManager::convertFlsToZipPly(const QString &filePath)
 {
     QString resultPath = "";
     QString originPath = filePath;
+    qDebug() << "filePath =" << filePath;
     originPath.replace(0,7,Util::getDriveLetter());
+    qDebug() << "originPath =" << originPath;
     bool isExist = FileManager::instance()->isFileExist(originPath);
     if(isExist){
         QString fileName = originPath.mid(originPath.lastIndexOf("/") + 1,originPath.length());
+         qDebug() << "fileName =" << fileName;
         faroScannerController->convertFlsToPly(originPath,originPath + "/" + fileName +".ply");
-        QString plyZipPath = FileManager::instance()-> compression_zip_by_filepath(originPath + "/" + fileName +".ply");
-        emit convertFlsToZipPlyResult(plyZipPath);
+        if(FileManager::instance()->isFileExist(originPath + "/" + fileName +".ply")){
+            QString plyZipPath = FileManager::instance()-> compression_zip_by_filepath(originPath + "/" + fileName +".ply");
+            qDebug() << "plyZipPath =" << plyZipPath;
+            emit convertFlsToZipPlyResult(plyZipPath);
+        }else{
+            emit convertFlsToZipPlyResult("");
+        }
     }else{
         emit convertFlsToZipPlyResult("");
     }

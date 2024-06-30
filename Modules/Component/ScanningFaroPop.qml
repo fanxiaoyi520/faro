@@ -18,7 +18,7 @@ Popup {
     }
     Timer {
         id: timer
-        interval: 1000 * 1000 //超时时间
+        interval: 24 * 60 * 60 * 1000 //超时时间
         repeat: false
 
         onTriggered: popup_wifi.close()
