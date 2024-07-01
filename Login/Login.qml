@@ -24,41 +24,41 @@ Rectangle{
     }
     Hub{id: hub}
 
-//    //登录模式
-//    LoginModeSelectionDialog {
-//        id: loginModeDialog
-//        titleStr: qsTr(Settings.login_mode)
-//        list: Settings.loginMode
-//        currentIndex: Number(loginMode) === QtEnumClass.Ordinary ? 0 : 1
-//        onConfirmOptionsAction: loginModelSelection(model)
-//    }
+    //登录模式
+    LoginModeSelectionDialog {
+        id: loginModeDialog
+        titleStr: qsTr(Settings.login_mode)
+        list: Settings.loginMode
+        currentIndex: Number(loginMode) === QtEnumClass.Ordinary ? 0 : 1
+        onConfirmOptionsAction: loginModelSelection(model)
+    }
 
-//    Rectangle{
-//        id: loginModeBtn
-//        anchors.top: parent.top
-//        anchors.topMargin: 20
-//        anchors.right: parent.right
-//        anchors.rightMargin: 12
-//        height: 34
-//        width: parent.width *  0.25
-//        radius: 17
-//        color: "#F7F7F7"
-//        z: 10
-//        Text{
-//            id: subtext
-//            anchors.horizontalCenter: parent.horizontalCenter
-//            anchors.verticalCenter: parent.verticalCenter
-//            text: qsTr(loginName)
-//            color: "#666666"
-//        }
-//        MouseArea{
-//            anchors.fill: parent
-//            onClicked: {
-//                loginModeDialog.list = Settings.loginMode
-//                loginModeDialog.open()
-//            }
-//        }
-//    }
+    Rectangle{
+        id: loginModeBtn
+        anchors.top: parent.top
+        anchors.topMargin: 20
+        anchors.right: parent.right
+        anchors.rightMargin: 12
+        height: 34
+        width: parent.width *  0.25
+        radius: 17
+        color: "#F7F7F7"
+        z: 10
+        Text{
+            id: subtext
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            text: qsTr(loginName)
+            color: "#666666"
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                loginModeDialog.list = Settings.loginMode
+                loginModeDialog.open()
+            }
+        }
+    }
 
     Rectangle{
         width: 640

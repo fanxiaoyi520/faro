@@ -8,6 +8,25 @@ Http::Http(QObject *parent) : QObject(parent)
     //QObject::connect(manager,SIGNAL(finished(const QString &, int)),this,SLOT(replyFail(const QString &, int)));
 }
 
+void Http::delayedExecution(const QString &response) {
+    QTimer* timer = new QTimer();
+    QObject::connect(timer, &QTimer::timeout, [this,timer,response]() {
+        qDebug() << "task handle complete!!!";
+        emit downloadReplyFinishedSignal(response);
+        delete timer;
+    });
+
+    int delay = 2;
+    timer->setSingleShot(true);
+    timer->start(delay);
+}
+
+void Http::downloadReplyFinished(const QString &response)
+{
+    //delayedExecution(response);
+    emit downloadReplyFinishedSignal(response);
+}
+
 void Http::replyFinished(const QString &response)
 {
     emit replySucSignal(response);
@@ -218,8 +237,9 @@ void Http::loginPost(QString url,
     }).post();
 }
 
-void Http::download(QString url,const QMap<QString, QVariant> &ps)
+void Http::download(QString url,const QMap<QString, QVariant> &ps,int allcount)
 {
+    qDebug() << "blockOffilneData.pics.length: " << allcount;
     QMap<QString, QVariant> paramsMap;
     for(int i = 0; i < ps.keys().size(); i++) {
         paramsMap.insert(ps.keys().at(i),ps.values().at(i));
@@ -239,22 +259,22 @@ void Http::download(QString url,const QMap<QString, QVariant> &ps)
     qDebug() << "params: " << paramsMap;
     qDebug() << "json: " << Util::mapToJson(paramsMap);
     QString jsonParams = Util::mapToJson(paramsMap);
-//    if (paramsMap.contains("integers")) {
-//        QJsonArray jsonArray;
-//        for (const QVariant  &id : paramsMap.value("integers").toList()) {
-//            QString stringItem = id.toString();
-//            jsonArray.append(stringItem);
-//        }
-//        QJsonDocument jsonDoc(jsonArray);
-//        jsonParams = jsonDoc.toJson(QJsonDocument::Indented);
-//        qDebug() << "jsonParams: " << jsonParams;
-//    }
+    if (paramsMap.contains("integers")) {
+        QJsonArray jsonArray;
+        for (const QVariant  &id : paramsMap.value("integers").toList()) {
+            QString stringItem = id.toString();
+            jsonArray.append(stringItem);
+        }
+        QJsonDocument jsonDoc(jsonArray);
+        jsonParams = jsonDoc.toJson(QJsonDocument::Indented);
+        qDebug() << "jsonParams: " << jsonParams;
+    }
     HttpClient(BASE_URL+url)
             .debug(true)
             //.params(paramsMap)
             .json(jsonParams)
             .headers(headersMap)
-            .success([headersMap,this](const QString &response) {
+            .success([headersMap,this,allcount](const QString &response) {
         //replyFinished(response);
         qDebug() << "download response: " << response;
         QJsonObject responseModel = Util::parseJsonStringToObject(response);
@@ -269,7 +289,7 @@ void Http::download(QString url,const QMap<QString, QVariant> &ps)
         QNetworkAccessManager *manager = new QNetworkAccessManager(this);
         QNetworkRequest request(urlStr);
         QNetworkReply *reply = manager->get(request);
-        connect(reply, &QNetworkReply::finished, this, [=]() {
+        connect(reply, &QNetworkReply::finished, this, [=]() mutable {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray imageData = reply->readAll();
                 QFile file(FileManager::getMajorPicsPath()+"/"+fileId+".png");
@@ -277,12 +297,23 @@ void Http::download(QString url,const QMap<QString, QVariant> &ps)
                     file.write(imageData);
                     file.close();
                 }
+                count++;
+                replyFinished("complete");
+                qDebug() << "count: " << count << "allcount: " << allcount;
+                if(count == allcount) {
+                    downloadReplyFinished("all complete");
+                    count = 0;
+                }
+            } else {
+                replyFail(reply->errorString(),-1);
+                count = 0;
             }
             reply->deleteLater();
         });
     }).fail([this](const QString &error, int errorCode) {
         qDebug() << "error: " << error << " errorCode: "<< errorCode;
         replyFail(error,errorCode);
+        count = 0;
     }).post();
 }
 

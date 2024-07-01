@@ -20,6 +20,7 @@ class Http : public QObject
 public:
 
     explicit Http(QObject *parent = nullptr);
+    Q_INVOKABLE void downloadReplyFinished(const QString &response);
     Q_INVOKABLE void replyFinished(const QString &response);
     Q_INVOKABLE void replyFail(const QString &error, int errorCode);
 
@@ -32,14 +33,15 @@ public:
     Q_INVOKABLE void put(QString url,const QMap<QString, QVariant> &ps);
     Q_INVOKABLE void loginPost(QString url,const QMap<QString, QVariant> &ps,const QMap<QString, QVariant> &headers);
 
-    Q_INVOKABLE void download(QString url,const QMap<QString, QVariant> &ps);
+    Q_INVOKABLE void download(QString url,const QMap<QString, QVariant> &ps,int allcount);
 
     Q_INVOKABLE QString getActiveWifi();
-
+    Q_INVOKABLE void delayedExecution(const QString &response);
 public slots:
     void upload(QString url,QString path);
 
 signals:
+    void downloadReplyFinishedSignal(const QString &response);
     void replySucSignal(const QString &response);
     void replyFailSignal(const QString &error, int errorCode);
     void qtreplySucSignal(const QString &response);
@@ -51,6 +53,7 @@ private:
     std::thread m_thread;
     bool m_running = false;
     QString BASE_URL = "http://gateway.metadigital.net.cn";
+    int count = 0;
 };
 
 #endif // HTTP_H

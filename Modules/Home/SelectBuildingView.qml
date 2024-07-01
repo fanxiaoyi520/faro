@@ -14,6 +14,7 @@ ScrollView{
     property var inputModelData
     property string projectName: "Measure"
     property var list:[]
+
     property int currentRow: 0
     property string selectedStageName: "主体阶段（一阶段）"
     property int inputIndex
@@ -407,10 +408,16 @@ ScrollView{
     }
 
     function downloadTaskHandle(){
+        var count = 0
         function onFileReply(reply){
             hub.close()
-            http.onReplySucSignal.disconnect(onFileReply)
+            //http.onReplySucSignal.disconnect(onFileReply)
             console.log("complete admin sys file listFileByFileIds: "+reply)
+            count++
+            console.log("count: "+count)
+            var percent = Math.floor(count/blockOffilneData.pics.length*100)
+            console.log("percent: "+percent)
+            scanningFaroPop.tipsconnect = SettingString.measure_resource_download_progress+percent+"%"
         }
 
         function onFileFail(reply,code){
@@ -418,13 +425,23 @@ ScrollView{
             http.replyFailSignal.disconnect(onFileFail)
             hub.close()
         }
+
+        function onDownloadReplyFinished(reply) {
+            console.log(reply)
+            scanningFaroPop.tipsconnect = SettingString.measure_resource_download_progress+"100%"
+            http.onReplySucSignal.disconnect(onFileReply)
+            http.onDownloadReplyFinishedSignal.disconnect(onDownloadReplyFinished)
+            scanningFaroPop.close()
+        }
+
         console.log("blockOffilneData.pics: "+blockOffilneData.pics)
         http.onReplySucSignal.connect(onFileReply)
         http.replyFailSignal.connect(onFileFail)
+        http.onDownloadReplyFinishedSignal.connect(onDownloadReplyFinished)
         blockOffilneData.pics.map(item=>{
                                       console.log("urlStr: "+item)
                                       http.download(Api.admin_sys_file_listFileByFileIds,
-                                                    {"integers":item})
+                                                    {"integers":[item]},blockOffilneData.pics.length)
                                       return item
                                   })
     }
