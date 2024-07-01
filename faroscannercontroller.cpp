@@ -253,6 +253,11 @@ void FaroScannerController::convertFlsToPly(const QString &inFlsFilePath,
 
     int scans = iQLibIfPtr->getNumScans();
     qDebug() << "scans: " << scans;
+    if(scans == 0 || result != 0){
+         qDebug() << "error convert";
+        iQLibIfPtrDisconnect();
+        return;
+    }
     int row = iQLibIfPtr->getScanNumRows(0);
     int col = iQLibIfPtr->getScanNumCols(0);
     qDebug() << "row: " << row;
