@@ -119,6 +119,6 @@ QString Util::getDriveLetter()
             move_devices.append(device);
         }
     }
-    if (move_devices.length() == 0) return "C:/";
+    if (move_devices.length() == 0) return "D:/";
     return move_devices.length() > 1 ? move_devices[1].rootPath() : move_devices[0].rootPath();
 }

@@ -68,6 +68,9 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
+
+    //FaroScannerController::instance()->convertFlsToPly("D:/QHDX_D_048.fls","E:/faro");
+
     return app.exec();
 }
 
