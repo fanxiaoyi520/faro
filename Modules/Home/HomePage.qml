@@ -132,8 +132,13 @@ StackView{
         if (GlobalFunc.isJson(tree)) {
             var organizationalTree = JSON.parse(settingsManager.getValue(settingsManager.organizationalTree))
             if (organizationalTree.data.length > 0) {
-                var selectedProjectData = JSON.parse(settingsManager.getValue(settingsManager.selectedProject))
-                sourcelist = modellist = selectedProjectData
+                if (GlobalFunc.isJson(settingsManager.getValue(settingsManager.selectedProject))) {
+                    var selectedProjectData = JSON.parse(settingsManager.getValue(settingsManager.selectedProject))
+                    sourcelist = modellist = selectedProjectData
+                } else {
+                    hub.open()
+                    getNumberOfOrganizations()
+                }
             } else {
                 hub.open()
                 getNumberOfOrganizations()

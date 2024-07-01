@@ -30,12 +30,12 @@ ScrollView{
         id: tipsPopUp
         onConfirmAction: preEnterMeasureMode()
     }
-//    Timer {
-//        id: downloadTimer
-//        interval: 500
-//        repeat: true
-//        onTriggered: downloadTimerTaskHandle ()
-//    }
+    //    Timer {
+    //        id: downloadTimer
+    //        interval: 500
+    //        repeat: true
+    //        onTriggered: downloadTimerTaskHandle ()
+    //    }
     ScanningFaroPop{
         id: scanningFaroPop
         title: SettingString.faro_measure_task
@@ -240,16 +240,22 @@ ScrollView{
                     }
                 }
                 onPressed: {
-                    longPressTimer.start();
+                    if (Number(loginMode) === QtEnumClass.Major) {
+                        longPressTimer.start();
+                    }
                 }
 
                 onReleased: {
-                    longPressTimer.stop();
+                    if (Number(loginMode) === QtEnumClass.Major) {
+                        longPressTimer.stop();
+                    }
                 }
 
                 onPositionChanged: {
                     if (mouseArea.pressed) {
-                        longPressTimer.stop();
+                        if (Number(loginMode) === QtEnumClass.Major) {
+                            longPressTimer.stop();
+                        }
                     }
                 }
             }
@@ -418,7 +424,7 @@ ScrollView{
         blockOffilneData.pics.map(item=>{
                                       console.log("urlStr: "+item)
                                       http.download(Api.admin_sys_file_listFileByFileIds,
-                                                {"integers":item})
+                                                    {"integers":item})
                                       return item
                                   })
     }
