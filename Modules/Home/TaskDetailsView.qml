@@ -543,6 +543,14 @@ Item{
                         datas.push(JSON.stringify(scanParams))
                     }
                 }
+                datas = datas.filter(obj => {
+                                        return GlobalFunc.isEmpty(obj.stageType)
+                                         || GlobalFunc.isEmpty(obj.projectName)
+                                         || GlobalFunc.isEmpty(obj.blockName)
+                                         || GlobalFunc.isEmpty(obj.unitName)
+                                         || GlobalFunc.isEmpty(obj.floorName)
+                                         || GlobalFunc.isEmpty(obj.roomName)
+                                     });
                 console.log("scan params and datas: "+JSON.stringify(datas))
                 settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
             } else {
@@ -659,7 +667,11 @@ Item{
             http.onReplySucSignal.disconnect(onBuildingReply)
             console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
-            roomTaskVoModel = response.data
+            if (!GlobalFunc.isEmpty(response)
+                && !Array.isArray(response.data)) {
+                roomTaskVoModel = response.data
+                console.log("roomTaskVoModel: "+JSON.stringify(roomTaskVoModel))
+            }
             if (!response.data || response.data.stations.length <=0) {
                 list = []
                 imageUrl = ""
