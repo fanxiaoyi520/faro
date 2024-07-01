@@ -21,7 +21,7 @@ Rectangle {
     property int sub_masonry_mode: 0
     property int sub_xy_crop_dist: 6
     property int sub_z_crop_dist: 3
-    property int sub_map_mode: 1
+    property int sub_map_mode: 2
     property string sub_scanningMode: "1/20"
     property int sub_scanningIndex: 7
 
@@ -117,7 +117,7 @@ Rectangle {
                 anchors.top: cell3.celltitle.bottom
                 anchors.topMargin: 12
                 visible: isControlLaunch1 ? true : false
-                selectIndex: sub_map_mode
+                selectIndex: sub_map_mode-1
                 onClickSelectAction: measureTheBottomRulerMode(index,model)
             }
         }

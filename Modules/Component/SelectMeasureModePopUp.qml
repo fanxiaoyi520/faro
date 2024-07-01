@@ -30,7 +30,7 @@ Popup {
     property int masonry_mode: 0
     property int xy_crop_dist: 6
     property int z_crop_dist: 3
-    property int map_mode: 1
+    property int map_mode: 2
     property string scanningMode: "1/20"
     property int scanningIndex: 7
 
@@ -180,7 +180,7 @@ Popup {
 
     function parent_measureTheBottomRulerMode(index,model){
         console.log("measure the bottom ruler mode index: "+index+" model: "+model)
-        map_mode = index
+        map_mode = index+1
     }
 
     function parent_onInputTextChanged(index,text){
@@ -205,7 +205,7 @@ Popup {
             "masonry_mode": masonry_mode,
             "xy_crop_dist": xy_crop_dist,
             "z_crop_dist": z_crop_dist,
-            "map_mode": map_mode,
+            "map_mode": Number.isInteger(map_mode) ? map_mode : 1,
             "scanningMode": scanningMode,
             "scanningIndex": scanningIndex,
             "activeColoring": "0",
