@@ -75,6 +75,11 @@ QString SettingsManager::fileInfoData() const
     return "fileInfoData";
 }
 
+QString SettingsManager::majorFileInfoData() const
+{
+    return "majorFileInfoData";
+}
+
 QString SettingsManager::LoginMode() const
 {
     return "LoginMode";

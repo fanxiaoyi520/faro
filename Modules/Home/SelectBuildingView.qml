@@ -210,19 +210,6 @@ ScrollView{
                 }
             }
 
-            Timer {
-                id: longPressTimer
-                interval: 500
-                repeat: false
-                onTriggered: {
-                    if (mouseArea.pressed) {
-                        islongpresse = true
-                        console.log("Long press detected!");
-                        longPressDetected()
-                    }
-                }
-            }
-
             MouseArea {
                 id: mouseArea
                 anchors.fill: parent
@@ -250,8 +237,6 @@ ScrollView{
                         var loginMode = settingsManager.getValue(settingsManager.LoginMode)
                         var majorTypeMode = settingsManager.getValue(settingsManager.MajorTypeMode)
 
-                        inputIndex = index
-                        transferModelData = modelData
                         if (Number(loginMode) === QtEnumClass.Ordinary) {
                             jumpToSelectFloor(index,modelData)
                         } else {
@@ -266,44 +251,12 @@ ScrollView{
                 }
 
                 onClicked: {
+                    inputIndex = index
+                    transferModelData = modelData
                     if (!isLongPress) {
                         console.log("Click without Long Press")
                     }
                 }
-                //                onClicked: {
-                //                    var loginMode = settingsManager.getValue(settingsManager.LoginMode)
-                //                    var majorTypeMode = settingsManager.getValue(settingsManager.MajorTypeMode)
-
-                //                    inputIndex = index
-                //                    transferModelData = modelData
-                //                    if (Number(loginMode) === QtEnumClass.Ordinary) {
-                //                        jumpToSelectFloor(index,modelData)
-                //                    } else {
-                //                        console.log("this is a major mode")
-                //                        settingsManager.setValue(settingsManager.MajorTypeMode,QtEnumClass.Browse)
-                //                        jumpToSelectFloor(index,modelData)
-                //                    }
-                //                }
-                //                onPressed: {
-                //                    if (Number(loginMode) === QtEnumClass.Major) {
-                //                        longPressTimer.start();
-                //                    }
-                //                }
-
-
-                //                onReleased: {
-                //                    if (Number(loginMode) === QtEnumClass.Major) {
-                //                        longPressTimer.stop();
-                //                    }
-                //                }
-
-                //                onPositionChanged: {
-                //                    if (mouseArea.pressed) {
-                //                        if (Number(loginMode) === QtEnumClass.Major) {
-                //                            longPressTimer.stop();
-                //                        }
-                //                    }
-                //                }
             }
         }
     }

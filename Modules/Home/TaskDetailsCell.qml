@@ -2,6 +2,7 @@
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtGraphicalEffects 1.0
+import QtEnumClass 1.0
 import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as Settings
 import "../../Util/GlobalEnum.js" as GlobalEnum
@@ -118,6 +119,7 @@ Rectangle {
             anchors.topMargin: 47
             color: tipsTitleColor(model)
             font.pixelSize: 13
+//            visible: show()
         }
         Rectangle {
             id: verticalLine
@@ -211,9 +213,21 @@ Rectangle {
         return "#2e2e2e"
     }
 
+    function major() {
+        var loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        var majorTypeMode = Number(settingsManager.getValue(settingsManager.MajorTypeMode))
+        return (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure)
+    }
+
     function tipsTitleContent(model){
+        var uniqueModel
+        if (major()) {
+            uniqueModel = majorFiltering(model)
+        } else {
+            uniqueModel = filtering(model)
+        }
+
         console.log("cell display model: "+JSON.stringify(model))
-        var uniqueModel = filtering(model)
         console.log("detais cell model: "+JSON.stringify(model))
         if (model.status === 0 && uniqueModel === undefined) {
             return Settings.station_waiting_scan
@@ -254,8 +268,38 @@ Rectangle {
         return uniqueModel
     }
 
+    function majorFiltering(model) {
+        var filejson = settingsManager.getValue(settingsManager.majorFileInfoData);
+        var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+        console.log("filejson: "+filejson)
+        var uniqueModel
+        if (GlobalFunc.isJson(filejson)){
+            var fileModel = JSON.parse(filejson)
+            if (Array.isArray(fileModel)){
+                uniqueModel = fileModel.find((value, index, self) => {
+                                                 console.log("JSON.parse(value).stationId: "+JSON.parse(value).stationId)
+                                                 console.log("model.stationId: "+model.stationId)
+                                                 console.log("JSON.parse(value).roomId: "+model.roomId)
+                                                 console.log("cellroom_id: "+model.roomId)
+                                                 console.log("stageType: "+model.stageType)
+
+                                                 return JSON.parse(value).stationId === model.stationId
+                                                 && JSON.parse(value).roomId === model.roomId
+                                                 && JSON.parse(value).stageType === selectedStageType.index+1
+                                             });
+            }
+        }
+        console.log("unique model: " + JSON.stringify(uniqueModel))
+        return uniqueModel
+    }
+
     function setStatusImageSource(modelData){
-        var uniqueModel = filtering(model)
+        var uniqueModel
+        if (major()) {
+            uniqueModel = majorFiltering(model)
+        } else {
+            uniqueModel = filtering(model)
+        }
         if (modelData) {
             var status = modelData.status;
             switch (modelData.status){

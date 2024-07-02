@@ -10,6 +10,8 @@ import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as SettingString
 import FaroManager 1.0
 import WifiHlper 1.0
+import QtEnumClass 1.0
+import FileManager 1.0
 
 Item{
     property int page: 0
@@ -26,6 +28,9 @@ Item{
     property var inputCellModel
     property string room_id
     property int selectHeaderIndex: 0
+    property var loginMode
+    property var majorTypeMode
+
     signal callbackOrSyncEventHandling()
     id: selectTaskDetailsView
     Layout.fillWidth: true
@@ -39,6 +44,7 @@ Item{
     Http {id: http}
     WifiHelper{id: wifiHelper}
     Loader{ id : userInfoLoader}
+    FileManager{id: fileManager}
     Dialog{
         id: dialog
         titleStr: qsTr(SettingString.selection_stage)
@@ -120,10 +126,11 @@ Item{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr(selectedStageName)
-                color: "#666666"
+                color: !(loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure)? "#666666" : "#999999"
             }
             MouseArea{
                 anchors.fill: parent
+                enabled: !(loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure)
                 onClicked: {
                     dialog.list = SettingString.stageType
                     dialog.currentIndex = currentRow
@@ -220,9 +227,25 @@ Item{
 
     onInputModelDataChanged: {
         console.log("task details input model data: "+JSON.stringify(inputModelData))
+        loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        majorTypeMode = Number(settingsManager.getValue(settingsManager.MajorTypeMode))
         var selectedItem = JSON.parse(settingsManager.getValue(settingsManager.selectedItem))
         projectName = selectedItem.projectName
         headerListView.currentIndex = selectHeaderIndex
+
+        if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+            roomsList = inputModelData.rooms
+            console.log("detail roomsList: "+JSON.stringify(roomsList))
+            room_id = roomsList[selectHeaderIndex].roomId
+            roomTaskVoModel = roomsList[0]
+            list = roomsList[0].stations
+            console.log("detail list: "+JSON.stringify(list))
+            var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
+            imageUrl = ""
+            imageUrl = "file:///"+fileManager.getArbitrarilyPath()+token+".png"
+            console.log("imageUrl: "+imageUrl)
+            return
+        }
         hub.open()
         getBuildingRoomListByFloorId()
     }
@@ -253,6 +276,19 @@ Item{
     function headerClickSwitchAction(index,model){
         console.log("selected header index and model data: "+index,JSON.stringify(model))
         selectHeaderIndex = index
+        if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+            room_id = roomsList[selectHeaderIndex].roomId
+            roomTaskVoModel = ""
+            roomTaskVoModel = roomsList[selectHeaderIndex]
+            list = []
+            list = roomsList[selectHeaderIndex].stations
+            console.log("detail list: "+JSON.stringify(list))
+            var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
+            imageUrl = ""
+            imageUrl = "file:///"+fileManager.getArbitrarilyPath()+token+".png"
+            console.log("imageUrl: "+imageUrl)
+            return
+        }
         room_id = model.id
         hub.open()
         getBuildingRoomTaskAndGetRoomTaskInfo(model)
@@ -451,16 +487,25 @@ Item{
         function scanComplete(filePath){
             faroManager.onScanComplete.disconnect(scanComplete)
             faroManager.onScanProgress.disconnect(scanProgress)
-            scanCompleteDataHandle(scanParams,filePath)
-            scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
-            scanningFaroPop.close()
-            taskDetialViewMonitorNetworkChanges()
-            function wifiDisConnect(result){
+
+            if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+                majorScanCompleteDataHandle(scanParams,filePath)
+                scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
+                scanningFaroPop.close()
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
                 nonerworkPopUp.open()
+            } else {
+                scanCompleteDataHandle(scanParams,filePath)
+                scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
+                scanningFaroPop.close()
+                taskDetialViewMonitorNetworkChanges()
+                function wifiDisConnect(result){
+                    nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
+                    nonerworkPopUp.open()
+                }
+                wifiHelper.onDisConnectWifiResult.connect(wifiDisConnect)
+                wifiHelper.disConnectWifi()
             }
-            wifiHelper.onDisConnectWifiResult.connect(wifiDisConnect)
-            wifiHelper.disConnectWifi()
         }
 
         ///扫描进度
@@ -544,7 +589,7 @@ Item{
                     }
                 }
                 datas = datas.filter(obj => {
-                                        return GlobalFunc.isEmpty(obj.stageType)
+                                         return GlobalFunc.isEmpty(obj.stageType)
                                          || GlobalFunc.isEmpty(obj.projectName)
                                          || GlobalFunc.isEmpty(obj.blockName)
                                          || GlobalFunc.isEmpty(obj.unitName)
@@ -560,6 +605,58 @@ Item{
             }
         }
         var newfilejson = settingsManager.getValue(settingsManager.fileInfoData)
+        console.log("new data: "+newfilejson)
+    }
+
+    function majorScanCompleteDataHandle(scanParams,filePath){
+        console.log("scan params: "+scanParams+" file path: "+filePath)
+        scanParams.filePath = filePath
+        var newscanParams = scanParams
+        console.log("new scan params: "+JSON.stringify(scanParams))
+        var filejson = settingsManager.getValue(settingsManager.majorFileInfoData)
+        console.log("get file json data: "+filejson)
+        if (!filejson || filejson.length === 0) {
+            var filedatas = []
+            filedatas.push(JSON.stringify(scanParams))
+            console.log("new data: "+filejson)
+            console.log("new data: "+JSON.stringify(scanParams))
+            settingsManager.setValue(settingsManager.majorFileInfoData,JSON.stringify(filedatas))
+        } else {
+            var datas = JSON.parse(filejson)
+            if (Array.isArray(datas)){
+                let index = datas.findIndex(value => {
+                                                var iscon = JSON.parse(value).stationId === scanParams.stationId
+                                                && JSON.parse(value).roomId === scanParams.roomId
+                                                && JSON.parse(value).stageType === scanParams.stageType
+                                                return iscon
+                                            });
+                console.log("cover index: "+index)
+                if (index !== -1) {
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas[index] = JSON.stringify(scanParams);
+                    }
+                } else {
+                    if (!GlobalFunc.isEmpty(scanParams.stageType)) {
+                        datas.push(JSON.stringify(scanParams))
+                    }
+                }
+                datas = datas.filter(obj => {
+                                         return GlobalFunc.isEmpty(obj.stageType)
+                                         || GlobalFunc.isEmpty(obj.projectName)
+                                         || GlobalFunc.isEmpty(obj.blockName)
+                                         || GlobalFunc.isEmpty(obj.unitName)
+                                         || GlobalFunc.isEmpty(obj.floorName)
+                                         || GlobalFunc.isEmpty(obj.roomName)
+                                     });
+                console.log("scan params and datas: "+JSON.stringify(datas))
+                settingsManager.setValue(settingsManager.majorFileInfoData,JSON.stringify(datas))
+            } else {
+                var nulldatas = []
+                nulldatas.push(JSON.stringify(scanParams))
+                settingsManager.setValue(settingsManager.majorFileInfoData,JSON.stringify(nulldatas))
+            }
+        }
+        var newfilejson = settingsManager.getValue(settingsManager.majorFileInfoData)
         console.log("new data: "+newfilejson)
     }
 
@@ -668,7 +765,7 @@ Item{
             console.log("complete building room task and get roomTaskInfo: "+reply)
             var response = JSON.parse(reply)
             if (!GlobalFunc.isEmpty(response)
-                && !Array.isArray(response.data)) {
+                    && !Array.isArray(response.data)) {
                 roomTaskVoModel = response.data
                 console.log("roomTaskVoModel: "+JSON.stringify(roomTaskVoModel))
             }
