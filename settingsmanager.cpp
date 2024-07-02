@@ -80,6 +80,16 @@ QString SettingsManager::LoginMode() const
     return "LoginMode";
 }
 
+QString SettingsManager::MajorTypeMode() const
+{
+    return "MajorTypeMode";
+}
+
+QString SettingsManager::blockOffilneData() const
+{
+    return "blockOffilneData";
+}
+
 QString SettingsManager::pubKey_integers() const
 {
     return "integers";

@@ -19,6 +19,8 @@ class SettingsManager : public QObject
     Q_PROPERTY(QString currentDevice READ currentDevice CONSTANT)
     Q_PROPERTY(QString fileInfoData READ fileInfoData CONSTANT)
     Q_PROPERTY(QString LoginMode READ LoginMode CONSTANT)
+    Q_PROPERTY(QString blockOffilneData READ blockOffilneData CONSTANT)
+    Q_PROPERTY(QString MajorTypeMode READ MajorTypeMode CONSTANT)
 
 public:
     static SettingsManager* instance();
@@ -44,6 +46,9 @@ public:
     QString currentDevice() const;
     QString fileInfoData() const;
     QString LoginMode() const;
+    QString MajorTypeMode() const;
+    QString blockOffilneData() const;
+    
     /**
      * @brief 静态数据
      * @return

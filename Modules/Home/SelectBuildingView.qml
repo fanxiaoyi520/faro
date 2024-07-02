@@ -20,6 +20,8 @@ ScrollView{
     property int inputIndex
     property var transferModelData
     property var blockOffilneData
+    property var blockOffilneDataList: []
+
     id: selectBuildingView
     Layout.fillWidth: true
     Layout.fillHeight: true
@@ -31,12 +33,6 @@ ScrollView{
         id: tipsPopUp
         onConfirmAction: preEnterMeasureMode()
     }
-    //    Timer {
-    //        id: downloadTimer
-    //        interval: 500
-    //        repeat: true
-    //        onTriggered: downloadTimerTaskHandle ()
-    //    }
     ScanningFaroPop{
         id: scanningFaroPop
         title: SettingString.faro_measure_task
@@ -220,8 +216,8 @@ ScrollView{
                 repeat: false
                 onTriggered: {
                     if (mouseArea.pressed) {
+                        islongpresse = true
                         console.log("Long press detected!");
-                        // 在这里添加你的长按响应代码
                         longPressDetected()
                     }
                 }
@@ -230,35 +226,84 @@ ScrollView{
             MouseArea {
                 id: mouseArea
                 anchors.fill: parent
-                onClicked: {
-                    var loginMode = settingsManager.getValue(settingsManager.LoginMode)
-                    inputIndex = index
-                    transferModelData = modelData
-                    if (Number(loginMode) === QtEnumClass.Ordinary) {
-                        jumpToSelectFloor(index,modelData)
-                    } else {
-                        console.log("this is a major mode")
-                    }
-                }
+                property int longPressThreshold: 500
+                property var pressTime: 0
+                property bool isLongPress: false
+
                 onPressed: {
-                    if (Number(loginMode) === QtEnumClass.Major) {
-                        longPressTimer.start();
+                    pressTime = Date.now()
+                    isLongPress = false
+                }
+
+                onPositionChanged: {
+                    if (Date.now() - pressTime > 100) {
+                        isLongPress = false
                     }
                 }
 
                 onReleased: {
-                    if (Number(loginMode) === QtEnumClass.Major) {
-                        longPressTimer.stop();
-                    }
-                }
+                    if (Date.now() - pressTime > longPressThreshold) {
+                        isLongPress = true
+                        console.log("Long Press Detected")
+                        longPressDetected()
+                    } else {
+                        var loginMode = settingsManager.getValue(settingsManager.LoginMode)
+                        var majorTypeMode = settingsManager.getValue(settingsManager.MajorTypeMode)
 
-                onPositionChanged: {
-                    if (mouseArea.pressed) {
-                        if (Number(loginMode) === QtEnumClass.Major) {
-                            longPressTimer.stop();
+                        inputIndex = index
+                        transferModelData = modelData
+                        if (Number(loginMode) === QtEnumClass.Ordinary) {
+                            jumpToSelectFloor(index,modelData)
+                        } else {
+                            console.log("this is a major mode")
+                            settingsManager.setValue(settingsManager.MajorTypeMode,QtEnumClass.Browse)
+                            jumpToSelectFloor(index,modelData)
                         }
                     }
+
+                    pressTime = 0
+                    isLongPress = false
                 }
+
+                onClicked: {
+                    if (!isLongPress) {
+                        console.log("Click without Long Press")
+                    }
+                }
+                //                onClicked: {
+                //                    var loginMode = settingsManager.getValue(settingsManager.LoginMode)
+                //                    var majorTypeMode = settingsManager.getValue(settingsManager.MajorTypeMode)
+
+                //                    inputIndex = index
+                //                    transferModelData = modelData
+                //                    if (Number(loginMode) === QtEnumClass.Ordinary) {
+                //                        jumpToSelectFloor(index,modelData)
+                //                    } else {
+                //                        console.log("this is a major mode")
+                //                        settingsManager.setValue(settingsManager.MajorTypeMode,QtEnumClass.Browse)
+                //                        jumpToSelectFloor(index,modelData)
+                //                    }
+                //                }
+                //                onPressed: {
+                //                    if (Number(loginMode) === QtEnumClass.Major) {
+                //                        longPressTimer.start();
+                //                    }
+                //                }
+
+
+                //                onReleased: {
+                //                    if (Number(loginMode) === QtEnumClass.Major) {
+                //                        longPressTimer.stop();
+                //                    }
+                //                }
+
+                //                onPositionChanged: {
+                //                    if (mouseArea.pressed) {
+                //                        if (Number(loginMode) === QtEnumClass.Major) {
+                //                            longPressTimer.stop();
+                //                        }
+                //                    }
+                //                }
             }
         }
     }
@@ -284,7 +329,7 @@ ScrollView{
     }
 
     function preEnterMeasureMode() {
-        if (tipsPopUp.tipsContentStr === SettingString.enter_measure_mode) {
+        if (tipsPopUp.tipsContentStr === SettingString.enter_measure_mode || tipsPopUp.tipsContentStr === SettingString.download_fail_and_retry) {
             console.log("inputIndex: "+inputIndex)
             console.log("transferModelData: "+JSON.stringify(transferModelData))
             tipsPopUp.close()
@@ -295,7 +340,6 @@ ScrollView{
 
         if (tipsPopUp.tipsContentStr === SettingString.sure_cancle_tasks) {
             console.log("sure cancle task ...")
-            //downloadTimer.stop()
             scanningFaroPop.close()
             tipsPopUp.close()
         }
@@ -391,7 +435,7 @@ ScrollView{
                 return;
             }
             blockOffilneData = response.data
-            //downloadTimer.start()
+            insertAllData()
             scanningFaroPop.tipsconnect = SettingString.measure_resource_download_progress+"1%"
             downloadTaskHandle()
         }
@@ -405,6 +449,28 @@ ScrollView{
         http.onReplySucSignal.connect(onReply)
         http.replyFailSignal.connect(onFail)
         http.get(Api.building_block_queryBlockOfflineData,{"stageType":currentRow+1,"blockId":transferModelData.id})
+    }
+
+    function insertAllData() {
+        var klistjson = settingsManager.getValue(settingsManager.blockOffilneData)
+        console.log("klistjson: "+JSON.stringify(blockOffilneData))
+        if (GlobalFunc.isEmpty(klistjson)) {
+            blockOffilneDataList.push(JSON.stringify(blockOffilneData))
+        } else if (GlobalFunc.isJson(klistjson) && Array.isArray(JSON.parse(klistjson))) {
+            blockOffilneDataList = JSON.parse(klistjson)
+            let index = blockOffilneDataList.findIndex(value => {
+                                                           var iscon = JSON.parse(value).blockId === blockOffilneData.blockId
+                                                           return iscon
+                                                       });
+            if (index !== -1) {
+                blockOffilneDataList[index] = JSON.stringify(blockOffilneData);
+            } else {
+                blockOffilneDataList.push(JSON.stringify(blockOffilneData))
+            }
+        } else {
+            blockOffilneDataList = []
+        }
+        settingsManager.setValue(settingsManager.blockOffilneData,JSON.stringify(blockOffilneDataList))
     }
 
     function downloadTaskHandle(){
@@ -424,6 +490,23 @@ ScrollView{
             console.log(reply,code)
             http.replyFailSignal.disconnect(onFileFail)
             hub.close()
+            scanningFaroPop.close()
+            tipsPopUp.tipsContentStr = SettingString.download_fail_and_retry
+            tipsPopUp.open()
+
+            var klistjson = settingsManager.getValue(settingsManager.blockOffilneData)
+            if (GlobalFunc.isJson(klistjson) && Array.isArray(JSON.parse(klistjson))) {
+                blockOffilneDataList = JSON.parse(klistjson)
+                let index = blockOffilneDataList.findIndex(value => {
+                                                               var iscon = JSON.parse(value).blockId === blockOffilneData.blockId
+                                                               return iscon
+                                                           });
+                if (index !== -1) {
+                    blockOffilneDataList.splice(index, 1);
+                }
+            }
+            blockOffilneData = undefined
+            settingsManager.setValue(settingsManager.blockOffilneData,blockOffilneDataList)
         }
 
         function onDownloadReplyFinished(reply) {
@@ -432,6 +515,10 @@ ScrollView{
             http.onReplySucSignal.disconnect(onFileReply)
             http.onDownloadReplyFinishedSignal.disconnect(onDownloadReplyFinished)
             scanningFaroPop.close()
+
+            settingsManager.setValue(settingsManager.MajorTypeMode,QtEnumClass.Measure)
+            console.log("input transferModelData: "+JSON.stringify(transferModelData))
+            jumpToSelectFloor(inputIndex,transferModelData)
         }
 
         console.log("blockOffilneData.pics: "+blockOffilneData.pics)

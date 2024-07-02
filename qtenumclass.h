@@ -13,6 +13,12 @@ public:
         Major
     };
     Q_ENUM(LoginMode)
+
+    enum MajorTypeMode {
+        Browse,
+        Measure
+    };
+    Q_ENUM(MajorTypeMode)
 signals:
 
 };

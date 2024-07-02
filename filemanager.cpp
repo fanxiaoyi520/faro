@@ -273,6 +273,36 @@ bool FileManager::removePath(const QString &path)
     return false;
 }
 
+bool FileManager::removeArbitrarilyPath(const QString &path)
+{
+    QString resultPath = "";
+    QString originPath = path;
+    qDebug() << "Trying to remove path:" << originPath;
+    QFileInfo fileInfo(originPath);
+    if (fileInfo.exists()) {
+        if (fileInfo.isDir()) {
+            // 删除目录及其内容
+            QDir dir(originPath);
+            bool success = dir.removeRecursively();
+            if (!success) {
+                qDebug() << "Failed to remove directory";
+            }
+            return success;
+        } else {
+            // 删除文件
+            QFile file(originPath);
+            bool success = file.remove();
+            if (!success) {
+                qDebug() << "Failed to remove file:" << file.errorString();
+            }
+            return success;
+        }
+    }
+    // 路径不存在，返回 false
+    qDebug() << "Path does not exist:" << path;
+    return false;
+}
+
 bool FileManager::isFileExist(const QString &path)
 {
     QFileInfo fileInfo(path);

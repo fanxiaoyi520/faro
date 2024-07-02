@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<WifiHelper>("WifiHlper",1,0,"WifiHelper");
     qmlRegisterType<QtEnumClass>("QtEnumClass", 1, 0, "QtEnumClass");
     qmlRegisterType<FaroManager>("FaroManager", 1, 0, "FaroManager");
+    qmlRegisterType<FileManager>("FileManager", 1, 0, "FileManager");
     qmlRegisterSingletonType<QObject>("Api", 1, 0, "Api",apiProvider);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("settingsManager", SettingsManager::instance());

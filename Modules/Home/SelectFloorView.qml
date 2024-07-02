@@ -6,6 +6,10 @@ import Http 1.0
 import Api 1.0
 import Dialog 1.0
 import QtGraphicalEffects 1.0
+import QtEnumClass 1.0
+import FileManager 1.0
+import WifiHlper 1.0
+
 import "../../Util/GlobalFunc.js" as GlobalFunc
 import "../../String_Zh_Cn.js" as SettingString
 
@@ -16,6 +20,8 @@ ScrollView{
     property var list:[]
     property int currentRow: 0
     property string selectedStageName: SettingString.main_stage_one
+    property var loginMode
+    property var majorTypeMode
     signal buildCallbackOrSyncEventHandling()
     onBuildCallbackOrSyncEventHandling: {
         kbuildCallbackOrSyncEventHandling()
@@ -27,6 +33,8 @@ ScrollView{
     clip: true
     Toast {id: toastPopup}
     Http {id: http}
+    FileManager{id: fileManager}
+    WifiHelper{id: wifiHelper}
     Dialog{
         id: dialog
         titleStr: qsTr("选择阶段")
@@ -44,6 +52,13 @@ ScrollView{
     background: Rectangle{
         color: "#FFFFFF"
     }
+
+    TipsPopUp {
+        id: tipsPopUp
+        tipsContentStr: SettingString.quit_measure_task
+        onConfirmAction: majorModeBackAction()
+    }
+
     BaseNavigationBar{
         id: navigationBar
         title: qsTr(inputModelData ? inputModelData.blockName : "选择楼层")
@@ -61,10 +76,11 @@ ScrollView{
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr(selectedStageName)
-                color: "#666666"
+                color: !(loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure)? "#666666" : "#999999"
             }
             MouseArea{
                 anchors.fill: parent
+                enabled: !(loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure)
                 onClicked: {
                     dialog.list = SettingString.stageType
                     dialog.currentIndex = currentRow
@@ -73,8 +89,12 @@ ScrollView{
             }
         }
         onBackAction: {
-            rootStackView.pop()
-            buildCallbackOrSyncEventHandling()
+            if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+                tipsPopUp.open()
+            } else {
+                rootStackView.pop()
+                buildCallbackOrSyncEventHandling()
+            }
         }
     }
 
@@ -215,11 +235,28 @@ ScrollView{
     }
 
     onInputModelDataChanged: {
+        loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        majorTypeMode = Number(settingsManager.getValue(settingsManager.MajorTypeMode))
         hub.open()
         getBuildingUnitPage()
     }
 
     //MARK: logic
+    function majorModeBackAction() {
+        settingsManager.setValue(settingsManager.blockOffilneData,[])
+        fileManager.removeArbitrarilyPath("C:\\faromajorpics")
+        var wifi = settingsManager.getValue(settingsManager.currentDevice)
+        if(GlobalFunc.isJson(wifi)) {
+            var contentName = JSON.parse(wifi).wifiName
+            var currentWifiName = wifiHelper.queryInterfaceName()
+            if (currentWifiName === contentName){
+                wifiHelper.disConnectWifi()
+            }
+        }
+        rootStackView.pop()
+        buildCallbackOrSyncEventHandling()
+    }
+
     function headerFilterData(index,itemData){
         console.log("selected header index and item data: "+index,itemData)
         accordingToUnitIdSearchFloor(index)
