@@ -101,7 +101,7 @@ bool FileManager::compression_zip_file(const QString &selectFile2DirPath, const 
 
         QZipWriter writer(saveFilePath);
 //        writer.addDirectory(zipRootFolder);
-        QFileInfoList fileList = ergodic_compression_file(&writer, selectDirUpDir, selectFile2DirPath);
+        QFileInfoList fileList = ergodic_compression_file(&writer, selectFile2DirPath, selectFile2DirPath);
         writer.close();
         if (0 == fileList.size())
             return true;
