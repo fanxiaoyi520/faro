@@ -361,7 +361,8 @@ Rectangle{
     }
 
     function delByPath(){
-        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+        var loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        var filejson = settingsManager.getValue((loginMode === QtEnumClass.Major) ? settingsManager.majorFileInfoData : settingsManager.fileInfoData)
         console.log("fileInfoData = " + filejson)
         var totalFileInfo = []
         if (!filejson) {
@@ -383,7 +384,7 @@ Rectangle{
                                       return JSON.stringify(itemObj)
                                   });
                 console.log("compress after datas = " + JSON.stringify(datas))
-                settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
+                settingsManager.setValue((loginMode === QtEnumClass.Major) ? settingsManager.majorFileInfoData : settingsManager.fileInfoData,JSON.stringify(datas))
             } else {
                 totalFileInfo = []
             }
@@ -411,7 +412,7 @@ Rectangle{
                 totalFileInfo = fileDatas
 
                 if(fileDatas.length < datas.length){
-                    settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(fileDatas))
+                    settingsManager.setValue((loginMode === QtEnumClass.Major) ? settingsManager.majorFileInfoData : settingsManager.fileInfoData,JSON.stringify(fileDatas))
                 }
             } else {
                 totalFileInfo = []
@@ -528,6 +529,7 @@ Rectangle{
 
     function performCalculation(result,filePath,params,index){
         function onReply(reply){
+            var loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
             faroManager.performCalculationFailResult.disconnect(onFail)
             faroManager.performCalculationSucResult.disconnect(onReply)
             console.log("calculation reply:" + reply)
@@ -539,7 +541,7 @@ Rectangle{
                 rect_root.successCount += 1
                 fileManager.removePath(selectList[index].filePath)
                 fileManager.removePath(selectList[index].filePath.replace(".fls",".zip"))
-                var filejson = settingsManager.getValue(settingsManager.fileInfoData)
+                var filejson = settingsManager.getValue((loginMode === QtEnumClass.Major) ? settingsManager.majorFileInfoData : settingsManager.fileInfoData)
                 if (filejson) {
                     var datas = JSON.parse(filejson)
                     if (Array.isArray(datas)){
@@ -554,7 +556,7 @@ Rectangle{
                                               }
                                               return JSON.stringify(itemObj)
                                           });
-                        settingsManager.setValue(settingsManager.fileInfoData,JSON.stringify(datas))
+                        settingsManager.setValue((loginMode === QtEnumClass.Major) ? settingsManager.majorFileInfoData : settingsManager.fileInfoData,JSON.stringify(datas))
                     }
                 }
             }
