@@ -216,19 +216,20 @@ void FaroManager::convertFlsToPly(const QString &inFlsFilePath, const QString &o
 void FaroManager::performCalculation(const QString &response,const QString &filePath,const QString &calParams){
 
     qDebug() << "default fls path : " << filePath;
+     qDebug() << "calParams: " << calParams;
     QJsonObject fileModel = Util::parseJsonStringToObject(response);
     QJsonObject myCalParams = Util::parseJsonStringToObject(calParams);
     QMap<QString, QVariant> paramsMap;
     paramsMap.insert("roomId",myCalParams.value("roomId"));
     paramsMap.insert("stationId",myCalParams.value("stationId"));
-    QString str = myCalParams.value("stageType").toString();
-    paramsMap.insert("stageType",(str.isEmpty()) ? "5" : str);
+    qDebug() << "param value stageType ==" << myCalParams.value("stageType");
+    paramsMap.insert("stageType",myCalParams.value("stageType"));
     paramsMap.insert("fileId",fileModel.value("fileId"));
     paramsMap.insert("equipmentModel","Faro-Focus-X");
     //inputModel.value("scanningMode")
     paramsMap.insert("scanningMode",myCalParams.value("scanningMode"));
     //    paramsMap.insert("scanningDataFormat","xyzi");
-    paramsMap.insert("fileType","fls");
+    paramsMap.insert("fileType","fls_folder");
     QMap<QString, QVariant> modeTable;
     modeTable.insert("masonry_mode",myCalParams.value("masonry_mode"));
     modeTable.insert("map_mode",myCalParams.value("map_mode"));

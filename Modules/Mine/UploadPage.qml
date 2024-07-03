@@ -6,6 +6,7 @@ import Http 1.0
 import Api 1.0
 import FaroManager 1.0
 import Util 1.0
+import QtEnumClass 1.0
 import "../../String_Zh_Cn.js" as String
 
 Rectangle{
@@ -29,13 +30,14 @@ Rectangle{
         onConfirmAction: {
             for(var i =0 ;i < selectList.length; i ++){
                 fileManager.removePath(selectList[i].filePath)
-//                fileManager.removePath(selectList[i].filePath.replace(".fls",".zip"))
+                //                fileManager.removePath(selectList[i].filePath.replace(".fls",".zip"))
             }
             delByPath()
             selectList = []
             refreshFileInfo()
         }
     }
+
 
     TipsPopUp{
         id:tipsPop_upload
@@ -67,24 +69,24 @@ Rectangle{
     /***bug fixing: 不能在这再次调用faroManager.init()*/
     FaroManager {
         id: faroManager
-//        onConvertFlsToZipPlyResult: {
-//            console.log("enter ply zip result = " + filePath)
-//            if(filePath){
-//                uploadFile(rect_root.index,filePath)
-//            }else{
-//                rect_root.failedCount += 1
-//                if (index + 1 < selectList.length) {
-//                    callBackUploadFile(index + 1)
-//                }else{
-//                    tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
-//                    tipsPop_upload_finish.open()
-//                    upload_pop.close()
-//                    selectAllGroup(false)
-//                    selectList = []
-//                }
-//                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
-//            }
-//        }
+        //        onConvertFlsToZipPlyResult: {
+        //            console.log("enter ply zip result = " + filePath)
+        //            if(filePath){
+        //                uploadFile(rect_root.index,filePath)
+        //            }else{
+        //                rect_root.failedCount += 1
+        //                if (index + 1 < selectList.length) {
+        //                    callBackUploadFile(index + 1)
+        //                }else{
+        //                    tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
+        //                    tipsPop_upload_finish.open()
+        //                    upload_pop.close()
+        //                    selectAllGroup(false)
+        //                    selectList = []
+        //                }
+        //                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
+        //            }
+        //        }
         onConvertFlsToZipResult: {
             console.log("enter fls zip result = " + filePath)
             if(filePath){
@@ -242,7 +244,7 @@ Rectangle{
                         selectAllGroup(false)
                         selectList = []
                     }
-//                    console.log("select data = " + JSON.stringify(selectList))
+                    //                    console.log("select data = " + JSON.stringify(selectList))
                 }
             }
         }
@@ -389,8 +391,9 @@ Rectangle{
     }
 
     function refreshFileInfo(){
-        var filejson = settingsManager.getValue(settingsManager.fileInfoData)
-        console.log("fileInfoData = " + filejson)
+        var loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        var filejson = settingsManager.getValue( (loginMode === QtEnumClass.Major) ? settingsManager.majorFileInfoData : settingsManager.fileInfoData)
+        console.log("model isOffline =("+ loginMode === QtEnumClass.Major + ") filejson = " + filejson)
         var totalFileInfo = []
         if (!filejson) {
             totalFileInfo = []
@@ -456,7 +459,7 @@ Rectangle{
         rect_root.index = index
         console.log("begin totalUploadSize : " + rect_root.totalUploadSize)
         var fileAbsPath = selectList[index].filePath
-//        faroManager.startConvertFlsToZipPly(fileAbsPath)
+        //        faroManager.startConvertFlsToZipPly(fileAbsPath)
         faroManager.startConverFlsToZip(fileAbsPath)
     }
 
@@ -481,9 +484,9 @@ Rectangle{
             console.log("upload reply :" + reply)
             var response = JSON.parse(reply)
             if(response.code !== 0){
-                 rect_root.failedCount += 1
+                rect_root.failedCount += 1
                 if (index + 1 < selectList.length) {
-                   callBackUploadFile(index + 1)
+                    callBackUploadFile(index + 1)
                 }else{
                     upload_pop.close()
                     tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
@@ -556,12 +559,12 @@ Rectangle{
                 }
             }
             if (index + 1 < selectList.length) {
-               callBackUploadFile(index + 1)
+                callBackUploadFile(index + 1)
             }else{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
                 upload_pop.close()
-               selectAllGroup(false)
+                selectAllGroup(false)
                 selectList = []
             }
 
@@ -575,7 +578,7 @@ Rectangle{
             console.log("calculation totalCount:" + rect_root.totalUploadSize)
             rect_root.failedCount += 1
             if (index + 1 < selectList.length) {
-              callBackUploadFile(index + 1)
+                callBackUploadFile(index + 1)
             }else{
                 tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
                 tipsPop_upload_finish.open()
@@ -595,24 +598,24 @@ Rectangle{
         selectAllGroup(true)
         var totalArray = []
         groupedList.forEach((item,index)=>{
-          var subArray = item
-          if(subArray && subArray.length > 0){
-              subArray.forEach((subItem,subIndex)=>{
-                 totalArray.push(JSON.parse(subItem))
-              })
-          }
-        })
+                                var subArray = item
+                                if(subArray && subArray.length > 0){
+                                    subArray.forEach((subItem,subIndex)=>{
+                                                         totalArray.push(JSON.parse(subItem))
+                                                     })
+                                }
+                            })
         return totalArray
     }
 
     function selectAllGroup(isSelected){
         var newGroupedList = groupedList.map(function(item){
-                    return item.map(function(subItem){
-                        var subObjItem = JSON.parse(subItem)
-                        subObjItem.isSelected = isSelected
-                        return JSON.stringify(subObjItem)
-                    })
-                })
+            return item.map(function(subItem){
+                var subObjItem = JSON.parse(subItem)
+                subObjItem.isSelected = isSelected
+                return JSON.stringify(subObjItem)
+            })
+        })
         groupedList = []
         groupedList = newGroupedList
     }
