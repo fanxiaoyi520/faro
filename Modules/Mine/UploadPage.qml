@@ -29,11 +29,10 @@ Rectangle{
         onConfirmAction: {
             for(var i =0 ;i < selectList.length; i ++){
                 fileManager.removePath(selectList[i].filePath)
-                fileManager.removePath(selectList[i].filePath.replace(".fls",".zip"))
+//                fileManager.removePath(selectList[i].filePath.replace(".fls",".zip"))
             }
             delByPath()
             selectList = []
-            listItemSelectAll(false)
             refreshFileInfo()
         }
     }
@@ -68,8 +67,26 @@ Rectangle{
     /***bug fixing: 不能在这再次调用faroManager.init()*/
     FaroManager {
         id: faroManager
-        onConvertFlsToZipPlyResult: {
-            console.log("enter ply zip result = " + filePath)
+//        onConvertFlsToZipPlyResult: {
+//            console.log("enter ply zip result = " + filePath)
+//            if(filePath){
+//                uploadFile(rect_root.index,filePath)
+//            }else{
+//                rect_root.failedCount += 1
+//                if (index + 1 < selectList.length) {
+//                    callBackUploadFile(index + 1)
+//                }else{
+//                    tipsPop_upload_finish.tipsContentStr = String.upload_upload_mid_err_tips.replace("%1d",rect_root.successCount).replace("%2d",rect_root.failedCount)
+//                    tipsPop_upload_finish.open()
+//                    upload_pop.close()
+//                    selectAllGroup(false)
+//                    selectList = []
+//                }
+//                upload_pop.tipsconnect = qsTr(String.upload_progress.replace("%1d",rect_root.successCount + rect_root.failedCount).replace("%2d",rect_root.totalUploadSize))
+//            }
+//        }
+        onConvertFlsToZipResult: {
+            console.log("enter fls zip result = " + filePath)
             if(filePath){
                 uploadFile(rect_root.index,filePath)
             }else{
@@ -439,7 +456,8 @@ Rectangle{
         rect_root.index = index
         console.log("begin totalUploadSize : " + rect_root.totalUploadSize)
         var fileAbsPath = selectList[index].filePath
-        faroManager.startConvertFlsToZipPly(fileAbsPath)
+//        faroManager.startConvertFlsToZipPly(fileAbsPath)
+        faroManager.startConverFlsToZip(fileAbsPath)
     }
 
     function uploadFile(index,fileAbsPath){

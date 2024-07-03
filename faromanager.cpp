@@ -228,7 +228,7 @@ void FaroManager::performCalculation(const QString &response,const QString &file
     //inputModel.value("scanningMode")
     paramsMap.insert("scanningMode",myCalParams.value("scanningMode"));
     //    paramsMap.insert("scanningDataFormat","xyzi");
-    paramsMap.insert("fileType","ply");
+    paramsMap.insert("fileType","fls");
     QMap<QString, QVariant> modeTable;
     modeTable.insert("masonry_mode",myCalParams.value("masonry_mode"));
     modeTable.insert("map_mode",myCalParams.value("map_mode"));
@@ -273,6 +273,25 @@ void FaroManager::convertFlsToZipPly(const QString &filePath)
     }
 }
 
+void FaroManager::convertFlsToZip(const QString &filePath)
+{
+    QString resultPath = "";
+    QString originPath = filePath;
+    qDebug() << "filePath =" << filePath;
+    originPath.replace(0,7,Util::getDriveLetter());
+    qDebug() << "originPath =" << originPath;
+    bool isExist = FileManager::instance()->isFileExist(originPath);
+    if(isExist){
+        QString fileName = originPath.mid(originPath.lastIndexOf("/") + 1);
+        qDebug() << "fileName =" << fileName;
+         FileManager::instance()-> compression_zip_file(originPath,originPath);
+        qDebug() << "flsZipPath =" << originPath + "/" + fileName +".zip";
+        emit convertFlsToZipResult(originPath + "/" + fileName +".zip");
+    }else{
+        emit convertFlsToZipResult("");
+    }
+}
+
 void FaroManager::startConvertFlsToZipPly(const QString &filePath){
 
     if (!m_running) {
@@ -283,6 +302,19 @@ void FaroManager::startConvertFlsToZipPly(const QString &filePath){
         m_running = false;
         m_thread.join();
         startConvertFlsToZipPly(filePath);
+    }
+}
+
+void FaroManager::startConverFlsToZip(const QString &filePath)
+{
+    if (!m_running) {
+        m_thread = std::thread(&FaroManager::convertFlsToZip, this , filePath);
+        m_running = true;
+    }
+    else{
+        m_running = false;
+        m_thread.join();
+        startConverFlsToZip(filePath);
     }
 }
 

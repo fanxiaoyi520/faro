@@ -24,10 +24,10 @@ Column{
         font.pixelSize: 16
         Component.onCompleted: {
             var dataItem = JSON.parse(datas[0])
-            //            console.log("itemview datas = " + datas.length)
-            //            console.log("itemview datas Index = " + index)
-            //            console.log("itemview datas jsonString = " + JSON.stringify(datas[0]))
-            if (GlobalFunc.isJson(datas[0]).stageType - 1){
+            console.log("itemview datas = " + datas.length)
+            console.log("itemview datas Index = " + index)
+            console.log("itemview datas jsonString = " + JSON.stringify(datas[0]))
+            if (GlobalFunc.isJson(datas[0])){
                 var stageType = JSON.parse(String.stageType[JSON.parse(datas[0]).stageType - 1]).name
                 var typeName = String.result_task_type_room
                 text_sub_name.text = dataItem.blockName + "_" + dataItem.unitName + "_"+ dataItem.floorName + "_"+ dataItem.roomName + "_"+ typeName + "_"+ stageType
