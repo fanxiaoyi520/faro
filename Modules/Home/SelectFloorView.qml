@@ -22,6 +22,7 @@ ScrollView{
     property string selectedStageName: SettingString.main_stage_one
     property var loginMode
     property var majorTypeMode
+    property int headerSelectedIndex: 0
     signal buildCallbackOrSyncEventHandling()
     onBuildCallbackOrSyncEventHandling: {
         kbuildCallbackOrSyncEventHandling()
@@ -174,7 +175,6 @@ ScrollView{
                 Text {
                     id: name
                     text: qsTr("楼层: ")+qsTr(modelData.floorName)+qsTr("层")
-
                     anchors.verticalCenter: parent.verticalCenter
                     x:20
                 }
@@ -186,6 +186,7 @@ ScrollView{
                     anchors.top: parent.top
                     anchors.topMargin: 13.5
                     color: "#000000"
+                    visible: show()
                 }
                 Text {
                     id: numname
@@ -195,12 +196,14 @@ ScrollView{
                     anchors.top: parent.top
                     anchors.topMargin: 13.5
                     color: "#999999"
+                    visible: show()
                 }
                 Rectangle{
                     id: progress
                     height: 5
                     color: "#F5F5F5"
                     radius: 2.5
+                    visible: show()
                     anchors {
                         left: contentname.left
                         right: numname.right
@@ -213,6 +216,7 @@ ScrollView{
                         width: parent.width * (modelData.finishRoomCount / modelData.totalRoomCount)
                         color: GlobalFunc.getStageTypeColor(currentRow+1)
                         radius: 2.5
+                        visible: show()
                     }
                 }
                 Image {
@@ -237,11 +241,33 @@ ScrollView{
     onInputModelDataChanged: {
         loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
         majorTypeMode = Number(settingsManager.getValue(settingsManager.MajorTypeMode))
+        headerSelectedIndex = 0
+        headerListButtonGroup.selectedButtonIndex = headerSelectedIndex
+        if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+            var datasjson = settingsManager.getValue(settingsManager.blockOffilneData)
+            if (GlobalFunc.isJson(datasjson) && Array.isArray(JSON.parse(datasjson))) {
+                console.log("datasjson: "+datasjson)
+                var datas = JSON.parse(datasjson)
+                const found = datas.find(obj => JSON.parse(obj).blockId === inputModelData.id);
+                console.log("found: "+JSON.stringify(found))
+                unitList = []
+                unitList = JSON.parse(found).units
+                console.log("unitList: "+JSON.stringify(unitList))
+                var unit = unitList[0]
+                list = []
+                list = unit.floors
+            }
+            return
+        }
         hub.open()
         getBuildingUnitPage()
     }
 
     //MARK: logic
+    function show() {
+        return !(loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure   )
+    }
+
     function majorModeBackAction() {
         settingsManager.setValue(settingsManager.blockOffilneData,[])
         fileManager.removeArbitrarilyPath("C:\\faromajorpics")
@@ -259,6 +285,13 @@ ScrollView{
 
     function headerFilterData(index,itemData){
         console.log("selected header index and item data: "+index,itemData)
+        headerSelectedIndex = index
+        if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+            var unit = unitList[index]
+            list = unit.floors
+            return
+        }
+
         accordingToUnitIdSearchFloor(index)
     }
 

@@ -303,6 +303,11 @@ bool FileManager::removeArbitrarilyPath(const QString &path)
     return false;
 }
 
+QString FileManager::getArbitrarilyPath()
+{
+    return "C:\\faromajorpics\\";
+}
+
 bool FileManager::isFileExist(const QString &path)
 {
     QFileInfo fileInfo(path);

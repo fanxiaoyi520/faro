@@ -18,6 +18,7 @@ class SettingsManager : public QObject
     Q_PROPERTY(QString pubKey_integers READ pubKey_integers CONSTANT)
     Q_PROPERTY(QString currentDevice READ currentDevice CONSTANT)
     Q_PROPERTY(QString fileInfoData READ fileInfoData CONSTANT)
+    Q_PROPERTY(QString majorFileInfoData READ majorFileInfoData CONSTANT)
     Q_PROPERTY(QString LoginMode READ LoginMode CONSTANT)
     Q_PROPERTY(QString blockOffilneData READ blockOffilneData CONSTANT)
     Q_PROPERTY(QString MajorTypeMode READ MajorTypeMode CONSTANT)
@@ -45,6 +46,7 @@ public:
     QString selectedMeasureData() const;
     QString currentDevice() const;
     QString fileInfoData() const;
+    QString majorFileInfoData() const;
     QString LoginMode() const;
     QString MajorTypeMode() const;
     QString blockOffilneData() const;

@@ -283,6 +283,7 @@ void Http::download(QString url,const QMap<QString, QVariant> &ps,int allcount)
         QString fileUri = data["fileUri"].toString();
         QString fileName = data["fileName"].toString();
         QString fileId = data["fileId"].toString();
+        QString fileType = data["type"].toString();
         qDebug() << "fileId: " << fileId;
         QString urlStr= "http://"+bucketName+"."+fileUri+"/"+fileName;
 
@@ -292,23 +293,59 @@ void Http::download(QString url,const QMap<QString, QVariant> &ps,int allcount)
         connect(reply, &QNetworkReply::finished, this, [=]() mutable {
             if (reply->error() == QNetworkReply::NoError) {
                 QByteArray imageData = reply->readAll();
-                QFile file(FileManager::getMajorPicsPath()+"/"+fileId+".png");
-                if (file.open(QIODevice::WriteOnly)) {
-                    file.write(imageData);
-                    file.close();
-                }
-                count++;
-                replyFinished("complete");
-                qDebug() << "count: " << count << "allcount: " << allcount;
-                if(count == allcount) {
-                    downloadReplyFinished("all complete");
-                    count = 0;
+                if (imageData.size() >= 8 &&
+                        static_cast<unsigned char>(imageData[0]) == 0x89 &&
+                        static_cast<unsigned char>(imageData[1]) == 0x50 &&
+                        static_cast<unsigned char>(imageData[2]) == 0x4E &&
+                        static_cast<unsigned char>(imageData[3]) == 0x47 &&
+                        static_cast<unsigned char>(imageData[4]) == 0x0D &&
+                        static_cast<unsigned char>(imageData[5]) == 0x0A &&
+                        static_cast<unsigned char>(imageData[6]) == 0x1A &&
+                        static_cast<unsigned char>(imageData[7]) == 0x0A) {
+                    if (reply->error() == QNetworkReply::NoError) {
+                        QFile file(FileManager::getMajorPicsPath()+"/"+fileId+"."+fileType);
+                        if (file.open(QIODevice::WriteOnly)) {
+                            file.write(imageData);
+                            file.close();
+                        }
+                        count++;
+                        replyFinished("complete");
+                        qDebug() << "count: " << count << "allcount: " << allcount;
+                        if(count == allcount) {
+                            downloadReplyFinished("all complete");
+                            count = 0;
+                        }
+                    } else {
+                        replyFail(reply->errorString(),-1);
+                        count = 0;
+                    }
+                    reply->deleteLater();
+                } else {
+                    qDebug() << "Downloaded image is not a PNG file.";
+                    QImage image;
+                    if (image.loadFromData(imageData)) {
+                        QFile file(FileManager::getMajorPicsPath()+"/"+fileId+"."+fileType);
+                        if (file.open(QIODevice::WriteOnly)) {
+                            image.save(&file, "PNG");
+                            file.close();
+                        }
+                        count++;
+                        replyFinished("complete");
+                        qDebug() << "count: " << count << "allcount: " << allcount;
+                        if(count == allcount) {
+                            downloadReplyFinished("all complete");
+                            count = 0;
+                        }
+                    } else {
+                        qDebug() << "Unable to load image data";
+                        replyFail(reply->errorString(),-1);
+                    }
+                    reply->deleteLater();
                 }
             } else {
-                replyFail(reply->errorString(),-1);
-                count = 0;
+                qDebug() << "Network error:" << reply->errorString();
+                reply->deleteLater();
             }
-            reply->deleteLater();
         });
     }).fail([this](const QString &error, int errorCode) {
         qDebug() << "error: " << error << " errorCode: "<< errorCode;
