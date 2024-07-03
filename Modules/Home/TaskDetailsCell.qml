@@ -54,7 +54,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: 23.5
             anchors.top: parent.top
-            anchors.topMargin: 20.5
+            anchors.topMargin: major() ? (82.5-17)/2 : 20.5
             MouseArea{
                 width: parent.width
                 height: parent.height
@@ -90,6 +90,7 @@ Rectangle {
             anchors.verticalCenter: cellStatusImage.verticalCenter
             anchors.left: subTitle.right
             anchors.leftMargin: 10
+            visible: hideBrowse()
         }
         Rectangle{
             id: scoreRect
@@ -119,7 +120,7 @@ Rectangle {
             anchors.topMargin: 47
             color: tipsTitleColor(model)
             font.pixelSize: 13
-//            visible: show()
+            visible: !major()
         }
         Rectangle {
             id: verticalLine
@@ -129,6 +130,7 @@ Rectangle {
             color: "#80EAEAEA"
             anchors.right: parent.right
             anchors.rightMargin: parent.width * 0.18
+            visible: hideBrowse()
         }
 
         ColumnLayout{
@@ -136,6 +138,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: verticalLine.left
             anchors.leftMargin: 18.5 * ratioWidth
+            visible: hideBrowse()
             Image {
                 id: scanimage
                 source: "../../images/home_page_slices/home_scan@2x.png"
@@ -168,7 +171,7 @@ Rectangle {
             anchors.right: moreColumnLayout.right
             anchors.top: moreColumnLayout.top
             radius: 3
-            visible: /*model.status === 0 && */filtering(model) !== undefined
+            visible: redControlHide()/*model.status === 0 && */
         }
 
         ColumnLayout{
@@ -176,6 +179,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 13.5 * ratioWidth
+            visible: hideBrowse()
             Image {
                 id: moreimage
                 source: "../../images/home_page_slices/home_more@2x.png"
@@ -200,9 +204,33 @@ Rectangle {
                 }
             }
         }
+
+        Image {
+            id: arrowimg1
+            source: "../../images/home_page_slices/select_building_arrow@2x.png"
+            width: 7
+            height: 12.5
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 23.5
+            visible: !hideBrowse()
+        }
+    }
+
+    function redControlHide() {
+        var loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        var majorTypeMode = Number(settingsManager.getValue(settingsManager.MajorTypeMode))
+        if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+            return majorFiltering(model) !== undefined
+        } else if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Browse) {
+            return false
+        } else {
+            return filtering(model) !== undefined
+        }
     }
 
     function setScoresIsHidden(model){
+        if (major()) return false
         return !model.percentageScore ? false : model.status === 2
     }
 
@@ -211,6 +239,12 @@ Rectangle {
             return "#999999"
         }
         return "#2e2e2e"
+    }
+
+    function hideBrowse() {
+        var loginMode = Number(settingsManager.getValue(settingsManager.LoginMode))
+        var majorTypeMode = Number(settingsManager.getValue(settingsManager.MajorTypeMode))
+        return !(loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Browse)
     }
 
     function major() {
@@ -236,11 +270,11 @@ Rectangle {
         } else if (model.status === 1) {
             return Settings.station_waiting_calculated
         } else if (model.status === 2) {
-            return model.operationTime
+            return GlobalFunc.isEmpty(model.operationTime) ? "" : model.operationTime
         } else if (model.status === 3) {
             return Settings.station_calculated_fail
         }
-        return Settings.station_waiting_measurement
+        return Settings.station_waiting_scan
     }
 
     function filtering(model) {
@@ -271,7 +305,7 @@ Rectangle {
     function majorFiltering(model) {
         var filejson = settingsManager.getValue(settingsManager.majorFileInfoData);
         var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
-        console.log("filejson: "+filejson)
+        console.log("major filejson: "+filejson)
         var uniqueModel
         if (GlobalFunc.isJson(filejson)){
             var fileModel = JSON.parse(filejson)
@@ -297,6 +331,8 @@ Rectangle {
         var uniqueModel
         if (major()) {
             uniqueModel = majorFiltering(model)
+            console.log("major model data: "+JSON.stringify(modelData))
+            console.log("major unique model: "+JSON.stringify(uniqueModel))
         } else {
             uniqueModel = filtering(model)
         }
@@ -323,7 +359,8 @@ Rectangle {
                 } else {
                     return "../../images/measure_other/measure_ic_progress@2x.png"
                 }
-            default: break
+            default: return "../../images/measure_other/measure_ic_not_created@2x.png"
+
             }
         } else {
             return "../../images/measure_other/measure_ic_not_created@2x.png"

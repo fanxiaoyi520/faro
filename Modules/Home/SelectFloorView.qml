@@ -175,7 +175,6 @@ ScrollView{
                 Text {
                     id: name
                     text: qsTr("楼层: ")+qsTr(modelData.floorName)+qsTr("层")
-
                     anchors.verticalCenter: parent.verticalCenter
                     x:20
                 }

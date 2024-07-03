@@ -229,14 +229,17 @@ ScrollView{
                 }
 
                 onReleased: {
+                    var loginMode = settingsManager.getValue(settingsManager.LoginMode)
+                    var majorTypeMode = settingsManager.getValue(settingsManager.MajorTypeMode)
                     if (Date.now() - pressTime > longPressThreshold) {
                         isLongPress = true
                         console.log("Long Press Detected")
-                        longPressDetected()
+                        if (Number(loginMode) === QtEnumClass.Major) {
+                            longPressDetected()
+                        } else {
+                            jumpToSelectFloor(index,modelData)
+                        }
                     } else {
-                        var loginMode = settingsManager.getValue(settingsManager.LoginMode)
-                        var majorTypeMode = settingsManager.getValue(settingsManager.MajorTypeMode)
-
                         if (Number(loginMode) === QtEnumClass.Ordinary) {
                             jumpToSelectFloor(index,modelData)
                         } else {

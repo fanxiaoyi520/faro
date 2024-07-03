@@ -237,8 +237,12 @@ Item{
             roomsList = inputModelData.rooms
             console.log("detail roomsList: "+JSON.stringify(roomsList))
             room_id = roomsList[selectHeaderIndex].roomId
+            console.log("room_id: "+room_id)
             roomTaskVoModel = roomsList[0]
-            list = roomsList[0].stations
+            list = roomsList[0].stations.map(function(item) {
+                item.roomId = room_id
+                return item
+            })
             console.log("detail list: "+JSON.stringify(list))
             var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
             imageUrl = ""
@@ -278,10 +282,14 @@ Item{
         selectHeaderIndex = index
         if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
             room_id = roomsList[selectHeaderIndex].roomId
+            console.log("room_id: "+room_id)
             roomTaskVoModel = ""
             roomTaskVoModel = roomsList[selectHeaderIndex]
             list = []
-            list = roomsList[selectHeaderIndex].stations
+            list = roomsList[0].stations.map(function(item) {
+                item.roomId = room_id
+                return item
+            })
             console.log("detail list: "+JSON.stringify(list))
             var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
             imageUrl = ""
@@ -304,6 +312,7 @@ Item{
     ///扫描点击事件
     function scanAction(scanModel){
         inputCellModel = scanModel
+        console.log("inputCellModel: "+JSON.stringify(inputCellModel))
 
         if (inputCellModel.calculationStatus === 1) {
             nonerworkPopUp.tipsContentStr = qsTr(SettingString.station_being_calculated)
@@ -326,16 +335,35 @@ Item{
 
     function moreAction(scanModel,filteringStatus){
         console.log("scan model: "+JSON.stringify(scanModel))
-        var parsedMoreType = SettingString.moreType.map(function(itemString) {
-            var itemObject = JSON.parse(itemString);
-            itemObject.status = scanModel.status;
-            itemObject.filteringStatus = filteringStatus;
-            return JSON.stringify(itemObject);
-        });
-        console.log("parsed more type: "+parsedMoreType)
-        morePopUp.list = parsedMoreType
-        morePopUp.open()
-        inputCellModel = scanModel
+        if (loginMode === QtEnumClass.Major && majorTypeMode === QtEnumClass.Measure) {
+            var selectedStageType = JSON.parse(settingsManager.getValue(settingsManager.selectedStageType))
+            selectMeasureModePopUp.stageType = selectedStageType.index+1
+            selectMeasureModePopUp.stationType = scanModel.stationType
+
+            var selectedMeasureData = JSON.parse(settingsManager.getValue(settingsManager.selectedMeasureData))
+            var dataList = SettingString.selectedMeasureMode.map(function(itemString) {
+                var itemObject = JSON.parse(itemString);
+                itemObject.xy_crop_dist = selectedMeasureData.xy_crop_dist;
+                itemObject.z_crop_dist = selectedMeasureData.z_crop_dist;
+                return JSON.stringify(itemObject);
+            });
+            console.log("dataList: "+JSON.stringify(dataList))
+            selectMeasureModePopUp.list = []
+            selectMeasureModePopUp.list = dataList
+            selectMeasureModePopUp.open()
+        } else {
+            console.log("scan model: "+JSON.stringify(scanModel))
+            var parsedMoreType = SettingString.moreType.map(function(itemString) {
+                var itemObject = JSON.parse(itemString);
+                itemObject.status = scanModel.status;
+                itemObject.filteringStatus = filteringStatus;
+                return JSON.stringify(itemObject);
+            });
+            console.log("parsed more type: "+parsedMoreType)
+            morePopUp.list = parsedMoreType
+            morePopUp.open()
+            inputCellModel = scanModel
+        }
     }
 
     function moreCellClickAction(model){
@@ -437,7 +465,7 @@ Item{
             "unitName":roomTaskVoModel.unitName,
             "floorName":roomTaskVoModel.floorName,
             "roomName":roomTaskVoModel.roomName,
-            "stageType":roomTaskVoModel.stageType,
+            "stageType":GlobalFunc.isEmpty(roomTaskVoModel.stageType) ? currentRow+1 : roomTaskVoModel.stageType,
             "roomId":room_id,
             "stationTaskNo": inputCellModel.stationTaskNo,
             "update_time": timer.toLocaleString()
@@ -494,6 +522,17 @@ Item{
                 scanningFaroPop.close()
                 nonerworkPopUp.tipsContentStr = qsTr(SettingString.file_sync_suc)
                 nonerworkPopUp.open()
+
+                room_id = roomsList[selectHeaderIndex].roomId
+                roomTaskVoModel = ""
+                roomTaskVoModel = roomsList[selectHeaderIndex]
+                list = []
+                list = roomsList[selectHeaderIndex].stations
+                console.log("detail list: "+JSON.stringify(list))
+                var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
+                imageUrl = ""
+                imageUrl = "file:///"+fileManager.getArbitrarilyPath()+token+".png"
+                console.log("imageUrl: "+imageUrl)
             } else {
                 scanCompleteDataHandle(scanParams,filePath)
                 scanningFaroPop.tipsconnect = qsTr(SettingString.scanning_in_progress)+"(" + "100" + "%)"
