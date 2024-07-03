@@ -466,7 +466,7 @@ Item{
             "floorName":roomTaskVoModel.floorName,
             "roomName":roomTaskVoModel.roomName,
             "stageType":GlobalFunc.isEmpty(roomTaskVoModel.stageType) ? currentRow+1 : roomTaskVoModel.stageType,
-            "roomId":room_id,
+            "roomId":GlobalFunc.isEmpty(room_id) ? inoutModel.roomId : room_id,
             "stationTaskNo": inputCellModel.stationTaskNo,
             "update_time": timer.toLocaleString()
         }
