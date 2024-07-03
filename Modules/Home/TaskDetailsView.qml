@@ -189,6 +189,7 @@ Item{
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        cacheBuffer: 99999
         spacing: 12
         clip: true
         model: list
@@ -239,6 +240,11 @@ Item{
             room_id = roomsList[selectHeaderIndex].roomId
             console.log("room_id: "+room_id)
             roomTaskVoModel = roomsList[0]
+            if (GlobalFunc.isEmpty(roomsList[0].stations)) {
+                list = []
+                imageUrl = ""
+                return;
+            }
             list = roomsList[0].stations.map(function(item) {
                 item.roomId = room_id
                 return item
@@ -285,7 +291,11 @@ Item{
             console.log("room_id: "+room_id)
             roomTaskVoModel = ""
             roomTaskVoModel = roomsList[selectHeaderIndex]
-            list = []
+            if (GlobalFunc.isEmpty(roomsList[0].stations)) {
+                list = []
+                imageUrl = ""
+                return;
+            }
             list = roomsList[0].stations.map(function(item) {
                 item.roomId = room_id
                 return item

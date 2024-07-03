@@ -19,7 +19,10 @@ Rectangle {
         oldWidth = parent.width
     }
     onWidthChanged: {
-        ratioWidth = parent.width / oldWidth
+        ratioWidth = oldWidth === 0 ? 1 : parent.width / oldWidth
+        console.log("parent.width: "+parent.width)
+        console.log("oldWidth: "+oldWidth)
+        console.log("ratioWidth: "+ratioWidth)
     }
     Rectangle {
         color: "#FFFFFF"
@@ -200,7 +203,7 @@ Rectangle {
                 height: parent.height
                 onClicked: {
                     console.log("more clicked")
-                    moreAction(model,/*model.status === 0 && */filtering(model) !== undefined)
+                    moreAction(model,major() ? majorFiltering(model) !== undefined : filtering(model) !== undefined)
                 }
             }
         }
@@ -338,7 +341,8 @@ Rectangle {
         }
         if (modelData) {
             var status = modelData.status;
-            switch (modelData.status){
+            if (GlobalFunc.isEmpty(status)) status = 0
+            switch (status){
             case GlobalEnum.MMProjectStatus.NotTurnedOn:
                 if (uniqueModel === undefined) {
                     return "../../images/measure_other/measure_ic_not_created@2x.png"
