@@ -147,6 +147,11 @@ Rectangle {
                 source: "../../images/home_page_slices/home_scan@2x.png"
                 width: 20;height: 20
                 Layout.alignment: Qt.AlignHCenter
+                ColorOverlay{
+                    anchors.fill: parent
+                    color: model.ifReadyForTask ? "#000000" : "#999999"
+                    source: parent
+                }
             }
 
             Text {
@@ -154,12 +159,13 @@ Rectangle {
                 Layout.fillWidth: true
                 y: 5
                 text: qsTr("扫描")
-                color: "#000000"
+                color: model.ifReadyForTask ? "#000000" : "#999999"
                 font.pixelSize: 13
             }
             MouseArea{
                 width: parent.width
                 height: parent.height
+                enabled: GlobalFunc.isEmpty(model.ifReadyForTask) ? true : model.ifReadyForTask
                 onClicked: {
                     console.log("scan clicked")
                     scanAction(model)
