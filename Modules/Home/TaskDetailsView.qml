@@ -242,7 +242,9 @@ Item{
             list = roomsList[0].stations.map(function(item) {
                 item.roomId = room_id
                 return item
-            })
+            }).sort(function(a, b) {
+                return parseInt(a.stationNo, 10) - parseInt(b.stationNo, 10);
+            });
             console.log("detail list: "+JSON.stringify(list))
             var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
             imageUrl = ""
@@ -289,6 +291,8 @@ Item{
             list = roomsList[0].stations.map(function(item) {
                 item.roomId = room_id
                 return item
+            }).sort(function(a, b) {
+                return parseInt(a.stationNo, 10) - parseInt(b.stationNo, 10);
             })
             console.log("detail list: "+JSON.stringify(list))
             var token =  !GlobalFunc.isEmpty(roomTaskVoModel.vectorgraph) ? roomTaskVoModel.vectorgraph : roomTaskVoModel.houseTypeDrawing
@@ -815,7 +819,9 @@ Item{
                 return;
             }
             list = []
-            list = response.data.stations
+            list = response.data.stations.sort(function(a, b) {
+                return parseInt(a.stationNo, 10) - parseInt(b.stationNo, 10);
+            });
             var urlStr = response.data.vectorgraph !== null ? response.data.vectorgraph : response.data.houseTypeDrawing
             admin_sys_file_listFileByFileIds([urlStr])
         }
