@@ -831,6 +831,10 @@ Item{
             list = []
             list = response.data.stations.sort(function(a, b) {
                 return parseInt(a.stationNo, 10) - parseInt(b.stationNo, 10);
+            }).map(function(item) {
+                GlobalFunc.isEmpty(item.ifReadyForTask)
+                item.ifReadyForTask = roomTaskVoModel.ifReadyForTask
+                return item
             });
             var urlStr = response.data.vectorgraph !== null ? response.data.vectorgraph : response.data.houseTypeDrawing
             admin_sys_file_listFileByFileIds([urlStr])

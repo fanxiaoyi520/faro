@@ -251,7 +251,11 @@ ScrollView{
                 const found = datas.find(obj => JSON.parse(obj).blockId === inputModelData.id);
                 console.log("found: "+JSON.stringify(found))
                 unitList = []
-                unitList = JSON.parse(found).units
+                unitList = JSON.parse(found).units.map(function(item){
+                    var is = item.unitName.includes(SettingString.unit)
+                    item.unitName = is ? item.unitName : (item.unitName+SettingString.unit)
+                    return item
+                })
                 console.log("unitList: "+JSON.stringify(unitList))
                 var unit = unitList[0]
                 list = []
@@ -322,7 +326,11 @@ ScrollView{
             var response = JSON.parse(reply)
             console.log("complete building unit page data: "+reply)
             if (response.data.length <=0) return;
-            unitList = response.data
+            unitList = response.data.map(function(item){
+                var is = item.unitName.includes(SettingString.unit)
+                item.unitName = is ? item.unitName : (item.unitName+SettingString.unit)
+                return item
+            })
             if (unitList.length === 0) {
                 hub.close()
                 return
