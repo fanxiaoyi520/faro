@@ -139,9 +139,9 @@ Rectangle {
         ColumnLayout{
             id: scanColumnLayout
             anchors.verticalCenter: parent.verticalCenter
-            anchors.left: verticalLine.left
+            anchors.left: verticalLine.right
             anchors.leftMargin: 18.5 * ratioWidth
-            visible: hideBrowse()
+//            visible: hideBrowse()
             Image {
                 id: scanimage
                 source: "../../images/home_page_slices/home_scan@2x.png"
@@ -188,7 +188,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 13.5 * ratioWidth
-            visible: hideBrowse()
+//            visible: hideBrowse()
             Image {
                 id: moreimage
                 source: "../../images/home_page_slices/home_more@2x.png"
